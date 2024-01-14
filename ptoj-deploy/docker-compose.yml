@@ -1,0 +1,26 @@
+version: "3"
+services:
+  ptoj-mysql:
+    #    image: mysql:8.2.0
+    build: src/mysql
+    container_name: ptoj-mysql
+    restart: always
+    volumes:
+      - ${PTOJ_DIRECTORY}/data/mysql/data:/var/lib/mysql
+    environment:
+      - TZ=Asia/Shanghai
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD:-123456} # mysql数据库root账号的密码
+      - NACOS_USERNAME=${NACOS_USERNAME:-root} # 后续nacos所用管理员账号
+      - NACOS_PASSWORD=${NACOS_PASSWORD:-123456} # 后续nacos所用管理员密码
+    ports:
+      - ${MYSQL_PUBLIC_PORT:-3306}:3306
+    networks:
+      ptoj-network:
+        ipv4_address: ${MYSQL_HOST:-172.21.0.3}
+
+networks:
+  ptoj-network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: ${SUBNET:-172.21.0.0/16}
