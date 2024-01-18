@@ -1,15 +1,15 @@
-package love.pangteen;
+package love.pangteen.user;
 
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
 
 /**
  * @program: PTOJ
  * @author: PangTeen
  * @create: 2024/1/12 22:15
  **/
+@MapperScan("love.pangteen.user.mapper")
 @SpringBootApplication
 public class UserApplication {
 

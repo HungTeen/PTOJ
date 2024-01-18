@@ -1,5 +1,19 @@
 version: "3"
 services:
+  ptoj-redis:
+    image: redis:7.2
+    container_name: ptoj-redis
+    restart: always
+    volumes:
+      - ${PTOJ_DATA_DIRECTORY}/data/redis/data:/data
+    networks:
+      ptoj-network:
+        ipv4_address: ${REDIS_HOST:-172.21.0.2}
+    ports:
+      - ${REDIS_PORT:-6379}:6379
+    # --requirepass 后面为redis访问密码
+    command: redis-server --requirepass ${REDIS_PASSWORD:-123456} --appendonly yes
+
   ptoj-mysql:
     #    image: mysql:8.2.0
     build: src/mysql
@@ -17,6 +31,30 @@ services:
     networks:
       ptoj-network:
         ipv4_address: ${MYSQL_HOST:-172.21.0.3}
+
+#  hoj-frontend:
+##    image: registry.cn-shenzhen.aliyuncs.com/hcode/hoj_frontend
+#    build: src/frontend
+#    container_name: ptoj-frontend
+#    restart: always
+#    # 开启https，请提供证书
+#    #volumes:
+#    #  - ./server.crt:/etc/nginx/etc/crt/server.crt
+#    #  - ./server.key:/etc/nginx/etc/crt/server.key
+#    # 修改前端logo
+#    #  - ./logo.a0924d7d.png:/usr/share/nginx/html/assets/img/logo.a0924d7d.png
+#    #  - ./backstage.8bce8c6e.png:/usr/share/nginx/html/assets/img/backstage.8bce8c6e.png
+#    environment:
+#      - SERVER_NAME=localhost # 域名(例如baidu.com)或localhost(本地)
+#      - BACKEND_SERVER_HOST=${BACKEND_HOST:-172.20.0.5} # backend后端服务地址
+#      - BACKEND_SERVER_PORT=${BACKEND_PORT:-6688} # backend后端服务端口号
+#      - USE_HTTPS=false # 使用https请设置为true
+#    ports:
+#      - "80:80"
+#      - "443:443"
+#    networks:
+#      ptoj-network:
+#        ipv4_address: 172.21.0.6
 
 networks:
   ptoj-network:

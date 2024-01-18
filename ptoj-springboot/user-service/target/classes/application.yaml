@@ -1,0 +1,27 @@
+server:
+  port: 6688 # 内嵌的 Tomcat 端口号。默认值为 8080。
+spring:
+  application:
+    name: user-service # 微服务名称。
+  profiles:
+    active: dev
+  datasource:
+    url: jdbc:mysql://${ptoj.database.host}:${ptoj.database.port}/${ptoj.database.name}?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: ${ptoj.database.password}
+knife4j:
+  enable: true
+  openapi:
+    title: PTOJ接口文档
+    description: "PTOJ接口文档"
+    email: 1687289734@qq.com
+    concat: PangTeen
+    url: https://pangteen.love
+    version: v1.0.0
+    group:
+      default:
+        group-name: default
+        api-rule: package
+        api-rule-resources:
+          - love.pangteen.user.controller

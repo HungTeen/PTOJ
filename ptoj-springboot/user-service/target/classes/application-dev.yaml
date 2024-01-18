@@ -1,0 +1,6 @@
+ptoj:
+  database:
+    name: ptoj-user
+    host: localhost
+    port: 3306
+    password: 123456
