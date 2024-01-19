@@ -18,8 +18,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping
 public class CommonController {
 
-    @PostMapping("/login")
-    public CommonResult<UserInfoVO> login(@Validated @RequestBody LoginDTO loginDto){
-
-    }
+//    @PostMapping("/login")
+//    public CommonResult<UserInfoVO> login(@Validated @RequestBody LoginDTO loginDto){
+//
+//    }
 }

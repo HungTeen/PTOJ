@@ -16,10 +16,11 @@ import java.util.Date;
  * @author: PangTeen
  * @create: 2024/1/17 21:43
  **/
+@Component
 public class JwtUtils {
 
-    @Resource
-    private JwtProperties jwtProperties;
+//    @Resource
+//    private JwtProperties jwtProperties;
 
     @Resource
     private RedisUtils redisUtils;
@@ -28,20 +29,21 @@ public class JwtUtils {
      * 生成jwt token
      */
     public String generateToken(String userId) {
-        Date nowDate = new Date();
-        //过期时间
-        Date expireDate = new Date(nowDate.getTime() + jwtProperties.getExpire() * 1000);
-
-        String token = Jwts.builder()
-                .setHeaderParam("type", "JWT")
-                .setSubject(userId)
-                .setIssuedAt(nowDate)
-                .setExpiration(expireDate)
-                .signWith(SignatureAlgorithm.HS512, jwtProperties.getSecret())
-                .compact();
-        redisUtils.set(shiroTokenKey(userId), token, jwtProperties.getExpire());
-        redisUtils.set(shiroTokenRefresh(userId), "1", jwtProperties.getCheckRefreshExpire());
-        return token;
+//        Date nowDate = new Date();
+//        //过期时间
+//        Date expireDate = new Date(nowDate.getTime() + jwtProperties.getExpire() * 1000);
+//
+//        String token = Jwts.builder()
+//                .setHeaderParam("type", "JWT")
+//                .setSubject(userId)
+//                .setIssuedAt(nowDate)
+//                .setExpiration(expireDate)
+//                .signWith(SignatureAlgorithm.HS512, jwtProperties.getSecret())
+//                .compact();
+//        redisUtils.set(shiroTokenKey(userId), token, jwtProperties.getExpire());
+//        redisUtils.set(shiroTokenRefresh(userId), "1", jwtProperties.getCheckRefreshExpire());
+//        return token;
+        return "";
     }
 
     public void cleanToken(String userId) {
@@ -60,18 +62,18 @@ public class JwtUtils {
         return ShiroConstant.SHIRO_TOKEN_REFRESH + userId;
     }
 
-    @Data
-    @Component
-    @ConfigurationProperties(prefix = "hoj.jwt")
-    public static class JwtProperties {
-
-        private String secret;
-
-        private long expire;
-
-        private String header;
-
-        private long checkRefreshExpire;
-
-    }
+//    @Data
+//    @Component
+//    @ConfigurationProperties(prefix = "hoj.jwt")
+//    public static class JwtProperties {
+//
+//        private String secret;
+//
+//        private long expire;
+//
+//        private String header;
+//
+//        private long checkRefreshExpire;
+//
+//    }
 }

@@ -5,12 +5,14 @@ import love.pangteen.user.mapper.UserInfoMapper;
 import love.pangteen.user.mapper.UserRoleMapper;
 import love.pangteen.user.pojo.entity.UserInfo;
 import love.pangteen.user.service.UserInfoService;
+import org.springframework.stereotype.Service;
 
 /**
  * @program: PTOJ
  * @author: PangTeen
  * @create: 2024/1/18 22:30
  **/
+@Service
 public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> implements UserInfoService {
 
 

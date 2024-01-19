@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 6688
 spring:
   application:
     name: gateway
@@ -8,6 +8,8 @@ spring:
   cloud:
     nacos:
       server-addr: localhost:8848
+      username: nacos
+      password: nacos
     gateway:
       routes:
 #        - id: item # 路由规则id，自定义，唯一
@@ -21,7 +23,7 @@ spring:
         - id: user
           uri: lb://user-service
           predicates:
-            - Path=/users/**,/addresses/**
+            - Path=/admin/login,/users/**,/addresses/**
 #        - id: trade
 #          uri: lb://trade-service
 #          predicates:
@@ -30,3 +32,11 @@ spring:
 #          uri: lb://pay-service
 #          predicates:
 #            - Path=/pay-orders/**
+security:
+  ignore:
+    whitelist:
+      - /admin/login
+      - /search/**
+      - /users/login
+      - /items/**
+      - /hi

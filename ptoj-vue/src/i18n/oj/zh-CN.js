@@ -109,7 +109,6 @@ export const m = {
   Update_Password: '更新密码',
   Update_Email: '更新邮箱',
   Update_Mobile: '更新手机号',
-  Captcha: '验证码',
   The_new_password_does_not_change: '新密码未变动',
   The_new_email_does_not_change: '新邮箱未变动',
   The_new_mobile_does_not_change: '新手机号未变动',
@@ -215,7 +214,6 @@ export const m = {
   Reset: '重置',
   Username: '用户名',
   Solved: '已解决',
-  AC: 'AC',
   OJ: 'OJ',
   Title: '标题',
   Begin_Time: '开始时间',
@@ -255,7 +253,6 @@ export const m = {
   No_tag: '暂无标签',
   Statistic: '题目统计',
   Solutions: '全部提交',
-  Problem_Discussion: '题目讨论',
   Description: '题目描述',
   Input: '输入描述',
   Output: '输出描述',
@@ -298,7 +295,6 @@ export const m = {
 
   // /views/oj/status/SubmissionList.vue
   Mine: '我的',
-  ID: 'ID',
   Time: '运行时间',
   Memory: '运行内存',
   Length: '代码长度',

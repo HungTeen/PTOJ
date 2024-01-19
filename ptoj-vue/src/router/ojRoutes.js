@@ -460,7 +460,6 @@ const ojRoutes = [
     path: '*',
     meta: {title: '404'},
     component:NotFound,
-    meta: { title: '404' }
   }
 ]
 export default ojRoutes
