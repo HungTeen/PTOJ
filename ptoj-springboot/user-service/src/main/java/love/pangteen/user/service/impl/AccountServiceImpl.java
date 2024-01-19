@@ -1,36 +1,37 @@
-package love.pangteen.user.manager;
+package love.pangteen.user.service.impl;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.crypto.SecureUtil;
 import love.pangteen.exception.StatusAccessDeniedException;
 import love.pangteen.exception.StatusFailException;
+import love.pangteen.result.CommonResult;
 import love.pangteen.user.pojo.dto.LoginDTO;
 import love.pangteen.user.pojo.entity.Role;
 import love.pangteen.user.pojo.entity.UserInfo;
 import love.pangteen.user.pojo.vo.UserInfoVO;
-import love.pangteen.user.pojo.vo.UserRolesVO;
+import love.pangteen.user.service.AccountService;
 import love.pangteen.user.service.UserInfoService;
 import love.pangteen.user.service.UserRoleService;
 import love.pangteen.user.utils.JwtUtils;
 import love.pangteen.user.utils.RoleUtils;
 import love.pangteen.utils.RedisUtils;
-import org.springframework.beans.BeanUtils;
+import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
  * @program: PTOJ
  * @author: PangTeen
- * @create: 2024/1/18 12:35
+ * @create: 2024/1/17 20:02
  **/
-public class AdminAccountManager {
+@Service
+public class AccountServiceImpl implements AccountService {
 
     @Resource
     private JwtUtils jwtUtils;
@@ -41,8 +42,8 @@ public class AdminAccountManager {
     @Resource
     private UserRoleService userRoleService;
 
-    public UserInfoVO login(LoginDTO loginDto) throws StatusFailException, StatusAccessDeniedException {
-
+    @Override
+    public CommonResult<UserInfoVO> login(LoginDTO loginDto) {
         ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = servletRequestAttributes.getRequest();
         HttpServletResponse response = servletRequestAttributes.getResponse();
@@ -99,9 +100,14 @@ public class AdminAccountManager {
             BeanUtil.copyProperties(userInfo, userInfoVo);
             userInfoVo.setRoleList(roles);
 
-            return userInfoVo;
+            return CommonResult.success(userInfoVo);
         } else {
             throw new StatusAccessDeniedException("该账号并非管理员账号，无权登录！");
         }
+    }
+
+    @Override
+    public CommonResult<Void> logout() {
+        return null;
     }
 }

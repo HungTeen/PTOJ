@@ -2,3 +2,6 @@
 *.iml
 .idea
 ptoj-deploy/ptoj
+/ptoj-springboot/user-service/target/
+/ptoj-springboot/ptoj-common/target/
+/ptoj-springboot/ptoj-gateway/target/

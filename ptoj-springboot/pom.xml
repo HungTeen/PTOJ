@@ -12,6 +12,7 @@
         <module>ptoj-api</module>
         <module>ptoj-common</module>
         <module>user-service</module>
+        <module>ptoj-gateway</module>
     </modules>
 
     <parent>
@@ -34,7 +35,8 @@
         <swagger.version>4.1.0</swagger.version>
         <mysql.version>8.0.23</mysql.version>
         <jjwt.version>0.9.1</jjwt.version>
-        <shiro.version>1.13.0</shiro.version>
+<!--        <shiro.version>1.13.0</shiro.version>-->
+        <sa-token.version>1.37.0</sa-token.version>
     </properties>
 
     <!-- 对依赖包进行管理 -->
@@ -56,11 +58,11 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-            <dependency>
-                <groupId>org.apache.shiro</groupId>
-                <artifactId>shiro-spring-boot-web-starter</artifactId>
-                <version>${shiro.version}</version>
-            </dependency>
+<!--            <dependency>-->
+<!--                <groupId>org.apache.shiro</groupId>-->
+<!--                <artifactId>shiro-spring-boot-web-starter</artifactId>-->
+<!--                <version>${shiro.version}</version>-->
+<!--            </dependency>-->
             <!-- 数据库驱动包管理 -->
             <dependency>
                 <groupId>mysql</groupId>
@@ -90,6 +92,24 @@
                 <groupId>io.jsonwebtoken</groupId>
                 <artifactId>jjwt</artifactId>
                 <version>${jjwt.version}</version>
+            </dependency>
+            <!-- Sa-Token 权限认证，在线文档：https://sa-token.cc -->
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-spring-boot-starter</artifactId>
+                <version>${sa-token.version}</version>
+            </dependency>
+            <!-- Sa-Token 权限认证（Reactor响应式集成），在线文档：https://sa-token.cc -->
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-reactor-spring-boot-starter</artifactId>
+                <version>${sa-token.version}</version>
+            </dependency>
+            <!-- Sa-Token 整合 Redis （使用 jackson 序列化方式） -->
+            <dependency>
+                <groupId>cn.dev33</groupId>
+                <artifactId>sa-token-redis-jackson</artifactId>
+                <version>${sa-token.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

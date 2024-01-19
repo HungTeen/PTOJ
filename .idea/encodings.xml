@@ -3,6 +3,7 @@
   <component name="Encoding">
     <file url="file://$PROJECT_DIR$/ptoj-springboot/ptoj-api/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ptoj-springboot/ptoj-common/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/ptoj-springboot/ptoj-gateway/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ptoj-springboot/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ptoj-springboot/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/ptoj-springboot/user-service/src/main/java" charset="UTF-8" />
