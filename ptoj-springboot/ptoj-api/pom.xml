@@ -11,5 +11,7 @@
 
     <artifactId>ptoj-api</artifactId>
 
+    <dependencies>
 
+    </dependencies>
 </project>

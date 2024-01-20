@@ -12,10 +12,21 @@
     <artifactId>ptoj-common</artifactId>
 
     <dependencies>
-        <!--Hutool工具包-->
+        <!--API 接口-->
         <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
+            <groupId>love.pangteen</groupId>
+            <artifactId>ptoj-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <!--dubbo-spring-boot依赖-->
+        <dependency>
+            <groupId>org.apache.dubbo</groupId>
+            <artifactId>dubbo-spring-boot-starter</artifactId>
+        </dependency>
+        <!--dubbo 整合 nacos-->
+        <dependency>
+            <groupId>org.apache.dubbo</groupId>
+            <artifactId>dubbo-registry-nacos</artifactId>
         </dependency>
         <!--Swagger-->
         <dependency>
@@ -48,66 +59,10 @@
             <groupId>cn.dev33</groupId>
             <artifactId>sa-token-redis-jackson</artifactId>
         </dependency>
-
-        <!--        &lt;!&ndash;完成SpringMVC自动装配&ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework</groupId>-->
-<!--            <artifactId>spring-webmvc</artifactId>-->
-<!--            <scope>provided</scope>-->
-<!--        </dependency>-->
-<!--        &lt;!&ndash;日志&ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-starter-logging</artifactId>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.apache.tomcat.embed</groupId>-->
-<!--            <artifactId>tomcat-embed-core</artifactId>-->
-<!--            <version>9.0.73</version>-->
-<!--            <scope>provided</scope>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>com.baomidou</groupId>-->
-<!--            <artifactId>mybatis-plus-core</artifactId>-->
-<!--            <version>${mybatis-plus.version}</version>-->
-<!--            <scope>provided</scope>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>com.baomidou</groupId>-->
-<!--            <artifactId>mybatis-plus-extension</artifactId>-->
-<!--            <version>${mybatis-plus.version}</version>-->
-<!--            <scope>provided</scope>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.hibernate.validator</groupId>-->
-<!--            <artifactId>hibernate-validator</artifactId>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-autoconfigure</artifactId>-->
-<!--        </dependency>-->
-<!--        &lt;!&ndash;caffeine&ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>com.github.ben-manes.caffeine</groupId>-->
-<!--            <artifactId>caffeine</artifactId>-->
-<!--        </dependency>-->
-<!--        &lt;!&ndash;AMQP依赖&ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.amqp</groupId>-->
-<!--            <artifactId>spring-amqp</artifactId>-->
-<!--            <scope>provided</scope>-->
-<!--        </dependency>-->
-<!--        &lt;!&ndash;Spring整合Rabbit依赖&ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.amqp</groupId>-->
-<!--            <artifactId>spring-rabbit</artifactId>-->
-<!--            <scope>provided</scope>-->
-<!--        </dependency>-->
-<!--        &lt;!&ndash;json处理&ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>com.fasterxml.jackson.dataformat</groupId>-->
-<!--            <artifactId>jackson-dataformat-xml</artifactId>-->
-<!--            <scope>provided</scope>-->
-<!--        </dependency>-->
+        <!-- Sa-Token 整合 Dubbo -->
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-dubbo</artifactId>
+        </dependency>
     </dependencies>
 </project>

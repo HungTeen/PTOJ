@@ -26,10 +26,9 @@ public class AdminCommonController {
         return adminAccountService.login(loginDto);
     }
 
-//    @GetMapping("/logout")
-//    @RequiresAuthentication
+    @GetMapping("/logout")
 //    @RequiresRoles(value = {"root", "admin", "problem_admin"}, logical = Logical.OR)
-//    public CommonResult<Void> logout() {
-//        return adminAccountService.logout();
-//    }
+    public CommonResult<Void> logout() {
+        return adminAccountService.logout();
+    }
 }

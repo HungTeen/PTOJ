@@ -28,6 +28,14 @@ spring:
         service: ${spring.application.name} # 注册到 Nacos 的服务名。默认值为 ${spring.application.name}。
       username: nacos
       password: nacos
+dubbo:
+  application:
+    name: dubbo-user-service
+  protocol:
+    name: dubbo
+    port: -1
+  registry:
+    address: nacos://localhost:8848?username=nacos&password=nacos
 ############## Sa-Token 配置 (文档: https://sa-token.cc) ##############
 sa-token:
   # token 名称（同时也是 cookie 名称）

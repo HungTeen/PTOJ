@@ -22,9 +22,7 @@ public enum ResultStatus {
 
     NOT_FOUND(404, "数据不存在"),
 
-    SERVER_ERROR(500, "服务器错误"),
-
-    NOT_IMPLEMENTED(501, "功能不支持");
+    SERVER_ERROR(500, "服务器错误");
 
 
     private final int status;

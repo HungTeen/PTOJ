@@ -1,5 +1,6 @@
 package love.pangteen;
 
+import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
@@ -8,6 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @author: PangTeen
  * @create: 2024/1/19 15:59
  **/
+@EnableDubbo
 @SpringBootApplication
 public class GateWayApplication {
 

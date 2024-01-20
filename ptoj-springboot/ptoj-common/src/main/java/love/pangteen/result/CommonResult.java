@@ -56,4 +56,12 @@ public class CommonResult<T> implements Serializable {
         return error(ResultStatus.BAD_REQUEST);
     }
 
+    public static <T> CommonResult<T> serverError(String msg) {
+        return error(ResultStatus.SERVER_ERROR, msg);
+    }
+
+    public static <T> CommonResult<T> serverError() {
+        return error(ResultStatus.SERVER_ERROR);
+    }
+
 }

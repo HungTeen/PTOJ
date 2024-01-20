@@ -1,7 +1,8 @@
 package love.pangteen.user.service.impl;
 
+import cn.dev33.satoken.secure.SaSecureUtil;
+import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.crypto.SecureUtil;
 import love.pangteen.exception.StatusAccessDeniedException;
 import love.pangteen.exception.StatusFailException;
 import love.pangteen.result.CommonResult;
@@ -62,7 +63,7 @@ public class AccountServiceImpl implements AccountService {
             throw new StatusFailException("用户名或密码错误");
         }
 
-        if (!userInfo.getPassword().equals(SecureUtil.md5(loginDto.getPassword()))) {
+        if (!userInfo.getPassword().equals(SaSecureUtil.md5(loginDto.getPassword()))) {
 //            if (tryLoginCount == null) {
 //                redisUtils.set(key, 1, 60 * 30); // 三十分钟不尝试，该限制会自动清空消失
 //            } else {
@@ -85,10 +86,10 @@ public class AccountServiceImpl implements AccountService {
                 .map(Role::getRole).collect(Collectors.toList());
 
         // 是管理员。
-        if (RoleUtils.hasAdminRole(roles)) {
-            String jwt = jwtUtils.generateToken(userInfo.getUuid());
+        if (RoleUtils.hasAdminRole(roles) && response != null) {
+            StpUtil.login(userInfo.getUuid());
 
-            response.setHeader("Authorization", jwt); //放到信息头部
+            response.setHeader("Authorization", StpUtil.getTokenValue()); //放到信息头部
             response.setHeader("Access-Control-Expose-Headers", "Authorization");
 //            // 会话记录
 //            sessionEntityService.save(new Session().setUid(userRolesVo.getUid())
@@ -108,6 +109,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public CommonResult<Void> logout() {
-        return null;
+        StpUtil.logout();
+        return CommonResult.success();
     }
 }
