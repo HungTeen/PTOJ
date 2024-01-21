@@ -13,6 +13,7 @@
         <module>ptoj-common</module>
         <module>user-service</module>
         <module>ptoj-gateway</module>
+        <module>problem-service</module>
     </modules>
 
     <parent>
@@ -32,6 +33,7 @@
         <spring-cloud-alibaba.version>2021.0.4.0</spring-cloud-alibaba.version>
         <dubbo.version>3.2.2</dubbo.version>
         <mybatis-plus.version>3.4.3</mybatis-plus.version>
+        <mybatis-plus-join.version>1.4.9</mybatis-plus-join.version>
         <hutool.version>5.8.11</hutool.version>
         <swagger.version>4.1.0</swagger.version>
         <mysql.version>8.0.23</mysql.version>
@@ -84,6 +86,12 @@
                 <artifactId>mybatis-plus-boot-starter</artifactId>
                 <version>${mybatis-plus.version}</version>
             </dependency>
+            <!-- Mybatis plus Join 管理 -->
+            <dependency>
+                <groupId>com.github.yulichang</groupId>
+                <artifactId>mybatis-plus-join-boot-starter</artifactId>
+                <version>${mybatis-plus-join.version}</version>
+            </dependency>
             <!--Hutool工具包-->
             <dependency>
                 <groupId>cn.hutool</groupId>
@@ -112,32 +120,6 @@
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <dependencies>
-        <!--Hutool工具包-->
-        <dependency>
-            <groupId>cn.hutool</groupId>
-            <artifactId>hutool-all</artifactId>
-        </dependency>
-        <!-- lombok 管理 -->
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>${org.projectlombok.version}</version>
-        </dependency>
-        <!--单元测试-->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <!-- Junit -->
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
 
     <build>
         <pluginManagement>

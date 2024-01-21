@@ -14,7 +14,7 @@ import love.pangteen.user.service.AccountService;
 import love.pangteen.user.service.UserInfoService;
 import love.pangteen.user.service.UserRoleService;
 import love.pangteen.user.utils.JwtUtils;
-import love.pangteen.user.utils.RoleUtils;
+import love.pangteen.api.utils.RoleUtils;
 import love.pangteen.utils.RedisUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -82,7 +82,7 @@ public class AccountServiceImpl implements AccountService {
 //        }
 
         // 查询用户角色
-        List<String> roles = userRoleService.getUserRoles(userInfo.getUuid()).stream()
+        List<String> roles = userRoleService.getUserRoles(userInfo.getRoleId()).stream()
                 .map(Role::getRole).collect(Collectors.toList());
 
         // 是管理员。

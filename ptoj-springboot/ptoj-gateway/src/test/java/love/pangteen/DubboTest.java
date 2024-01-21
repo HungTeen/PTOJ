@@ -1,6 +1,6 @@
 package love.pangteen;
 
-import love.pangteen.api.service.IUserService;
+import love.pangteen.api.service.IDubboUserService;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -16,7 +16,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 public class DubboTest {
 
     @DubboReference
-    private IUserService userService;
+    private IDubboUserService userService;
 
     @org.junit.Test
     public void test(){

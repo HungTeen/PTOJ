@@ -72,6 +72,9 @@ public class UserRolesVO implements Serializable {
     @ApiModelProperty(value = "0可用，1不可用")
     private int status;
 
+    @ApiModelProperty(value = "角色ID")
+    private Long roleId;
+
     @ApiModelProperty(value = "创建时间")
     private Date gmtCreate;
 

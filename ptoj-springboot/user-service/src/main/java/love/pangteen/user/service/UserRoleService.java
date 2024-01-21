@@ -3,7 +3,6 @@ package love.pangteen.user.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import love.pangteen.user.pojo.entity.Role;
-import love.pangteen.user.pojo.entity.UserRole;
 import love.pangteen.user.pojo.vo.UserRolesVO;
 
 import java.util.List;
@@ -13,13 +12,19 @@ import java.util.List;
  * @author: PangTeen
  * @create: 2024/1/18 18:13
  **/
-public interface UserRoleService extends IService<UserRole> {
+public interface UserRoleService extends IService<Role> {
 
-    List<Role> getUserRoles(String uid);
+    /**
+     * 别问为什么是List。
+     */
+    List<Role> getUserRoles(Long roleId);
 
-//    List<Role> getRolesByUid(String uid);
-//
-//    IPage<UserRolesVO> getUserList(int limit, int currentPage, String keyword, Boolean onlyAdmin);
+    /**
+     * 根据用户uid，查询角色名。
+     */
+    List<String> getUserRoles(String uid);
+
+    IPage<UserRolesVO> getUserList(Integer limit, Integer currentPage, String keyword, Boolean onlyAdmin);
 //
 //    void deleteCache(String uid, boolean isRemoveSession);
 //

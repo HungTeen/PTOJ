@@ -7,7 +7,7 @@ import java.util.List;
  * @author: PangTeen
  * @create: 2024/1/20 16:30
  **/
-public interface IUserService {
+public interface IDubboUserService {
 
     List<String> getUserRoles(String uid);
 

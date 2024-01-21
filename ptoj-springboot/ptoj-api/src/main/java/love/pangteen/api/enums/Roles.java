@@ -1,4 +1,4 @@
-package love.pangteen.user.constant;
+package love.pangteen.api.enums;
 
 /**
  * @program: PTOJ
@@ -7,18 +7,22 @@ package love.pangteen.user.constant;
  **/
 public enum Roles {
 
-    ROOT(true),
+    ROOT(true, 1000),
 
-    ADMIN(true),
+    ADMIN(true, 1001),
 
-    PROBLEM_ADMIN(true),
+    DEFAULT_USER(false, 1002),
+
+    PROBLEM_ADMIN(true, 1008),
 
     ;
 
     private final boolean isAdmin;
+    private final int roleId;
 
-    Roles(boolean isAdmin) {
+    Roles(boolean isAdmin, int roleId) {
         this.isAdmin = isAdmin;
+        this.roleId = roleId;
     }
 
     public String getRoleName(){
@@ -27,5 +31,9 @@ public enum Roles {
 
     public boolean isAdmin() {
         return isAdmin;
+    }
+
+    public long getRoleId() {
+        return roleId;
     }
 }

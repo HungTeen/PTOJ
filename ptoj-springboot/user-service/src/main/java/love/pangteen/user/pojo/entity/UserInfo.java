@@ -18,7 +18,7 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value="用户信息", description="")
+@ApiModel(value = "用户信息", description = "")
 public class UserInfo implements Serializable {
 
     @TableId(value = "uuid", type = IdType.ASSIGN_UUID)
@@ -86,8 +86,8 @@ public class UserInfo implements Serializable {
     @ApiModelProperty(value = "0可用，-1不可用")
     private int status;
 
-//    @ApiModelProperty(value = "是否为比赛账号")
-//    private Boolean isContest;
+    @ApiModelProperty(value = "角色ID")
+    private Long roleId;
 
     @ApiModelProperty(value = "创建时间")
     @TableField(fill = FieldFill.INSERT)

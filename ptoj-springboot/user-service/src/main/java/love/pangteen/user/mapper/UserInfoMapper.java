@@ -3,8 +3,6 @@ package love.pangteen.user.mapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import love.pangteen.user.pojo.entity.UserInfo;
 
-import java.util.List;
-
 /**
  * @program: PTOJ
  * @author: PangTeen

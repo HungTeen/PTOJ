@@ -1,7 +1,7 @@
 package love.pangteen.config;
 
 import cn.dev33.satoken.stp.StpInterface;
-import love.pangteen.api.service.IUserService;
+import love.pangteen.api.service.IDubboUserService;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.stereotype.Component;
 
@@ -16,7 +16,7 @@ import java.util.List;
 public class StpInterfaceImpl implements StpInterface {
 
     @DubboReference
-    private IUserService userService;
+    private IDubboUserService userService;
 
     @Override
     public List<String> getPermissionList(Object loginId, String loginType) {
