@@ -10,12 +10,14 @@
         <module name="ptoj-api" />
         <module name="ptoj-gateway" />
         <module name="user-service" />
+        <module name="problem-service" />
         <module name="ptoj-common" />
       </profile>
     </annotationProcessing>
   </component>
   <component name="JavacSettings">
     <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="problem-service" options="-parameters" />
       <module name="ptoj-api" options="-parameters" />
       <module name="ptoj-common" options="-parameters" />
       <module name="ptoj-gateway" options="-parameters" />

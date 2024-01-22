@@ -1,6 +1,6 @@
 package love.pangteen.api.utils;
 
-import love.pangteen.api.enums.Roles;
+import love.pangteen.api.enums.OJRole;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -21,19 +21,19 @@ public class RoleUtils {
     }
 
     public static String getRoot(){
-        return Roles.ROOT.getRoleName();
+        return OJRole.ROOT.getRoleName();
     }
 
     public static String[] getProblemAdmins(){
-        return new String[]{getRoot(), Roles.PROBLEM_ADMIN.getRoleName()};
+        return new String[]{getRoot(), OJRole.PROBLEM_ADMIN.getRoleName()};
     }
 
     public static String[] getAdmins(){
-        return getAdminRoles().map(Roles::getRoleName).toArray(String[]::new);
+        return getAdminRoles().map(OJRole::getRoleName).toArray(String[]::new);
     }
 
-    public static Stream<Roles> getAdminRoles(){
-        return Arrays.stream(Roles.values()).filter(Roles::isAdmin);
+    public static Stream<OJRole> getAdminRoles(){
+        return Arrays.stream(OJRole.values()).filter(OJRole::isAdmin);
     }
 
 }

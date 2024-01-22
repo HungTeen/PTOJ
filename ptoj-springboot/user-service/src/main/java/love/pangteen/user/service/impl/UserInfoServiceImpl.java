@@ -6,7 +6,7 @@ import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import love.pangteen.api.enums.Roles;
+import love.pangteen.api.enums.OJRole;
 import love.pangteen.exception.StatusFailException;
 import love.pangteen.user.mapper.UserInfoMapper;
 import love.pangteen.user.pojo.dto.AdminEditUserDTO;
@@ -100,7 +100,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
                     .setUuid(uuid)
                     .setUsername(username)
                     .setPassword(SaSecureUtil.md5(password))
-                    .setRoleId(Roles.DEFAULT_USER.getRoleId())
+                    .setRoleId(OJRole.DEFAULT_USER.getRoleId())
                     ;
             userInfoList.add(userInfo);
             userInfoMap.put(username, password);

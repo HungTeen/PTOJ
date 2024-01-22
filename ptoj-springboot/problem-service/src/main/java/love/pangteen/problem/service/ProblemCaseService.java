@@ -1,0 +1,12 @@
+package love.pangteen.problem.service;
+
+import com.baomidou.mybatisplus.extension.service.IService;
+import love.pangteen.problem.pojo.entity.ProblemCase;
+
+/**
+ * @program: PTOJ
+ * @author: PangTeen
+ * @create: 2024/1/22 17:01
+ **/
+public interface ProblemCaseService extends IService<ProblemCase> {
+}

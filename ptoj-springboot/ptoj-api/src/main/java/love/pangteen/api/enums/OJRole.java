@@ -5,7 +5,7 @@ package love.pangteen.api.enums;
  * @author: PangTeen
  * @create: 2024/1/18 22:56
  **/
-public enum Roles {
+public enum OJRole {
 
     ROOT(true, 1000),
 
@@ -20,7 +20,7 @@ public enum Roles {
     private final boolean isAdmin;
     private final int roleId;
 
-    Roles(boolean isAdmin, int roleId) {
+    OJRole(boolean isAdmin, int roleId) {
         this.isAdmin = isAdmin;
         this.roleId = roleId;
     }
