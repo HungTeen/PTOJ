@@ -21,6 +21,7 @@ public class ProblemDTO {
     @Valid
     private Problem problem;
 
+    @NotNull(message = "题目的测试数据不能为空！")
     private List<ProblemCase> samples;
 
     private Boolean isUploadTestCase;

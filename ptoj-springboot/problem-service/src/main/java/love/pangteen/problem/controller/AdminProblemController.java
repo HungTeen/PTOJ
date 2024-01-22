@@ -4,12 +4,14 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import love.pangteen.problem.pojo.dto.ProblemDTO;
 import love.pangteen.problem.pojo.entity.Problem;
 import love.pangteen.problem.service.ProblemService;
+import love.pangteen.problem.utils.ValidateUtils;
 import love.pangteen.result.CommonResult;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.validation.groups.Default;
 
 /**
  * @program: PTOJ
@@ -50,11 +52,12 @@ public class AdminProblemController {
         return CommonResult.success();
     }
 
-//    @PutMapping("")
-//    public CommonResult<Void> updateProblem(@RequestBody ProblemDTO problemDto) {
-//        return adminProblemService.updateProblem(problemDto);
-//    }
-//
+    @PutMapping("")
+    public CommonResult<Void> updateProblem(@Validated({Default.class, ValidateUtils.Update.class}) @RequestBody ProblemDTO problemDto) {
+        problemService.updateProblem(problemDto);
+        return CommonResult.success();
+    }
+
 //    @GetMapping("/get-problem-cases")
 //    public CommonResult<List<ProblemCase>> getProblemCases(@RequestParam("pid") Long pid,
 //                                                           @RequestParam(value = "isUpload", defaultValue = "true") Boolean isUpload) {
