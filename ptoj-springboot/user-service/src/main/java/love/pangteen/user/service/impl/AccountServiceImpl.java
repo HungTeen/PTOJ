@@ -2,9 +2,10 @@ package love.pangteen.user.service.impl;
 
 import cn.dev33.satoken.secure.SaSecureUtil;
 import cn.dev33.satoken.stp.StpUtil;
-import cn.hutool.core.bean.BeanUtil;
+import love.pangteen.api.utils.RoleUtils;
 import love.pangteen.exception.StatusAccessDeniedException;
 import love.pangteen.exception.StatusFailException;
+import love.pangteen.pojo.AccountProfile;
 import love.pangteen.result.CommonResult;
 import love.pangteen.user.pojo.dto.LoginDTO;
 import love.pangteen.user.pojo.entity.Role;
@@ -14,9 +15,11 @@ import love.pangteen.user.service.AccountService;
 import love.pangteen.user.service.UserInfoService;
 import love.pangteen.user.service.UserRoleService;
 import love.pangteen.user.utils.JwtUtils;
-import love.pangteen.api.utils.RoleUtils;
+import love.pangteen.utils.AccountUtils;
 import love.pangteen.utils.RedisUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -43,6 +46,7 @@ public class AccountServiceImpl implements AccountService {
     @Resource
     private UserRoleService userRoleService;
 
+    @Transactional
     @Override
     public CommonResult<UserInfoVO> login(LoginDTO loginDto) {
         ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
@@ -87,7 +91,11 @@ public class AccountServiceImpl implements AccountService {
 
         // 是管理员。
         if (RoleUtils.hasAdminRole(roles) && response != null) {
+            // 登录并缓存用户信息到Session。
             StpUtil.login(userInfo.getUuid());
+            AccountProfile profile = new AccountProfile();
+            BeanUtils.copyProperties(userInfo, profile);
+            AccountUtils.setProfile(profile);
 
             response.setHeader("Authorization", StpUtil.getTokenValue()); //放到信息头部
             response.setHeader("Access-Control-Expose-Headers", "Authorization");
@@ -98,7 +106,7 @@ public class AccountServiceImpl implements AccountService {
 //            sessionEntityService.checkRemoteLogin(userRolesVo.getUid());
 
             UserInfoVO userInfoVo = new UserInfoVO();
-            BeanUtil.copyProperties(userInfo, userInfoVo);
+            BeanUtils.copyProperties(userInfo, userInfoVo);
             userInfoVo.setRoleList(roles);
 
             return CommonResult.success(userInfoVo);

@@ -4,6 +4,7 @@ import com.alibaba.nacos.shaded.com.google.protobuf.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import love.pangteen.exception.StatusAccessDeniedException;
 import love.pangteen.exception.StatusFailException;
+import love.pangteen.exception.StatusForbiddenException;
 import love.pangteen.result.CommonResult;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
@@ -42,7 +43,7 @@ public class GlobalExceptionAdvice {
      */
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(value = {
-//            StatusForbiddenException.class,
+            StatusForbiddenException.class,
             StatusAccessDeniedException.class,
             StatusFailException.class,
 //            StatusNotFoundException.class,

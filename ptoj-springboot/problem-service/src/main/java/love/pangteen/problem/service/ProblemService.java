@@ -21,4 +21,6 @@ public interface ProblemService extends IService<Problem> {
     void addProblem(ProblemDTO problemDto);
 
     void updateProblem(ProblemDTO problemDto);
+
+    void changeProblemAuth(Problem problem);
 }

@@ -67,6 +67,24 @@ services:
       ptoj-network:
         ipv4_address: ${NACOS_HOST:-172.21.0.4}
 
+  ptoj-es:
+    image: elasticsearch:7.3.0
+    container_name: es7
+    restart: always
+    volumes:
+      - "/data/es7/logs:/usr/share/es7/logs:rw"
+      - "/data/es7/data:/usr/share/es7/data:rw"
+    environment:
+      cluster.name: elasticsearch
+      discovery.type: single-node
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+
 #  hoj-frontend:
 ##    image: registry.cn-shenzhen.aliyuncs.com/hcode/hoj_frontend
 #    build: src/frontend

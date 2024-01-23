@@ -1,20 +1,33 @@
 package love.pangteen.problem.utils;
 
+import cn.dev33.satoken.stp.StpUtil;
 import love.pangteen.api.enums.JudgeCaseMode;
 import love.pangteen.api.enums.ProblemType;
+import love.pangteen.api.utils.RoleUtils;
 import love.pangteen.exception.StatusFailException;
+import love.pangteen.exception.StatusForbiddenException;
+import love.pangteen.pojo.AccountProfile;
 import love.pangteen.problem.pojo.entity.Problem;
-import org.springframework.stereotype.Component;
 
 /**
  * @program: PTOJ
  * @author: PangTeen
  * @create: 2024/1/22 10:21
  **/
-@Component
 public class ValidateUtils {
 
-    public void validateJudgeCaseMode(Problem problem){
+    /**
+     * 校验用户权限&题目。
+     * @param problem
+     */
+    public static void validateProblemAndRole(Problem problem, AccountProfile profile){
+        validateProblem(problem);
+        if(! StpUtil.hasRoleOr(RoleUtils.getProblemAdmins()) && !profile.getUsername().equals(problem.getAuthor())){
+            throw new StatusForbiddenException("对不起，你无权限修改题目！");
+        }
+    }
+
+    public static void validateProblem(Problem problem){
         ProblemType type = ProblemType.getProblemType(problem.getType());
         JudgeCaseMode mode = JudgeCaseMode.getJudgeCaseMode(problem.getJudgeCaseMode());
         if (type == ProblemType.ACM) {
