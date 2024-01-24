@@ -26,7 +26,7 @@ spring:
         - id: problem
           uri: lb://problem-service
           predicates:
-            - Path=/admin/problem/**
+            - Path=/admin/problem/**,/admin/tag/**
 dubbo:
   application:
     name: dubbo-${spring.application.name}

@@ -6,17 +6,16 @@ import love.pangteen.api.utils.RoleUtils;
 import love.pangteen.exception.StatusAccessDeniedException;
 import love.pangteen.exception.StatusFailException;
 import love.pangteen.pojo.AccountProfile;
-import love.pangteen.result.CommonResult;
+import love.pangteen.user.pojo.dto.ChangeEmailDTO;
+import love.pangteen.user.pojo.dto.ChangePasswordDTO;
 import love.pangteen.user.pojo.dto.LoginDTO;
 import love.pangteen.user.pojo.entity.Role;
 import love.pangteen.user.pojo.entity.UserInfo;
-import love.pangteen.user.pojo.vo.UserInfoVO;
+import love.pangteen.user.pojo.vo.*;
 import love.pangteen.user.service.AccountService;
 import love.pangteen.user.service.UserInfoService;
 import love.pangteen.user.service.UserRoleService;
-import love.pangteen.user.utils.JwtUtils;
 import love.pangteen.utils.AccountUtils;
-import love.pangteen.utils.RedisUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -32,23 +31,20 @@ import java.util.stream.Collectors;
 /**
  * @program: PTOJ
  * @author: PangTeen
- * @create: 2024/1/17 20:02
+ * @create: 2024/1/24 16:23
  **/
 @Service
 public class AccountServiceImpl implements AccountService {
 
     @Resource
-    private JwtUtils jwtUtils;
-    @Resource
-    private RedisUtils redisUtils;
-    @Resource
     private UserInfoService userInfoService;
+
     @Resource
     private UserRoleService userRoleService;
 
     @Transactional
     @Override
-    public CommonResult<UserInfoVO> login(LoginDTO loginDto) {
+    public UserInfoVO login(LoginDTO loginDto) {
         ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         HttpServletRequest request = servletRequestAttributes.getRequest();
         HttpServletResponse response = servletRequestAttributes.getResponse();
@@ -109,15 +105,49 @@ public class AccountServiceImpl implements AccountService {
             BeanUtils.copyProperties(userInfo, userInfoVo);
             userInfoVo.setRoleList(roles);
 
-            return CommonResult.success(userInfoVo);
+            return userInfoVo;
         } else {
             throw new StatusAccessDeniedException("该账号并非管理员账号，无权登录！");
         }
     }
 
     @Override
-    public CommonResult<Void> logout() {
+    public void logout() {
         StpUtil.logout();
-        return CommonResult.success();
+    }
+
+    @Override
+    public UserHomeVO getUserHomeInfo(String uid, String username) {
+        return null;
+    }
+
+    @Override
+    public UserCalendarHeatmapVO getUserCalendarHeatmap(String uid, String username) {
+        return null;
+    }
+
+    @Override
+    public ChangeAccountVO changePassword(ChangePasswordDTO changePasswordDto) {
+        return null;
+    }
+
+    @Override
+    public void getChangeEmailCode(String email) {
+
+    }
+
+    @Override
+    public ChangeAccountVO changeEmail(ChangeEmailDTO changeEmailDto) {
+        return null;
+    }
+
+    @Override
+    public UserInfoVO changeUserInfo(UserInfoVO userInfoVo) {
+        return null;
+    }
+
+    @Override
+    public UserAuthInfoVO getUserAuthInfo() {
+        return null;
     }
 }

@@ -2,9 +2,11 @@ package love.pangteen.user.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import love.pangteen.user.pojo.dto.AdminEditUserDTO;
+import love.pangteen.user.pojo.dto.CheckUsernameOrEmailDTO;
 import love.pangteen.user.pojo.dto.DeleteUserDTO;
 import love.pangteen.user.pojo.dto.GenerateUserDTO;
 import love.pangteen.user.pojo.entity.UserInfo;
+import love.pangteen.user.pojo.vo.CheckUsernameOrEmailVO;
 import love.pangteen.user.pojo.vo.GenerateKeyVO;
 
 import javax.servlet.http.HttpServletResponse;
@@ -28,4 +30,6 @@ public interface UserInfoService extends IService<UserInfo> {
     void generateUserExcel(String key, HttpServletResponse response) throws IOException;
 
     void deleteUser(DeleteUserDTO deleteUserDTO);
+
+    CheckUsernameOrEmailVO checkUsernameOrEmail(CheckUsernameOrEmailDTO checkUsernameOrEmailDto);
 }

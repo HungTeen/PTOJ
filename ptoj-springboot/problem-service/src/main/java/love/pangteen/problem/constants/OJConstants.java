@@ -21,4 +21,6 @@ public interface OJConstants {
      * 最大堆栈限制：1024MB。
      */
     int MAX_STACK_LIMIT = 1024;
+
+    String DEFAULT_TAG_SOURCE = "ME";
 }

@@ -41,6 +41,12 @@ public class ValidateUtils {
         }
     }
 
+    public static void validateProblemAuth(Problem problem){
+        if(problem.getAuth() == 1 && ! StpUtil.hasRoleOr(RoleUtils.getProblemAdmins())){
+            throw new StatusForbiddenException("修改失败！你无权限公开题目！");
+        }
+    }
+
     public interface Group {
 
     }

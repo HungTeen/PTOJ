@@ -73,7 +73,7 @@ public class SaTokenConfig {
                     StpUtil.checkRoleOr(RoleUtils.getAdmins());
                 });
 
-        SaRouter.match("/admin/problem")
+        SaRouter.match("/admin/problem", "/admin/tag/**")
                 .match(SaHttpMethod.DELETE)
                 .check(r -> {
                     StpUtil.checkRoleOr(RoleUtils.getProblemAdmins());

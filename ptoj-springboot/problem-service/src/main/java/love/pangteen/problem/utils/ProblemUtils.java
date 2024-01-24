@@ -14,6 +14,10 @@ import java.util.List;
  **/
 public class ProblemUtils {
 
+    public static boolean forAllProblem(String oj){
+        return oj != null && !"All".equals(oj);
+    }
+
     public static int calProblemTotalScore(String judgeCaseMode, List<ProblemCase> problemCaseList) {
         int sumScore = 0;
         if (JudgeCaseMode.SUBTASK_LOWEST.getMode().equals(judgeCaseMode)) {

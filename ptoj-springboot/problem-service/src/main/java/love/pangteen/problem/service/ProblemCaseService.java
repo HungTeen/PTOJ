@@ -1,6 +1,7 @@
 package love.pangteen.problem.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import love.pangteen.problem.pojo.entity.Problem;
 import love.pangteen.problem.pojo.entity.ProblemCase;
 
 import java.util.List;
@@ -12,4 +13,10 @@ import java.util.List;
  **/
 public interface ProblemCaseService extends IService<ProblemCase> {
     List<ProblemCase> getProblemCases(Long pid, Boolean isUpload);
+
+    void saveProblemCases(Problem problem, List<ProblemCase> problemCases, boolean isUpload, String uploadTestcaseDir);
+
+    void updateProblemCases(Problem problem, List<ProblemCase> samples, Boolean isUploadTestCase, String uploadTestcaseDir);
+
+    void deleteProblemCases(Long pid);
 }

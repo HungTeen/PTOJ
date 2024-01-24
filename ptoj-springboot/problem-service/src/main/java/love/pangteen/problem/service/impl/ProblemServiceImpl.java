@@ -1,30 +1,26 @@
 package love.pangteen.problem.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import love.pangteen.api.enums.JudgeMode;
+import love.pangteen.api.enums.ProblemType;
 import love.pangteen.api.enums.RemoteOJ;
 import love.pangteen.exception.StatusFailException;
 import love.pangteen.pojo.AccountProfile;
 import love.pangteen.problem.mapper.ProblemMapper;
 import love.pangteen.problem.pojo.dto.ProblemDTO;
-import love.pangteen.problem.pojo.entity.*;
-import love.pangteen.problem.service.CodeTemplateService;
-import love.pangteen.problem.service.ProblemCaseService;
-import love.pangteen.problem.service.ProblemLanguageService;
-import love.pangteen.problem.service.ProblemService;
-import love.pangteen.problem.utils.FileUtils;
+import love.pangteen.problem.pojo.entity.Problem;
+import love.pangteen.problem.pojo.entity.ProblemCase;
+import love.pangteen.problem.service.*;
+import love.pangteen.problem.utils.ProblemUtils;
 import love.pangteen.problem.utils.ValidateUtils;
 import love.pangteen.utils.AccountUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -36,9 +32,6 @@ import java.util.List;
 public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> implements ProblemService {
 
     @Resource
-    private FileUtils fileUtils;
-
-    @Resource
     private ProblemLanguageService problemLanguageService;
 
     @Resource
@@ -47,11 +40,14 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
     @Resource
     private ProblemCaseService problemCaseService;
 
+    @Resource
+    private ProblemTagService problemTagService;
+
     @Override
     public IPage<Problem> getProblemList(Integer limit, Integer currentPage, String keyword, Integer auth, String oj) {
         return lambdaQuery()
                 .eq(Problem::getIsGroup, false)
-                .and(forAllProblem(oj), wrapper -> {
+                .and(ProblemUtils.forAllProblem(oj), wrapper -> {
                     if (!RemoteOJ.isRemoteOJ(oj)) {
                         wrapper.eq(Problem::getIsRemote, false);
                     } else {
@@ -74,19 +70,14 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
         return lambdaQuery().eq(Problem::getProblemId, pid).oneOpt().orElseThrow(() -> new StatusFailException("查询失败！"));
     }
 
+    @Transactional
     @Override
     public void deleteProblem(Long pid) {
-        boolean success = remove(new LambdaQueryWrapper<>(Problem.class)
-                .eq(Problem::getProblemId, pid));
-        if(success){
-            //TODO 删除对于题目的文件。
-//            FileUtil.del(Constants.File.TESTCASE_BASE_FOLDER.getPath() + File.separator + "problem_" + pid);
-//            AccountProfile userRolesVo = (AccountProfile) SecurityUtils.getSubject().getPrincipal();
-//            log.info("[{}],[{}],pid:[{}],operatorUid:[{}],operatorUsername:[{}]",
-//                    "Admin_Problem", "Delete", pid, userRolesVo.getUid(), userRolesVo.getUsername());
-        } else {
-            throw new StatusFailException("删除失败！");
-        }
+        removeById(pid);
+        problemLanguageService.deleteProblemLanguages(pid);
+        codeTemplateService.deleteCodeTemplates(pid);
+        problemCaseService.deleteProblemCases(pid);
+        problemTagService.deleteProblemTags(pid);
     }
 
     @Transactional
@@ -98,40 +89,22 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
         if(lambdaQuery().eq(Problem::getProblemId, problem.getProblemId().toUpperCase()).oneOpt().isPresent()){
             throw new StatusFailException("该题目的Problem ID已存在，请更换！");
         }
+        problem.setCaseVersion(String.valueOf(System.currentTimeMillis()));
 
         // 设置Problem其他属性，然后保存。
+        saveOrUpdateProblem(problem, problemDto.getSamples());
 
         // 为新的题目添加对应的language。
-        List<ProblemLanguage> problemLanguageList = new ArrayList<>();
-        for (Language language : problemDto.getLanguages()) {
-            problemLanguageList.add(new ProblemLanguage().setPid(problem.getId()).setLid(language.getId()));
-        }
-        problemLanguageService.saveBatch(problemLanguageList);
+        problemLanguageService.saveProblemLanguages(problem.getId(), problemDto.getLanguages());
 
         // 为新的题目添加对应的codeTemplate。
-        if (CollUtil.isNotEmpty(problemDto.getCodeTemplates())) {
-            for (CodeTemplate codeTemplate : problemDto.getCodeTemplates()) {
-                codeTemplate.setPid(problem.getId());
-            }
-            codeTemplateService.saveBatch(problemDto.getCodeTemplates());
-        }
+        codeTemplateService.saveCodeTemplates(problem.getId(), problemDto.getCodeTemplates());
 
         // 为新的题目添加对应的case。
-        List<ProblemCase> problemCases = problemDto.getSamples();
-        problemCases.forEach(problemCase -> problemCase.setPid(problem.getId()));
-        if (problemDto.getIsUploadTestCase()) { // 如果是选择上传测试文件的，则需要遍历对应文件夹，读取数据。。
-            String testcaseDir = problemDto.getUploadTestcaseDir();
-            for (ProblemCase problemCase : problemCases) {
-                if (StrUtil.isEmpty(problemCase.getOutput())) {
-                    String filePreName = problemCase.getInput().split("\\.")[0];
-                    problemCase.setOutput(filePreName + ".out");
-                }
-            }
-            fileUtils.initUploadTestCase(problemDto.getJudgeMode(), problem.getJudgeCaseMode(), problem.getCaseVersion(), problem.getId(), testcaseDir, problemCases);
-        } else {
-            fileUtils.initHandTestCase(problemDto.getJudgeMode(), problem.getJudgeCaseMode(), problem.getCaseVersion(), problem.getId(), problemCases);
-        }
-        problemCaseService.saveBatch(problemCases);
+        problemCaseService.saveProblemCases(problem, problemDto.getSamples(), problemDto.getIsUploadTestCase(), problemDto.getUploadTestcaseDir());
+
+        // 为新的题目添加对应的tag，可能tag是原表已有，也可能是新的，所以需要判断。
+        problemTagService.saveOrUpdateProblemTags(problem.getId(), problemDto.getTags());
     }
 
     @Transactional
@@ -149,18 +122,38 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
         }
 
         problem.setModifiedUser(profile.getUsername());
-        long pid = problemDto.getProblem().getId();
 
+        // 更新 题目与语言 的关系。
+        problemLanguageService.updateProblemLanguages(problem.getId(), problemDto.getLanguages());
+
+        // 更新 代码模板。
+        codeTemplateService.updateCodeTemplates(problem.getId(), problemDto.getCodeTemplates());
+
+        // 更新 题目样例。
+        problemCaseService.updateProblemCases(problem, problemDto.getSamples(), problemDto.getIsUploadTestCase(), problemDto.getUploadTestcaseDir());
+
+        // 更新 题目与标签 的关系。
+        problemTagService.updateProblemTags(problem.getId(), problemDto.getTags());
+
+        // 更新题目。
+        saveOrUpdateProblem(problem, problemDto.getSamples());
+
+        //TODO judge update.
     }
 
     @Override
     public void changeProblemAuth(Problem problem) {
-
+        ValidateUtils.validateProblemAuth(problem);
+        AccountProfile profile = AccountUtils.getProfile();
+        lambdaUpdate().eq(Problem::getId, problem.getId()).set(Problem::getAuth, problem.getAuth()).set(Problem::getModifiedUser, profile.getUsername()).update();
     }
 
+    /**
+     * 设置Problem其他属性，然后保存或更新。
+     * @param problem
+     */
     @Transactional
-    public void saveOrUpdateProblem(Problem problem) {
-        // 设置Problem其他属性，然后保存。
+    public void saveOrUpdateProblem(Problem problem, List<ProblemCase> problemCases) {
         if (JudgeMode.DEFAULT.getMode().equals(problem.getJudgeMode())) {
             problem.setSpjLanguage(null).setSpjCode(null);
         }
@@ -168,11 +161,12 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
             problem.setIsGroup(false);
         }
         problem.setProblemId(problem.getProblemId().toUpperCase());
+        // 设置oi总分数，根据每个测试点的加和
+        if (ProblemType.isOIType(problem.getType())) {
+            int sumScore = ProblemUtils.calProblemTotalScore(problem.getJudgeCaseMode(), problemCases);
+            problem.setIoScore(sumScore);
+        }
         saveOrUpdate(problem);
-    }
-
-    private boolean forAllProblem(String oj){
-        return oj != null && !"All".equals(oj);
     }
 
 }

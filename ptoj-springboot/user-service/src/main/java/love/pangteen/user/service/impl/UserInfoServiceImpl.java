@@ -2,6 +2,7 @@ package love.pangteen.user.service.impl;
 
 import cn.dev33.satoken.secure.SaSecureUtil;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
@@ -10,11 +11,14 @@ import love.pangteen.api.enums.OJRole;
 import love.pangteen.exception.StatusFailException;
 import love.pangteen.user.mapper.UserInfoMapper;
 import love.pangteen.user.pojo.dto.AdminEditUserDTO;
+import love.pangteen.user.pojo.dto.CheckUsernameOrEmailDTO;
 import love.pangteen.user.pojo.dto.DeleteUserDTO;
 import love.pangteen.user.pojo.dto.GenerateUserDTO;
 import love.pangteen.user.pojo.entity.UserInfo;
+import love.pangteen.user.pojo.vo.CheckUsernameOrEmailVO;
 import love.pangteen.user.pojo.vo.GenerateKeyVO;
 import love.pangteen.user.service.UserInfoService;
+import love.pangteen.user.service.UserRoleService;
 import love.pangteen.user.utils.FileUtils;
 import love.pangteen.utils.RedisUtils;
 import org.springframework.stereotype.Service;
@@ -40,6 +44,9 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
 
     @Resource
     private FileUtils fileUtils;
+
+    @Resource
+    private UserRoleService userRoleService;
 
     @Override
     public UserInfo getUserInfoByUid(String uid) {
@@ -129,6 +136,19 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         if (!isOk) {
             throw new StatusFailException("删除失败！");
         }
+    }
+
+    @Transactional
+    @Override
+    public CheckUsernameOrEmailVO checkUsernameOrEmail(CheckUsernameOrEmailDTO checkDTO) {
+        String username = checkDTO.getUsername();
+
+        CheckUsernameOrEmailVO vo = new CheckUsernameOrEmailVO();
+        if (Validator.isEmail(checkDTO.getEmail())) {
+            vo.setEmail(lambdaQuery().eq(UserInfo::getEmail, checkDTO.getEmail()).oneOpt().isEmpty());
+        }
+        vo.setUsername(lambdaQuery().eq(UserInfo::getUsername, username).oneOpt().isEmpty());
+        return vo;
     }
 
 }

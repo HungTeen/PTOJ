@@ -16,18 +16,19 @@ import javax.annotation.Resource;
  **/
 @RestController
 @RequestMapping("/admin")
-public class AdminCommonController {
+public class AdminAccountController {
 
     @Resource
-    private AccountService adminAccountService;
+    private AccountService accountService;
 
     @PostMapping("/login")
     public CommonResult<UserInfoVO> login(@Validated @RequestBody LoginDTO loginDto) {
-        return adminAccountService.login(loginDto);
+        return CommonResult.success(accountService.login(loginDto));
     }
 
     @GetMapping("/logout")
     public CommonResult<Void> logout() {
-        return adminAccountService.logout();
+        accountService.logout();
+        return CommonResult.success();
     }
 }

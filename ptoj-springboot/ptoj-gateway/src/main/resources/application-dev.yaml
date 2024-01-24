@@ -17,3 +17,4 @@ security:
   ignore:
     whitelist:
       - /admin/login
+      - /check-username-or-email
