@@ -1,7 +1,13 @@
 # idea
 *.iml
 .idea
+
+logs
+
 ptoj-deploy/ptoj
-/ptoj-springboot/user-service/target/
+
+/ptoj-springboot/ptoj-api/target/
 /ptoj-springboot/ptoj-common/target/
 /ptoj-springboot/ptoj-gateway/target/
+/ptoj-springboot/user-service/target/
+/ptoj-springboot/problem-service/target/

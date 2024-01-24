@@ -1,11 +1,13 @@
 package love.pangteen.advice;
 
+import cn.dev33.satoken.exception.SameTokenInvalidException;
 import com.alibaba.nacos.shaded.com.google.protobuf.ServiceException;
 import lombok.extern.slf4j.Slf4j;
 import love.pangteen.exception.StatusAccessDeniedException;
 import love.pangteen.exception.StatusFailException;
 import love.pangteen.exception.StatusForbiddenException;
 import love.pangteen.result.CommonResult;
+import love.pangteen.result.ResultStatus;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -21,6 +23,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.io.IOException;
@@ -53,17 +57,17 @@ public class GlobalExceptionAdvice {
         return CommonResult.clientError(e.getMessage());
     }
 
-//    /**
-//     * 401 -UnAuthorized 处理AuthenticationException,token相关异常 即是认证出错 可能无法处理！
-//     */
-//    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-//    @ExceptionHandler(value = AuthenticationException.class)
-//    public CommonResult<Void> handleAuthenticationException(AuthenticationException e,
-//                                                            HttpServletRequest httpRequest,
-//                                                            HttpServletResponse httpResponse) {
-//        httpResponse.setHeader("Url-Type", httpRequest.getHeader("Url-Type")); // 为了前端能区别请求来源
-//        return CommonResult.errorResponse(e.getMessage(), ResultStatus.ACCESS_DENIED);
-//    }
+    /**
+     * 401 -UnAuthorized 处理AuthenticationException,token相关异常 即是认证出错 可能无法处理！
+     */
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(value = SameTokenInvalidException.class)
+    public CommonResult<Void> handleAuthenticationException(SameTokenInvalidException e,
+                                                            HttpServletRequest httpRequest,
+                                                            HttpServletResponse httpResponse) {
+        httpResponse.setHeader("Url-Type", httpRequest.getHeader("Url-Type")); // 为了前端能区别请求来源
+        return CommonResult.error(ResultStatus.ACCESS_DENIED, e.getMessage());
+    }
 
 //    /**
 //     * 401 -UnAuthorized UnauthenticatedException,token相关异常 即是认证出错 可能无法处理！

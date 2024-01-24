@@ -1,8 +1,4 @@
-server:
-  port: 8000 # 内嵌的 Tomcat 端口号。默认值为 8080。
 spring:
-  application:
-    name: user-service # 微服务名称。
   profiles:
     active: dev
   datasource:
@@ -24,18 +20,39 @@ spring:
   cloud:
     nacos:
       discovery:
-        server-addr: localhost:8848 # Nacos 服务器地址
+        server-addr: ${ptoj.nacos.host}:${ptoj.nacos.port} # Nacos 服务器地址
         service: ${spring.application.name} # 注册到 Nacos 的服务名。默认值为 ${spring.application.name}。
-      username: nacos
-      password: nacos
+      username: ${ptoj.nacos.username}
+      password: ${ptoj.nacos.password}
 dubbo:
   application:
-    name: dubbo-user-service
+    name: dubbo-${spring.application.name}
   protocol:
     name: dubbo
     port: -1
   registry:
-    address: nacos://localhost:8848?username=nacos&password=nacos
+    address: nacos://${ptoj.nacos.host}:${ptoj.nacos.port}?username=${ptoj.nacos.username}&password=${ptoj.nacos.password}
+logging:
+  level:
+    love.pangteen: debug
+  pattern:
+    dateformat: HH:mm:ss:SSS
+  file:
+    path: "logs/${spring.application.name}"
+knife4j:
+  enable: true
+  openapi:
+    title: ${ptoj.swagger.title}
+    email: 1687289734@qq.com
+    concat: PangTeen
+    url: https://pangteen.love
+    version: v1.0.0
+    group:
+      default:
+        group-name: default
+        api-rule: package
+        api-rule-resources:
+          - ${ptoj.swagger.package}
 ############## Sa-Token 配置 (文档: https://sa-token.cc) ##############
 sa-token:
   # token 名称（同时也是 cookie 名称）
@@ -52,19 +69,5 @@ sa-token:
   token-style: uuid
   # 是否输出操作日志
   is-log: true
-
-knife4j:
-  enable: true
-  openapi:
-    title: PTOJ接口文档
-    description: "PTOJ接口文档"
-    email: 1687289734@qq.com
-    concat: PangTeen
-    url: https://pangteen.love
-    version: v1.0.0
-    group:
-      default:
-        group-name: default
-        api-rule: package
-        api-rule-resources:
-          - love.pangteen.user.controller
+  # 打开 RPC 调用鉴权
+  check-same-token: true

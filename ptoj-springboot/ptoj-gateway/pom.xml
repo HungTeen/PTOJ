@@ -62,7 +62,7 @@
         <!-- Sa-Token 整合 Dubbo -->
         <dependency>
             <groupId>cn.dev33</groupId>
-            <artifactId>sa-token-dubbo</artifactId>
+            <artifactId>sa-token-dubbo3</artifactId>
         </dependency>
     </dependencies>
 

@@ -3,7 +3,7 @@ services:
   ptoj-redis:
     image: redis:7.2
     container_name: ptoj-redis
-    restart: always
+    restart: unless-stopped
     volumes:
       - ${PTOJ_DATA_DIRECTORY}/data/redis/data:/data
     networks:
@@ -18,7 +18,7 @@ services:
     #    image: mysql:8.2.0
     build: src/mysql
     container_name: ptoj-mysql
-    restart: always
+    restart: unless-stopped
     volumes:
       - ${PTOJ_DIRECTORY}/data/mysql/data:/var/lib/mysql
     environment:
@@ -36,7 +36,7 @@ services:
     image: nacos/nacos-server:v2.3.0-slim
 #    image: nacos/nacos-server:v2.1.0-slim
     container_name: ptoj-nacos
-    restart: always
+    restart: unless-stopped
     depends_on:
       - ptoj-mysql
     environment:
@@ -70,7 +70,7 @@ services:
   ptoj-es:
     image: elasticsearch:7.14.0
     container_name: es7
-    restart: always
+    restart: unless-stopped
     volumes:
       - ${PTOJ_DIRECTORY}/data/elasticsearch/data:/usr/share/elasticsearch/data
       - ${PTOJ_DIRECTORY}/data/elasticsearch/plugins:/usr/share/elasticsearch/plugins

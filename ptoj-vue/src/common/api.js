@@ -665,7 +665,7 @@ const ojApi = {
 
   // about页部分请求
   getAllLanguages(all) {
-    return ajax("/api/languages", 'get', {
+    return ajax("/api/language/languages", 'get', {
       params: {
         all
       }
@@ -1509,7 +1509,7 @@ const adminApi = {
   },
 
   getLanguages(pid, all) {
-    return ajax('/api/languages', 'get', {
+    return ajax('/api/language/languages', 'get', {
       params: {
         pid,
         all
@@ -1517,7 +1517,7 @@ const adminApi = {
     })
   },
   getProblemLanguages(pid) {
-    return ajax('/api/get-problem-languages', 'get', {
+    return ajax('/api/language/get-problem-languages', 'get', {
       params: {
         pid: pid
       }

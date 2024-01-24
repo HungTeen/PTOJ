@@ -26,7 +26,8 @@ public class StpInterfaceImpl implements StpInterface {
     @Override
     public List<String> getRoleList(Object loginId, String loginType) {
         if(loginId instanceof String){
-            return userService.getUserRoles((String) loginId);
+            List<String> roles = userService.getUserRoles((String) loginId);
+            return roles;
         }
         return List.of();
     }

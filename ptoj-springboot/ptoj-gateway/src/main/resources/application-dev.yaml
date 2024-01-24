@@ -18,3 +18,10 @@ security:
     whitelist:
       - /admin/login
       - /check-username-or-email
+      - /get-problem-detail
+      - /get-problem-list
+      - /get-random-problem
+      - /get-all-problem-tags
+      - /get-problem-tags-and-classification
+      - /get-problem-tags
+      - /language/**

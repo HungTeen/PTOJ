@@ -10,9 +10,11 @@ import love.pangteen.api.enums.RemoteOJ;
 import love.pangteen.exception.StatusFailException;
 import love.pangteen.pojo.AccountProfile;
 import love.pangteen.problem.mapper.ProblemMapper;
+import love.pangteen.problem.pojo.dto.PidListDTO;
 import love.pangteen.problem.pojo.dto.ProblemDTO;
 import love.pangteen.problem.pojo.entity.Problem;
 import love.pangteen.problem.pojo.entity.ProblemCase;
+import love.pangteen.problem.pojo.vo.*;
 import love.pangteen.problem.service.*;
 import love.pangteen.problem.utils.ProblemUtils;
 import love.pangteen.problem.utils.ValidateUtils;
@@ -21,6 +23,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -42,6 +45,11 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 
     @Resource
     private ProblemTagService problemTagService;
+
+    @Override
+    public Page<ProblemVO> getProblemList(Integer limit, Integer currentPage, String keyword, List<Long> tagIds, Integer difficulty, String oj) {
+        return null;
+    }
 
     @Override
     public IPage<Problem> getProblemList(Integer limit, Integer currentPage, String keyword, Integer auth, String oj) {
@@ -146,6 +154,31 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
         ValidateUtils.validateProblemAuth(problem);
         AccountProfile profile = AccountUtils.getProfile();
         lambdaUpdate().eq(Problem::getId, problem.getId()).set(Problem::getAuth, problem.getAuth()).set(Problem::getModifiedUser, profile.getUsername()).update();
+    }
+
+    @Override
+    public RandomProblemVO getRandomProblem() {
+        return null;
+    }
+
+    @Override
+    public HashMap<Long, Object> getUserProblemStatus(PidListDTO pidListDto) {
+        return null;
+    }
+
+    @Override
+    public ProblemInfoVO getProblemInfo(String problemId, Long gid) {
+        return null;
+    }
+
+    @Override
+    public LastAcceptedCodeVO getUserLastAcceptedCode(Long pid, Long cid) {
+        return null;
+    }
+
+    @Override
+    public List<ProblemFullScreenListVO> getFullScreenProblemList(Long tid, Long cid) {
+        return null;
     }
 
     /**
