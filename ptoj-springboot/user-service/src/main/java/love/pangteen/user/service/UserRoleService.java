@@ -15,6 +15,11 @@ import java.util.List;
 public interface UserRoleService extends IService<Role> {
 
     /**
+     * 根据用户uid，查询其信息以及角色。
+     */
+    UserRolesVO getUserRoles(String uid, String username);
+
+    /**
      * 别问为什么是List。
      */
     List<Role> getUserRoles(Long roleId);
@@ -25,7 +30,7 @@ public interface UserRoleService extends IService<Role> {
     List<String> getUserRoles(String uid);
 
     IPage<UserRolesVO> getUserList(Integer limit, Integer currentPage, String keyword, Boolean onlyAdmin);
-//
+
 //    void deleteCache(String uid, boolean isRemoveSession);
 //
 //    String getAuthChangeContent(int oldType,int newType);

@@ -27,7 +27,7 @@ axios.interceptors.request.use(
     // 如果存在，则统一在http请求的header都加上token，这样后台根据token判断你的登录情况
     // 即使本地存在token，也有可能token是过期的，所以在响应拦截器中要对返回状态进行判断
     const token = localStorage.getItem('token')
-    if(config.url != '/api/login' && config.url != '/api/admin/login'){
+    if(config.url != '/api/account/login' && config.url != '/api/admin/account/login'){
       token && (config.headers.Authorization = token);
     }
     let type = config.url.split("/")[2];
@@ -103,7 +103,7 @@ axios.interceptors.response.use(
             }
           }
           if (error.response.config.headers['Url-Type'] === 'admin') {
-            router.push("/admin/login")
+            router.push("/admin/account/login")
           } else {
             store.commit('changeModalStatus', { mode: 'Login', visible: true });
           }
@@ -217,18 +217,18 @@ const ojApi = {
     let params = {
       email: email
     }
-    return ajax('/api/get-register-code', 'get', {
+    return ajax('/api/account/get-register-code', 'get', {
       params
     })
   },
 
   login(data) {
-    return ajax('/api/login', 'post', {
+    return ajax('/api/account/login', 'post', {
       data
     })
   },
   checkUsernameOrEmail(username, email) {
-    return ajax('/api/check-username-or-email', 'post', {
+    return ajax('/api/user/check-username-or-email', 'post', {
       data: {
         username,
         email
@@ -241,33 +241,33 @@ const ojApi = {
   },
   // 注册
   register(data) {
-    return ajax('/api/register', 'post', {
+    return ajax('/api/account/register', 'post', {
       data
     })
   },
   logout() {
-    return ajax('/api/logout', 'get')
+    return ajax('/api/account/logout', 'get')
   },
 
   // 账户的相关操作
   getUserAuthInfo() {
-    return ajax('/api/get-user-auth-info', 'get')
+    return ajax('/api/account/get-user-auth-info', 'get')
   },
 
   // 账户的相关操作
   applyResetPassword(data) {
-    return ajax('/api/apply-reset-password', 'post', {
+    return ajax('/api/account/apply-reset-password', 'post', {
       data
     })
   },
   resetPassword(data) {
-    return ajax('/api/reset-password', 'post', {
+    return ajax('/api/account/reset-password', 'post', {
       data
     })
   },
   // Problem List页的相关请求
   getProblemTagList(oj) {
-    return ajax('/api/get-all-problem-tags', 'get', {
+    return ajax('/api/tag/get-all-problem-tags', 'get', {
       params: {
         oj
       }
@@ -275,7 +275,7 @@ const ojApi = {
   },
 
   getProblemTagsAndClassification(oj) {
-    return ajax('/api/get-problem-tags-and-classification', 'get', {
+    return ajax('/api/tag/get-problem-tags-and-classification', 'get', {
       params: {
         oj
       }
@@ -289,14 +289,14 @@ const ojApi = {
         params[element] = searchParams[element]
       }
     })
-    return ajax('/api/get-problem-list', 'get', {
+    return ajax('/api/problem/get-problem-list', 'get', {
       params: params
     })
   },
 
   // 查询当前登录用户对题目的提交状态
   getUserProblemStatus(pidList, isContestProblemList, cid, gid, containsEnd = false) {
-    return ajax("/api/get-user-problem-status", 'post', {
+    return ajax("/api/problem/get-user-problem-status", 'post', {
       data: {
         pidList,
         isContestProblemList,
@@ -308,12 +308,12 @@ const ojApi = {
   },
   // 随机来一题
   pickone() {
-    return ajax('/api/get-random-problem', 'get')
+    return ajax('/api/problem/get-random-problem', 'get')
   },
 
   // Problem详情页的相关请求
   getProblem(problemId, cid, gid) {
-    return ajax('/api/get-problem-detail', 'get', {
+    return ajax('/api/problem/get-problem-detail', 'get', {
       params: {
         problemId,
         gid
@@ -323,7 +323,7 @@ const ojApi = {
 
   // 获取题目代码模板
   getProblemCodeTemplate(pid) {
-    return ajax('/api/get-problem-code-template', 'get', {
+    return ajax('/api/problem/get-problem-code-template', 'get', {
       params: {
         pid
       }
@@ -332,13 +332,13 @@ const ojApi = {
 
   // 提交评测模块
   submitCode(data) {
-    return ajax('/api/submit-problem-judge', 'post', {
+    return ajax('/api/judge/submit-problem-judge', 'post', {
       data
     })
   },
   // 获取单个提交的信息
   getSubmission(submitId) {
-    return ajax('/api/get-submission-detail', 'get', {
+    return ajax('/api/judge/get-submission-detail', 'get', {
       params: {
         submitId
       }
@@ -346,13 +346,13 @@ const ojApi = {
   },
   // 在线调试
   submitTestJudge(data) {
-    return ajax('/api/submit-problem-test-judge', 'post', {
+    return ajax('/api/judge/submit-problem-test-judge', 'post', {
       data
     })
   },
   // 获取调试结果
   getTestJudgeResult(testJudgeKey) {
-    return ajax('/api/get-test-judge-result', 'get', {
+    return ajax('/api/judge/get-test-judge-result', 'get', {
       params: {
         testJudgeKey
       }
@@ -366,20 +366,20 @@ const ojApi = {
     if(cid){
       params.cid = cid
     }
-    return ajax('/api/get-last-ac-code', 'get', {
+    return ajax('/api/problem/get-last-ac-code', 'get', {
       params: params
     })
   },
   // 获取题目专注模式底部题目列表
   getFullScreenProblemList(tid, cid){
     let params = {tid, cid}
-    return ajax('/api/get-full-screen-problem-list', 'get', {
+    return ajax('/api/problem/get-full-screen-problem-list', 'get', {
       params: params
     })
   },
   // 获取单个提交的全部测试点详情
   getAllCaseResult(submitId) {
-    return ajax('/api/get-all-case-result', 'get', {
+    return ajax('/api/judge/get-all-case-result', 'get', {
       params: {
         submitId,
       }
@@ -387,7 +387,7 @@ const ojApi = {
   },
   // 远程虚拟判题失败进行重新提交
   reSubmitRemoteJudge(submitId) {
-    return ajax("/api/resubmit", 'get', {
+    return ajax("/api/judge/resubmit", 'get', {
       params: {
         submitId,
       }
@@ -395,23 +395,23 @@ const ojApi = {
   },
   // 更新提交详情
   updateSubmission(data) {
-    return ajax('/api/submission', 'put', {
+    return ajax('/api/judge/submission', 'put', {
       data
     })
   },
   getSubmissionList(limit, params) {
     params.limit = limit
-    return ajax('/api/get-submission-list', 'get', {
+    return ajax('/api/judge/get-submission-list', 'get', {
       params
     })
   },
   checkSubmissonsStatus(submitIds, cid) {
-    return ajax('/api/check-submissions-status', 'post', {
+    return ajax('/api/judge/check-submissions-status', 'post', {
       data: { submitIds, cid }
     })
   },
   checkContestSubmissonsStatus(submitIds, cid) {
-    return ajax('/api/check-contest-submissions-status', 'post', {
+    return ajax('/api/judge/check-contest-submissions-status', 'post', {
       data: { submitIds, cid }
     })
   },
@@ -673,35 +673,35 @@ const ojApi = {
   },
   // userhome页的请求
   getUserInfo(uid, username) {
-    return ajax("/api/get-user-home-info", 'get', {
+    return ajax("/api/user/get-user-home-info", 'get', {
       params: { uid, username }
     })
   },
 
   getUserCalendarHeatmap(uid, username) {
-    return ajax("/api/get-user-calendar-heatmap", 'get', {
+    return ajax("/api/user/get-user-calendar-heatmap", 'get', {
       params: { uid, username }
     })
   },
 
   // setting页的请求
   changePassword(data) {
-    return ajax("/api/change-password", 'post', {
+    return ajax("/api/user/change-password", 'post', {
       data
     })
   },
   getChangeEmailCode(email) {
-    return ajax("/api/get-change-email-code", 'get',  {
+    return ajax("/api/user/get-change-email-code", 'get',  {
       params: { email }
     })
   },
   changeEmail(data) {
-    return ajax("/api/change-email", 'post', {
+    return ajax("/api/user/change-email", 'post', {
       data
     })
   },
   changeUserInfo(data) {
-    return ajax("/api/change-userInfo", 'post', {
+    return ajax("/api/user/change-userinfo", 'post', {
       data
     })
   },
@@ -984,7 +984,7 @@ const ojApi = {
     })
   },
   getGroupProblemTags(pid) {
-    return ajax('/api/get-problem-tags', 'get', {
+    return ajax('/api/tag/get-problem-tags', 'get', {
       params: {
         pid
       }
@@ -1332,7 +1332,7 @@ const ojApi = {
 const adminApi = {
   // 登录
   admin_login(username, password) {
-    return ajax('/api/admin/login', 'post', {
+    return ajax('/api/admin/account/login', 'post', {
       data: {
         username,
         password
@@ -1340,7 +1340,7 @@ const adminApi = {
     })
   },
   admin_logout() {
-    return ajax('/api/admin/logout', 'get')
+    return ajax('/api/admin/account/logout', 'get')
   },
   admin_getDashboardInfo() {
     return ajax('/api/admin/dashboard/get-dashboard-info', 'get')
@@ -1581,7 +1581,7 @@ const adminApi = {
     })
   },
   admin_getAllProblemTagList(oj) {
-    return ajax('/api/get-all-problem-tags', 'get', {
+    return ajax('/api/tag/get-all-problem-tags', 'get', {
       params: {
         oj
       }
@@ -1589,7 +1589,7 @@ const adminApi = {
   },
 
   admin_getProblemTags(pid) {
-    return ajax('/api/get-problem-tags', 'get', {
+    return ajax('/api/tag/get-problem-tags', 'get', {
       params: {
         pid
       }

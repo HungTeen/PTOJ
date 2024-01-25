@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import love.pangteen.problem.pojo.entity.ProblemTag;
 import love.pangteen.problem.pojo.entity.Tag;
 
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -17,4 +18,6 @@ public interface ProblemTagService extends IService<ProblemTag> {
     void updateProblemTags(Long id, List<Tag> tags);
 
     void deleteProblemTags(Long pid);
+
+    Collection<Tag> getProblemTags(Long pid);
 }

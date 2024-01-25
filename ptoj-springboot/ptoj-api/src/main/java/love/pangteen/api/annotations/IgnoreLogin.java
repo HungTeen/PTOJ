@@ -5,6 +5,12 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
+/**
+ * 单纯做个标记，方便寻找不需要登录验证的方法。
+ * @program: PTOJ
+ * @author: PangTeen
+ * @create: 2024/1/24 16:31
+ */
 @Target({ElementType.TYPE, ElementType.METHOD})
 @Retention(RetentionPolicy.RUNTIME)
 public @interface IgnoreLogin {

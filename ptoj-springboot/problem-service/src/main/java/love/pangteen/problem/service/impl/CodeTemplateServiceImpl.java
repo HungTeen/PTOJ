@@ -49,4 +49,9 @@ public class CodeTemplateServiceImpl extends ServiceImpl<CodeTemplateMapper, Cod
     public void deleteCodeTemplates(Long pid) {
         remove(new LambdaQueryWrapper<>(CodeTemplate.class).eq(CodeTemplate::getPid, pid));
     }
+
+    @Override
+    public List<CodeTemplate> getProblemCodeTemplate(Long pid) {
+        return lambdaQuery().eq(CodeTemplate::getPid, pid).list();
+    }
 }

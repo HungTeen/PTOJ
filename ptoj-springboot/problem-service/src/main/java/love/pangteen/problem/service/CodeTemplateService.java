@@ -16,4 +16,6 @@ public interface CodeTemplateService extends IService<CodeTemplate> {
     void updateCodeTemplates(Long pid, List<CodeTemplate> codeTemplates);
 
     void deleteCodeTemplates(Long pid);
+
+    List<CodeTemplate> getProblemCodeTemplate(Long pid);
 }

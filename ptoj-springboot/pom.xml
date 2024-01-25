@@ -14,6 +14,7 @@
         <module>user-service</module>
         <module>ptoj-gateway</module>
         <module>problem-service</module>
+        <module>judge-service</module>
     </modules>
 
     <parent>

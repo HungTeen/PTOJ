@@ -10,17 +10,18 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import love.pangteen.api.enums.OJRole;
 import love.pangteen.exception.StatusFailException;
 import love.pangteen.user.mapper.UserInfoMapper;
-import love.pangteen.user.pojo.dto.AdminEditUserDTO;
-import love.pangteen.user.pojo.dto.CheckUsernameOrEmailDTO;
-import love.pangteen.user.pojo.dto.DeleteUserDTO;
-import love.pangteen.user.pojo.dto.GenerateUserDTO;
+import love.pangteen.user.pojo.dto.*;
+import love.pangteen.user.pojo.entity.Role;
 import love.pangteen.user.pojo.entity.UserInfo;
 import love.pangteen.user.pojo.vo.CheckUsernameOrEmailVO;
 import love.pangteen.user.pojo.vo.GenerateKeyVO;
+import love.pangteen.user.pojo.vo.UserInfoVO;
+import love.pangteen.user.pojo.vo.UserRolesVO;
 import love.pangteen.user.service.UserInfoService;
 import love.pangteen.user.service.UserRoleService;
 import love.pangteen.user.utils.FileUtils;
 import love.pangteen.utils.RedisUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +31,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @program: PTOJ
@@ -47,11 +49,6 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
 
     @Resource
     private UserRoleService userRoleService;
-
-    @Override
-    public UserInfo getUserInfoByUid(String uid) {
-        return getById(uid);
-    }
 
     @Override
     public UserInfo getUserInfoByName(String username) {
@@ -149,6 +146,23 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         }
         vo.setUsername(lambdaQuery().eq(UserInfo::getUsername, username).oneOpt().isEmpty());
         return vo;
+    }
+
+    @Transactional
+    @Override
+    public UserInfoVO changeUserInfo(EditUserInfoDTO editDTO) {
+        UserInfo userInfo = new UserInfo();
+        BeanUtils.copyProperties(editDTO, userInfo);
+        userInfo.setUuid(editDTO.getUid());
+        if(updateById(userInfo)){
+            UserRolesVO userRolesVO = userRoleService.getUserRoles(editDTO.getUid(), null);
+            UserInfoVO userInfoVO = new UserInfoVO();
+            BeanUtils.copyProperties(userRolesVO, userInfoVO);
+            userInfoVO.setRoleList(userRolesVO.getRoles().stream().map(Role::getRole).collect(Collectors.toList()));
+            return userInfoVO;
+        } else {
+            throw new StatusFailException("个人信息修改失败！");
+        }
     }
 
 }

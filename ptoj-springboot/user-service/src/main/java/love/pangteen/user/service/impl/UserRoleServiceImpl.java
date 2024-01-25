@@ -20,6 +20,11 @@ import java.util.List;
 public class UserRoleServiceImpl extends ServiceImpl<UserRoleMapper, Role> implements UserRoleService {
 
     @Override
+    public UserRolesVO getUserRoles(String uid, String username) {
+        return getBaseMapper().getUserRoles(uid, username);
+    }
+
+    @Override
     public List<Role> getUserRoles(Long roleId) {
         return List.of(getById(roleId));
     }

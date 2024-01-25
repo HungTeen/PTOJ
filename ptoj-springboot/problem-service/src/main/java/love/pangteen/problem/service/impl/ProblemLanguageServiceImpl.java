@@ -5,10 +5,14 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import love.pangteen.problem.mapper.ProblemLanguageMapper;
 import love.pangteen.problem.pojo.entity.Language;
 import love.pangteen.problem.pojo.entity.ProblemLanguage;
+import love.pangteen.problem.service.LanguageService;
 import love.pangteen.problem.service.ProblemLanguageService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.Resource;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -20,6 +24,9 @@ import java.util.stream.Collectors;
  **/
 @Service
 public class ProblemLanguageServiceImpl extends ServiceImpl<ProblemLanguageMapper, ProblemLanguage> implements ProblemLanguageService {
+
+    @Resource
+    private LanguageService languageService;
 
     @Transactional
     @Override
@@ -48,5 +55,13 @@ public class ProblemLanguageServiceImpl extends ServiceImpl<ProblemLanguageMappe
     @Override
     public void deleteProblemLanguages(Long pid) {
         remove(new LambdaQueryWrapper<>(ProblemLanguage.class).eq(ProblemLanguage::getPid, pid));
+    }
+
+    @Override
+    public Collection<Language> getProblemLanguages(Long pid) {
+        List<Long> lids = lambdaQuery().eq(ProblemLanguage::getPid, pid).list().stream().map(ProblemLanguage::getLid).collect(Collectors.toList());
+        return languageService.listByIds(lids).stream().sorted(Comparator.comparing(Language::getSeq, Comparator.reverseOrder())
+                        .thenComparing(Language::getId))
+                .collect(Collectors.toList());
     }
 }

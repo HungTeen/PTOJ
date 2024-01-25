@@ -2,6 +2,7 @@ package love.pangteen.problem.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import love.pangteen.problem.pojo.entity.TagClassification;
+import love.pangteen.problem.pojo.vo.ProblemTagVO;
 
 import java.util.List;
 
@@ -15,4 +16,5 @@ public interface ClassificationService extends IService<TagClassification> {
 
     TagClassification addTagClassification(TagClassification tagClassification);
 
+    List<ProblemTagVO> getProblemTagsAndClassification(String oj);
 }

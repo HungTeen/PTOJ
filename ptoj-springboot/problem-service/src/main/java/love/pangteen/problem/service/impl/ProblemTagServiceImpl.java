@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -53,6 +54,12 @@ public class ProblemTagServiceImpl extends ServiceImpl<ProblemTagMapper, Problem
     @Override
     public void deleteProblemTags(Long pid) {
         remove(new LambdaQueryWrapper<>(ProblemTag.class).eq(ProblemTag::getPid, pid));
+    }
+
+    @Override
+    public Collection<Tag> getProblemTags(Long pid) {
+        List<Long> tids = lambdaQuery().eq(ProblemTag::getPid, pid).list().stream().map(ProblemTag::getTid).collect(Collectors.toList());
+        return tagService.listByIds(tids);
     }
 
 }

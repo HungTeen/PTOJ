@@ -53,12 +53,12 @@ public class SaTokenConfig {
      * 用户服务鉴权。
      */
     private void checkUserService(){
-        SaRouter.match("/admin/user/**", "/admin/logout")
+        SaRouter.match("/admin/user/**", "/admin/account/logout")
                 .check(r -> {
                     StpUtil.checkRoleOr(RoleUtils.getAdmins());
                 });
 
-        SaRouter.match("/file/generate-user-excel")
+        SaRouter.match("/admin/user/generate-user-excel")
                 .check(r -> {
                     StpUtil.checkRole(RoleUtils.getRoot());
                 });
@@ -73,8 +73,13 @@ public class SaTokenConfig {
                     StpUtil.checkRoleOr(RoleUtils.getAdmins());
                 });
 
-        SaRouter.match("/admin/problem", "/admin/tag/**")
+        SaRouter.match("/admin/problem")
                 .match(SaHttpMethod.DELETE)
+                .check(r -> {
+                    StpUtil.checkRoleOr(RoleUtils.getProblemAdmins());
+                });
+
+        SaRouter.match("/admin/tag/**")
                 .check(r -> {
                     StpUtil.checkRoleOr(RoleUtils.getProblemAdmins());
                 });

@@ -7,6 +7,7 @@ import love.pangteen.problem.constants.OJConstants;
 import love.pangteen.problem.mapper.TagMapper;
 import love.pangteen.problem.pojo.entity.Tag;
 import love.pangteen.problem.service.TagService;
+import love.pangteen.problem.utils.ProblemUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,14 +40,21 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
 
     @Override
     public Tag addTag(Tag tag) {
-        if(lambdaQuery()
+        if (lambdaQuery()
                 .eq(tag.getGid() != null, Tag::getGid, tag.getGid())
                 .eq(Tag::getName, tag.getName())
-                .eq(Tag::getOj, tag.getOj()).oneOpt().isPresent()){
+                .eq(Tag::getOj, tag.getOj()).oneOpt().isPresent()) {
             throw new StatusFailException("该标签名称已存在！请勿重复添加！");
         }
         save(tag);
         return tag;
+    }
+
+    @Override
+    public List<Tag> getAllProblemTagsList(String oj) {
+        return lambdaQuery()
+                .isNull(Tag::getGid)
+                .eq(!ProblemUtils.forAllProblem(oj), Tag::getOj, oj.toUpperCase()).list();
     }
 
 }

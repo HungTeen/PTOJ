@@ -22,5 +22,6 @@ public interface OJConstants {
      */
     int MAX_STACK_LIMIT = 1024;
 
-    String DEFAULT_TAG_SOURCE = "ME";
+    String DEFAULT_OJ = "ME";
+    String DEFAULT_TAG_SOURCE = DEFAULT_OJ;
 }

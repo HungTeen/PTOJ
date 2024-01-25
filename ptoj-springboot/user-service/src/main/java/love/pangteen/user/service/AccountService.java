@@ -5,6 +5,9 @@ import love.pangteen.user.pojo.dto.ChangePasswordDTO;
 import love.pangteen.user.pojo.dto.LoginDTO;
 import love.pangteen.user.pojo.vo.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
 /**
  * @program: PTOJ
  * @author: PangTeen
@@ -12,11 +15,9 @@ import love.pangteen.user.pojo.vo.*;
  **/
 public interface AccountService {
 
-    UserInfoVO login(LoginDTO loginDto);
+    UserInfoVO login(LoginDTO loginDto, boolean requireAdmin, HttpServletResponse response, HttpServletRequest request);
 
     void logout();
-
-    UserHomeVO getUserHomeInfo(String uid, String username);
 
     UserCalendarHeatmapVO getUserCalendarHeatmap(String uid, String username);
 
@@ -25,8 +26,6 @@ public interface AccountService {
     void getChangeEmailCode(String email);
 
     ChangeAccountVO changeEmail(ChangeEmailDTO changeEmailDto);
-
-    UserInfoVO changeUserInfo(UserInfoVO userInfoVo);
 
     UserAuthInfoVO getUserAuthInfo();
 }

@@ -15,4 +15,5 @@ public interface TagService extends IService<Tag> {
 
     Tag addTag(Tag tag);
 
+    List<Tag> getAllProblemTagsList(String oj);
 }

@@ -4,6 +4,7 @@ import org.apache.dubbo.config.spring.context.annotation.EnableDubbo;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
  * @program: PTOJ
@@ -11,6 +12,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * @create: 2024/1/12 22:15
  **/
 @EnableDubbo
+@EnableTransactionManagement
 @MapperScan("love.pangteen.user.mapper")
 @SpringBootApplication(scanBasePackages = "love.pangteen")
 public class UserApplication {

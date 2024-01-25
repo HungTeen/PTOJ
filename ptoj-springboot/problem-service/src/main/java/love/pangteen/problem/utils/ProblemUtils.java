@@ -2,10 +2,15 @@ package love.pangteen.problem.utils;
 
 import cn.hutool.core.lang.Pair;
 import love.pangteen.api.enums.JudgeCaseMode;
+import love.pangteen.problem.constants.OJConstants;
 import love.pangteen.problem.pojo.entity.ProblemCase;
+import love.pangteen.problem.pojo.entity.TagClassification;
+import love.pangteen.problem.pojo.vo.ProblemTagVO;
 
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * @program: PTOJ
@@ -14,8 +19,30 @@ import java.util.List;
  **/
 public class ProblemUtils {
 
+    public static final Comparator<ProblemTagVO> PROBLEM_TAG_VO_COMPARATOR = (p1, p2) -> {
+        if (p1 == null || p2 == null || p1.getClassification() == null) {
+            return 1;
+        }
+        if (p2.getClassification() == null) {
+            return -1;
+        }
+        TagClassification p1Classification = p1.getClassification();
+        TagClassification p2Classification = p2.getClassification();
+        if (Objects.equals(p1Classification.getOj(), p2Classification.getOj())) {
+            return p1Classification.getRank().compareTo(p2Classification.getRank());
+        } else {
+            if (OJConstants.DEFAULT_TAG_SOURCE.equals(p1Classification.getOj())) {
+                return -1;
+            } else if (OJConstants.DEFAULT_TAG_SOURCE.equals(p2Classification.getOj())) {
+                return 1;
+            } else {
+                return p1Classification.getOj().compareTo(p2Classification.getOj());
+            }
+        }
+    };
+
     public static boolean forAllProblem(String oj){
-        return oj != null && !"All".equals(oj);
+        return oj != null && !"ALL".equalsIgnoreCase(oj);
     }
 
     public static int calProblemTotalScore(String judgeCaseMode, List<ProblemCase> problemCaseList) {
@@ -53,4 +80,5 @@ public class ProblemUtils {
         }
         return sumScore;
     }
+
 }

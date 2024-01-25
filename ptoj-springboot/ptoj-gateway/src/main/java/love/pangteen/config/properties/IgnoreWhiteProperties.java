@@ -17,7 +17,7 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 @Configuration
-//@RefreshScope
+@RefreshScope
 @ConfigurationProperties(prefix = "security.ignore")
 public class IgnoreWhiteProperties {
     /**

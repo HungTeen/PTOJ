@@ -22,11 +22,27 @@ spring:
         - id: user
           uri: lb://user-service
           predicates:
-            - Path=/admin/login,/admin/logout,/admin/user/**,/user/**,/file/generate-user-excel
+            - Path=/admin/account/**,/admin/user/**,/user/**,/account/**
         - id: problem
           uri: lb://problem-service
           predicates:
-            - Path=/admin/problem/**,/admin/tag/**
+            - Path=/admin/problem/**,/admin/tag/**,/problem/**,/tag/**,/language/**
+security:
+  ignore:
+    whitelist:
+      - /admin/account/login
+      - /account/login
+      - /account/get-register-code
+      - /account/register
+      - /account/apply-reset-password
+      - /account/reset-password
+      - /user/check-username-or-email
+      - /problem/get-problem-detail
+      - /problem/get-problem-list
+      - /problem/get-random-problem
+      - /problem/get-problem-code-template
+      - /tag/**
+      - /language/**
 dubbo:
   application:
     name: dubbo-${spring.application.name}

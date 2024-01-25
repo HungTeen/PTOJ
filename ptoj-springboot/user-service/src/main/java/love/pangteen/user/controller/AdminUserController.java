@@ -13,6 +13,8 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Map;
 
 /**
@@ -60,6 +62,11 @@ public class AdminUserController {
     @PostMapping("/generate-user")
     public CommonResult<GenerateKeyVO> generateUser(@RequestBody @Validated GenerateUserDTO generateUserDTO) {
         return CommonResult.success(userInfoService.generateUser(generateUserDTO));
+    }
+
+    @GetMapping("/generate-user-excel")
+    public void generateUserExcel(@RequestParam("key") String key, HttpServletResponse response) throws IOException {
+        userInfoService.generateUserExcel(key, response);
     }
 
 }

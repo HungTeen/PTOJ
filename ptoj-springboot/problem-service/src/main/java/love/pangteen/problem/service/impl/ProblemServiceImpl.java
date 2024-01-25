@@ -1,12 +1,15 @@
 package love.pangteen.problem.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import love.pangteen.api.enums.JudgeMode;
+import love.pangteen.api.enums.ProblemAuth;
 import love.pangteen.api.enums.ProblemType;
 import love.pangteen.api.enums.RemoteOJ;
+import love.pangteen.api.utils.RandomUtils;
 import love.pangteen.exception.StatusFailException;
 import love.pangteen.pojo.AccountProfile;
 import love.pangteen.problem.mapper.ProblemMapper;
@@ -46,9 +49,31 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
     @Resource
     private ProblemTagService problemTagService;
 
+    @Resource
+    private ProblemMapper problemMapper;
+
+    @Transactional
     @Override
     public Page<ProblemVO> getProblemList(Integer limit, Integer currentPage, String keyword, List<Long> tagIds, Integer difficulty, String oj) {
-        return null;
+        Page<ProblemVO> page = new Page<>(currentPage, limit);
+        Integer tagListSize = null;
+        if (CollUtil.isNotEmpty(tagIds)) {
+            tagListSize = Math.toIntExact(tagIds.stream().distinct().count());
+        }
+        List<ProblemVO> problemList = problemMapper.getProblemList(page, null, keyword, difficulty, tagIds, tagListSize, oj);
+        if(!problemList.isEmpty()){
+//            List<Long> pidList = problemList.stream().map(ProblemVO::getPid).collect(Collectors.toList());
+//            List<ProblemCountVO> problemListCount = judgeEntityService.getProblemListCount(pidList);
+//            for (ProblemVO problemVo : problemList) {
+//                for (ProblemCountVO problemCountVo : problemListCount) {
+//                    if (problemVo.getPid().equals(problemCountVo.getPid())) {
+//                        problemVo.setProblemCountVo(problemCountVo);
+//                        break;
+//                    }
+//                }
+//            }
+        }
+        return page.setRecords(problemList);
     }
 
     @Override
@@ -158,7 +183,18 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 
     @Override
     public RandomProblemVO getRandomProblem() {
-        return null;
+        List<Problem> problemList = lambdaQuery()
+                .select(Problem::getProblemId)
+                .eq(Problem::getAuth, ProblemAuth.PUBLIC.getAuth())
+                .eq(Problem::getIsGroup, false)
+                .list();
+        if(problemList.isEmpty()){
+            throw new StatusFailException("获取随机题目失败，题库暂无公开题目！");
+        }
+        int index = RandomUtils.get().nextInt(problemList.size());
+        RandomProblemVO randomProblemVO = new RandomProblemVO();
+        randomProblemVO.setProblemId(problemList.get(index).getProblemId());
+        return randomProblemVO;
     }
 
     @Override

@@ -19,8 +19,6 @@ import love.pangteen.utils.AccountUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
@@ -44,11 +42,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Transactional
     @Override
-    public UserInfoVO login(LoginDTO loginDto) {
-        ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        HttpServletRequest request = servletRequestAttributes.getRequest();
-        HttpServletResponse response = servletRequestAttributes.getResponse();
-
+    public UserInfoVO login(LoginDTO loginDto, boolean requireAdmin, HttpServletResponse response, HttpServletRequest request) {
 //        String userIpAddr = IpUtils.getUserIpAddr(request);
 //        String key = Constants.Account.TRY_LOGIN_NUM.getCode() + loginDto.getUsername() + "_" + userIpAddr;
 //        Integer tryLoginCount = (Integer) redisUtils.get(key);
@@ -60,7 +54,7 @@ public class AccountServiceImpl implements AccountService {
         // 根据用户名查找用户。
         UserInfo userInfo = userInfoService.getUserInfoByName(loginDto.getUsername());
         if (userInfo == null) {
-            throw new StatusFailException("用户名或密码错误");
+            throw new StatusFailException("用户名或密码错误！请注意大小写！");
         }
 
         if (!userInfo.getPassword().equals(SaSecureUtil.md5(loginDto.getPassword()))) {
@@ -69,7 +63,7 @@ public class AccountServiceImpl implements AccountService {
 //            } else {
 //                redisUtils.set(key, tryLoginCount + 1, 60 * 30);
 //            }
-            throw new StatusFailException("用户名或密码错误");
+            throw new StatusFailException("用户名或密码错误！请注意大小写！");
         }
 
         if (userInfo.getStatus() != 0) {
@@ -85,8 +79,7 @@ public class AccountServiceImpl implements AccountService {
         List<String> roles = userRoleService.getUserRoles(userInfo.getRoleId()).stream()
                 .map(Role::getRole).collect(Collectors.toList());
 
-        // 是管理员。
-        if (RoleUtils.hasAdminRole(roles) && response != null) {
+        if (! requireAdmin || RoleUtils.hasAdminRole(roles)) {
             // 登录并缓存用户信息到Session。
             StpUtil.login(userInfo.getUuid());
             AccountProfile profile = new AccountProfile();
@@ -117,11 +110,6 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public UserHomeVO getUserHomeInfo(String uid, String username) {
-        return null;
-    }
-
-    @Override
     public UserCalendarHeatmapVO getUserCalendarHeatmap(String uid, String username) {
         return null;
     }
@@ -142,12 +130,10 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public UserInfoVO changeUserInfo(UserInfoVO userInfoVo) {
-        return null;
+    public UserAuthInfoVO getUserAuthInfo() {
+        UserAuthInfoVO userAuthInfoVO = new UserAuthInfoVO();
+        userAuthInfoVO.setRoles(userRoleService.getUserRoles(StpUtil.getLoginIdAsString()));
+        return userAuthInfoVO;
     }
 
-    @Override
-    public UserAuthInfoVO getUserAuthInfo() {
-        return null;
-    }
 }
