@@ -12,6 +12,8 @@ import love.pangteen.judge.pojo.vo.SubmissionInfoVO;
 import love.pangteen.judge.pojo.vo.TestJudgeVO;
 import love.pangteen.judge.service.JudgeService;
 import love.pangteen.result.CommonResult;
+import org.hibernate.validator.constraints.Range;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -34,8 +36,9 @@ public class JudgeController {
      * 通用查询判题记录列表。
      */
     @GetMapping("/get-submission-list")
-    public CommonResult<IPage<JudgeVO>> getJudgeList(@RequestParam(value = "limit", required = false) Integer limit,
-                                                     @RequestParam(value = "currentPage", required = false) Integer currentPage,
+    @Validated
+    public CommonResult<IPage<JudgeVO>> getJudgeList(@Range(min = 1) @RequestParam(value = "limit", defaultValue = "1") Integer limit,
+                                                     @Range(min = 1) @RequestParam(value = "currentPage", defaultValue = "30") Integer currentPage,
                                                      @RequestParam(value = "onlyMine", required = false) Boolean onlyMine,
                                                      @RequestParam(value = "problemID", required = false) String searchPid,
                                                      @RequestParam(value = "status", required = false) Integer searchStatus,

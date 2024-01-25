@@ -41,6 +41,10 @@ public class JudgeServiceImpl extends ServiceImpl<JudgeMapper, Judge> implements
 
     @Override
     public IPage<JudgeVO> getJudgeList(Integer limit, Integer currentPage, Boolean onlyMine, String searchPid, Integer searchStatus, String searchUsername, Boolean completeProblemID, Long gid) {
+        // 只查看当前用户的提交
+        if (onlyMine) {
+
+        }
         return null;
     }
 
