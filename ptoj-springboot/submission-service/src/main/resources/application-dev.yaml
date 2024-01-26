@@ -1,8 +1,8 @@
 server:
-  port: 8003 # 内嵌的 Tomcat 端口号。默认值为 8080。
+  port: 8002 # 内嵌的 Tomcat 端口号。默认值为 8080。
 spring:
   application:
-    name: judge-service # 微服务名称。
+    name: submission-service # 微服务名称。
 ptoj:
   mysql:
     name: ptoj-judge
@@ -26,5 +26,5 @@ ptoj:
     password: 123456
 
   swagger:
-    title: "评测管理接口文档"
-    package: love.pangteen.judge.controller
+    title: "提交管理接口文档"
+    package: love.pangteen.submission.controller

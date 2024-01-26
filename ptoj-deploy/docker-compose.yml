@@ -71,7 +71,8 @@ services:
     hostname: ptoj-mq
     restart: unless-stopped
     volumes:
-      - ${PTOJ_DIRECTORY}/data/rabbitmq/plugins:/plugins
+#      - ${PTOJ_DIRECTORY}/data/rabbitmq/plugins:/plugins
+      - ${PTOJ_DIRECTORY}/data/rabbitmq/data:/var/lib/rabbitmq
     environment:
       - RABBITMQ_DEFAULT_USER=root
       - RABBITMQ_DEFAULT_PASS=123456
@@ -82,23 +83,23 @@ services:
       ptoj-network:
         ipv4_address: ${ES:-172.21.0.5}
 
-  ptoj-es:
-    image: elasticsearch:7.14.0
-    container_name: ptoj-es
-    restart: unless-stopped
-    volumes:
-      - ${PTOJ_DIRECTORY}/data/elasticsearch/data:/usr/share/elasticsearch/data
-      - ${PTOJ_DIRECTORY}/data/elasticsearch/plugins:/usr/share/elasticsearch/plugins
-    environment:
-      - cluster.name=elasticsearch
-      - discovery.type=single-node
-      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
-    ports:
-      - "9200:9200"
-      - "9300:9300"
-    networks:
-      ptoj-network:
-        ipv4_address: ${ES:-172.21.0.6}
+#  ptoj-es:
+#    image: elasticsearch:7.14.0
+#    container_name: ptoj-es
+#    restart: unless-stopped
+#    volumes:
+#      - ${PTOJ_DIRECTORY}/data/elasticsearch/data:/usr/share/elasticsearch/data
+#      - ${PTOJ_DIRECTORY}/data/elasticsearch/plugins:/usr/share/elasticsearch/plugins
+#    environment:
+#      - cluster.name=elasticsearch
+#      - discovery.type=single-node
+#      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+#    ports:
+#      - "9200:9200"
+#      - "9300:9300"
+#    networks:
+#      ptoj-network:
+#        ipv4_address: ${ES:-172.21.0.6}
 
 #  hoj-frontend:
 ##    image: registry.cn-shenzhen.aliyuncs.com/hcode/hoj_frontend

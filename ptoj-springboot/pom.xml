@@ -15,6 +15,7 @@
         <module>ptoj-gateway</module>
         <module>problem-service</module>
         <module>judge-service</module>
+        <module>submission-service</module>
     </modules>
 
     <parent>
