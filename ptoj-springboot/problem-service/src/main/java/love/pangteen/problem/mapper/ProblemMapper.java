@@ -2,7 +2,7 @@ package love.pangteen.problem.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import love.pangteen.problem.pojo.entity.Problem;
+import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.problem.pojo.vo.ProblemVO;
 
 import java.util.List;

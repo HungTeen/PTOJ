@@ -15,7 +15,6 @@ services:
     command: redis-server --requirepass ${REDIS_PASSWORD:-123456} --appendonly yes
 
   ptoj-mysql:
-    #    image: mysql:8.2.0
     build: src/mysql
     container_name: ptoj-mysql
     restart: unless-stopped
@@ -34,7 +33,6 @@ services:
 
   ptoj-nacos:
     image: nacos/nacos-server:v2.3.0-slim
-#    image: nacos/nacos-server:v2.1.0-slim
     container_name: ptoj-nacos
     restart: unless-stopped
     depends_on:
@@ -67,9 +65,26 @@ services:
       ptoj-network:
         ipv4_address: ${NACOS_HOST:-172.21.0.4}
 
+  ptoj-mq:
+    image: rabbitmq:3.12.12-management
+    container_name: ptoj-mq
+    hostname: ptoj-mq
+    restart: unless-stopped
+    volumes:
+      - ${PTOJ_DIRECTORY}/data/rabbitmq/plugins:/plugins
+    environment:
+      - RABBITMQ_DEFAULT_USER=root
+      - RABBITMQ_DEFAULT_PASS=123456
+    ports:
+      - "15672:15672"
+      - "5672:5672"
+    networks:
+      ptoj-network:
+        ipv4_address: ${ES:-172.21.0.5}
+
   ptoj-es:
     image: elasticsearch:7.14.0
-    container_name: es7
+    container_name: ptoj-es
     restart: unless-stopped
     volumes:
       - ${PTOJ_DIRECTORY}/data/elasticsearch/data:/usr/share/elasticsearch/data
@@ -83,7 +98,7 @@ services:
       - "9300:9300"
     networks:
       ptoj-network:
-        ipv4_address: ${ES:-172.21.0.5}
+        ipv4_address: ${ES:-172.21.0.6}
 
 #  hoj-frontend:
 ##    image: registry.cn-shenzhen.aliyuncs.com/hcode/hoj_frontend

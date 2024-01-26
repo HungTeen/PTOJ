@@ -11,6 +11,7 @@ import love.pangteen.judge.pojo.vo.JudgeVO;
 import love.pangteen.judge.pojo.vo.SubmissionInfoVO;
 import love.pangteen.judge.pojo.vo.TestJudgeVO;
 import love.pangteen.judge.service.JudgeService;
+import love.pangteen.judge.service.SubmitService;
 import love.pangteen.result.CommonResult;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.validation.annotation.Validated;
@@ -28,9 +29,11 @@ import java.util.HashMap;
 @RequestMapping("/judge")
 public class JudgeController {
 
-
     @Resource
     private JudgeService judgeService;
+
+    @Resource
+    private SubmitService submitService;
 
     /**
      * 通用查询判题记录列表。
@@ -52,8 +55,8 @@ public class JudgeController {
      * 获取单个提交记录的详情。
      */
     @GetMapping("/get-submission-detail")
-    public CommonResult<SubmissionInfoVO> getSubmission(@RequestParam(value = "submitId", required = true) Long submitId) {
-        return CommonResult.success(judgeService.getSubmission(submitId));
+    public CommonResult<SubmissionInfoVO> getSubmission(@RequestParam(value = "submitId") Long submitId) {
+        return CommonResult.success(submitService.getSubmission(submitId));
     }
 
     /**
@@ -62,13 +65,13 @@ public class JudgeController {
     @RequiresPermissions("/submit")
     @RequestMapping(value = "/submit-problem-judge", method = RequestMethod.POST)
     public CommonResult<Judge> submitProblemJudge(@RequestBody SubmitJudgeDTO judgeDto) {
-        return CommonResult.success(judgeService.submitProblemJudge(judgeDto));
+        return CommonResult.success(submitService.submitProblemJudge(judgeDto));
     }
 
     @RequiresPermissions("/submit")
     @RequestMapping(value = "/submit-problem-test-judge", method = RequestMethod.POST)
     public CommonResult<String> submitProblemTestJudge(@RequestBody TestJudgeDTO testJudgeDto) {
-        return CommonResult.success(judgeService.submitProblemTestJudge(testJudgeDto));
+        return CommonResult.success(submitService.submitProblemTestJudge(testJudgeDto));
     }
 
     @GetMapping("/get-test-judge-result")
@@ -81,7 +84,7 @@ public class JudgeController {
      */
     @GetMapping(value = "/resubmit")
     public CommonResult<Judge> resubmit(@RequestParam("submitId") Long submitId) {
-        return CommonResult.success(judgeService.resubmit(submitId));
+        return CommonResult.success(submitService.resubmit(submitId));
     }
 
     /**
@@ -89,7 +92,7 @@ public class JudgeController {
      */
     @PutMapping("/submission")
     public CommonResult<Void> updateSubmission(@RequestBody Judge judge) {
-        judgeService.updateSubmission(judge);
+        submitService.updateSubmission(judge);
         return CommonResult.success();
     }
 

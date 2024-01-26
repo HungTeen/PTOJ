@@ -4,7 +4,7 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import love.pangteen.problem.mapper.ProblemCaseMapper;
-import love.pangteen.problem.pojo.entity.Problem;
+import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.problem.pojo.entity.ProblemCase;
 import love.pangteen.problem.service.ProblemCaseService;
 import love.pangteen.problem.utils.FileUtils;

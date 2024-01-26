@@ -3,7 +3,7 @@ package love.pangteen.problem.service.impl;
 import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import love.pangteen.exception.StatusFailException;
-import love.pangteen.problem.constants.OJConstants;
+import love.pangteen.api.constant.OJConstant;
 import love.pangteen.problem.mapper.TagMapper;
 import love.pangteen.problem.pojo.entity.Tag;
 import love.pangteen.problem.service.TagService;
@@ -30,10 +30,10 @@ public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagSe
                     .filter(tag -> tag.getId() == null)
                     .filter(tag -> lambdaQuery()
                             .eq(Tag::getName, tag.getName())
-                            .eq(Tag::getOj, OJConstants.DEFAULT_TAG_SOURCE)
+                            .eq(Tag::getOj, OJConstant.DEFAULT_TAG_SOURCE)
                             .oneOpt().isEmpty())
                     .collect(Collectors.toList());
-            newTags.forEach(tag -> tag.setOj(OJConstants.DEFAULT_TAG_SOURCE));
+            newTags.forEach(tag -> tag.setOj(OJConstant.DEFAULT_TAG_SOURCE));
             saveBatch(newTags);
         }
     }

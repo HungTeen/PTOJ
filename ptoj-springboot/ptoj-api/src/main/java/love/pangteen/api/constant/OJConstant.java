@@ -1,11 +1,11 @@
-package love.pangteen.problem.constants;
+package love.pangteen.api.constant;
 
 /**
  * @program: PTOJ
  * @author: PangTeen
  * @create: 2024/1/22 10:49
  **/
-public interface OJConstants {
+public interface OJConstant {
 
     /**
      * 最大时间限制：30s。

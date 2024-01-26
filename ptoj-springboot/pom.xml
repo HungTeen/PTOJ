@@ -33,9 +33,9 @@
         <spring-cloud.version>2021.0.3</spring-cloud.version>
         <spring-cloud-alibaba.version>2021.0.4.0</spring-cloud-alibaba.version>
         <dubbo.version>3.2.4</dubbo.version>
-        <mybatis-plus.version>3.4.3</mybatis-plus.version>
+        <mybatis-plus.version>3.5.5</mybatis-plus.version>
         <mybatis-plus-join.version>1.4.9</mybatis-plus-join.version>
-        <hutool.version>5.8.11</hutool.version>
+        <hutool.version>5.8.22</hutool.version>
         <swagger.version>4.1.0</swagger.version>
         <mysql.version>8.0.23</mysql.version>
         <jjwt.version>0.9.1</jjwt.version>

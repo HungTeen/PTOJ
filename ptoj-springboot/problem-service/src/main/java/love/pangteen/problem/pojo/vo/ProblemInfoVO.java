@@ -2,7 +2,7 @@ package love.pangteen.problem.pojo.vo;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import love.pangteen.problem.pojo.entity.Problem;
+import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.problem.pojo.entity.Tag;
 
 import java.util.HashMap;

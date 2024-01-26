@@ -1,4 +1,4 @@
-package love.pangteen.problem.pojo.entity;
+package love.pangteen.api.pojo.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.annotations.ApiModel;
@@ -6,8 +6,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import love.pangteen.problem.constants.OJConstants;
-import love.pangteen.problem.utils.ValidateUtils;
+import love.pangteen.api.interfaces.ValidateGroups;
+import love.pangteen.api.constant.OJConstant;
 import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.Range;
 
@@ -30,17 +30,17 @@ import java.util.Date;
 public class Problem implements Serializable {
 
     @TableId(value = "id", type = IdType.AUTO)
-    @NotNull(message = "题目的id不能为空！", groups = {ValidateUtils.Update.class})
+    @NotNull(message = "题目的id不能为空！", groups = {ValidateGroups.Update.class})
     private Long id;
 
     @ApiModelProperty(value = "题目的自定义ID 例如（HOJ-1000）")
-    @NotBlank(message = "题目的展示ID不能为空！", groups = {Default.class, ValidateUtils.Group.class})
-    @Length(max = 50, message = "题目的展示ID的内容长度超过限制，请重新编辑！", groups = {ValidateUtils.Group.class})
+    @NotBlank(message = "题目的展示ID不能为空！", groups = {Default.class, ValidateGroups.Group.class})
+    @Length(max = 50, message = "题目的展示ID的内容长度超过限制，请重新编辑！", groups = {ValidateGroups.Group.class})
     private String problemId;
 
     @ApiModelProperty(value = "题目")
-    @NotNull(message = "题目的标题不能为空！", groups = {ValidateUtils.Group.class})
-    @Length(max = 255, message = "题目的标题的内容长度超过限制，请重新编辑！", groups = {ValidateUtils.Group.class})
+    @NotNull(message = "题目的标题不能为空！", groups = {ValidateGroups.Group.class})
+    @Length(max = 255, message = "题目的标题的内容长度超过限制，请重新编辑！", groups = {ValidateGroups.Group.class})
     private String title;
 
     @ApiModelProperty(value = "作者")
@@ -60,30 +60,30 @@ public class Problem implements Serializable {
     private String judgeCaseMode;
 
     @ApiModelProperty(value = "单位ms")
-    @NotNull(message = "题目的时间限制不能为空！", groups = {ValidateUtils.Group.class})
-    @Range(min = 1, max = OJConstants.MAX_TIME_LIMIT, message = "题目的时间限制范围请合理填写！(1~30000ms)")
+    @NotNull(message = "题目的时间限制不能为空！", groups = {ValidateGroups.Group.class})
+    @Range(min = 1, max = OJConstant.MAX_TIME_LIMIT, message = "题目的时间限制范围请合理填写！(1~30000ms)")
     private Integer timeLimit;
 
     @ApiModelProperty(value = "单位mb")
-    @NotNull(message = "题目的内存限制不能为空！", groups = {ValidateUtils.Group.class})
-    @Range(min = 1, max = OJConstants.MAX_MEMORY_LIMIT, message = "题目的内存限制范围请合理填写！(1~1024mb)")
+    @NotNull(message = "题目的内存限制不能为空！", groups = {ValidateGroups.Group.class})
+    @Range(min = 1, max = OJConstant.MAX_MEMORY_LIMIT, message = "题目的内存限制范围请合理填写！(1~1024mb)")
     private Integer memoryLimit;
 
     @ApiModelProperty(value = "单位mb")
-    @NotNull(message = "题目的栈限制不能为空！", groups = {ValidateUtils.Group.class})
-    @Range(min = 1, max = OJConstants.MAX_STACK_LIMIT, message = "题目的栈限制范围请合理填写！(1~1024mb)")
+    @NotNull(message = "题目的栈限制不能为空！", groups = {ValidateGroups.Group.class})
+    @Range(min = 1, max = OJConstant.MAX_STACK_LIMIT, message = "题目的栈限制范围请合理填写！(1~1024mb)")
     private Integer stackLimit;
 
     @ApiModelProperty(value = "描述")
-    @Length(max = 65535, message = "题目的描述的内容长度超过限制，请重新编辑！", groups = {ValidateUtils.Group.class})
+    @Length(max = 65535, message = "题目的描述的内容长度超过限制，请重新编辑！", groups = {ValidateGroups.Group.class})
     private String description;
 
     @ApiModelProperty(value = "输入描述")
-    @Length(max = 65535, message = "题目的输入描述的内容长度超过限制，请重新编辑！", groups = {ValidateUtils.Group.class})
+    @Length(max = 65535, message = "题目的输入描述的内容长度超过限制，请重新编辑！", groups = {ValidateGroups.Group.class})
     private String input;
 
     @ApiModelProperty(value = "输出描述")
-    @Length(max = 65535, message = "题目的输出描述的内容长度超过限制，请重新编辑！", groups = {ValidateUtils.Group.class})
+    @Length(max = 65535, message = "题目的输出描述的内容长度超过限制，请重新编辑！", groups = {ValidateGroups.Group.class})
     private String output;
 
     @ApiModelProperty(value = "题面样例")
@@ -99,7 +99,7 @@ public class Problem implements Serializable {
     private Integer difficulty;
 
     @ApiModelProperty(value = "备注,提醒")
-    @Length(max = 255, message = "题目的备注的内容长度超过限制，请重新编辑！", groups = {ValidateUtils.Group.class})
+    @Length(max = 255, message = "题目的备注的内容长度超过限制，请重新编辑！", groups = {ValidateGroups.Group.class})
     private String hint;
 
     @ApiModelProperty(value = "默认为1公开，2为私有，3为比赛中")

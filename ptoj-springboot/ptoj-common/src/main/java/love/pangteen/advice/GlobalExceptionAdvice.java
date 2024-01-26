@@ -1,11 +1,10 @@
 package love.pangteen.advice;
 
+import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.SameTokenInvalidException;
 import com.alibaba.nacos.shaded.com.google.protobuf.ServiceException;
 import lombok.extern.slf4j.Slf4j;
-import love.pangteen.exception.StatusAccessDeniedException;
-import love.pangteen.exception.StatusFailException;
-import love.pangteen.exception.StatusForbiddenException;
+import love.pangteen.exception.*;
 import love.pangteen.result.CommonResult;
 import love.pangteen.result.ResultStatus;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -50,8 +49,8 @@ public class GlobalExceptionAdvice {
             StatusForbiddenException.class,
             StatusAccessDeniedException.class,
             StatusFailException.class,
-//            StatusNotFoundException.class,
-//            StatusSystemErrorException.class
+            StatusNotFoundException.class,
+            JudgeSystemError.class
     })
     public CommonResult<Void> handleCustomException(Exception e) {
         return CommonResult.clientError(e.getMessage());
@@ -69,18 +68,18 @@ public class GlobalExceptionAdvice {
         return CommonResult.error(ResultStatus.ACCESS_DENIED, e.getMessage());
     }
 
-//    /**
-//     * 401 -UnAuthorized UnauthenticatedException,token相关异常 即是认证出错 可能无法处理！
-//     * 没有登录（没有token），访问有@RequiresAuthentication的请求路径会报这个异常
-//     */
-//    @ResponseStatus(HttpStatus.UNAUTHORIZED)
-//    @ExceptionHandler(value = UnauthenticatedException.class)
-//    public CommonResult<Void> handleUnauthenticatedException(UnauthenticatedException e,
-//                                                             HttpServletRequest httpRequest,
-//                                                             HttpServletResponse httpResponse) {
-//        httpResponse.setHeader("Url-Type", httpRequest.getHeader("Url-Type")); // 为了前端能区别请求来源
-//        return CommonResult.errorResponse("请您先登录！", ResultStatus.ACCESS_DENIED);
-//    }
+    /**
+     * 401 -UnAuthorized UnauthenticatedException,token相关异常 即是认证出错 可能无法处理！
+     * 没有登录（没有token），访问有@RequiresAuthentication的请求路径会报这个异常
+     */
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    @ExceptionHandler(value = NotLoginException.class)
+    public CommonResult<Void> handleUnauthenticatedException(NotLoginException e,
+                                                             HttpServletRequest httpRequest,
+                                                             HttpServletResponse httpResponse) {
+        httpResponse.setHeader("Url-Type", httpRequest.getHeader("Url-Type")); // 为了前端能区别请求来源
+        return CommonResult.error(ResultStatus.ACCESS_DENIED, "请您先登录！");
+    }
 
 //    /**
 //     * 403 -FORBIDDEN AuthorizationException异常 即是授权认证出错 可能无法处理！
@@ -106,14 +105,14 @@ public class GlobalExceptionAdvice {
 //        return CommonResult.error(ResultStatus.FORBIDDEN, "对不起，您无权限进行此操作，请先登录进行授权认证");
 //    }
 
-//    /**
-//     * 403 -FORBIDDEN 处理访问api能力被禁止的异常
-//     */
-//    @ResponseStatus(HttpStatus.FORBIDDEN)
-//    @ExceptionHandler(value = AccessException.class)
-//    public CommonResult<Void> handleAccessException(AccessException e) {
-//        return CommonResult.errorResponse(e.getMessage(), ResultStatus.FORBIDDEN);
-//    }
+    /**
+     * 403 -FORBIDDEN 处理访问api能力被禁止的异常
+     */
+    @ResponseStatus(HttpStatus.FORBIDDEN)
+    @ExceptionHandler(value = OJAccessException.class)
+    public CommonResult<Void> handleAccessException(OJAccessException e) {
+        return CommonResult.error(ResultStatus.FORBIDDEN, e.getMessage());
+    }
 
     /**
      * 400 - Bad Request 处理Assert的异常 断言的异常！

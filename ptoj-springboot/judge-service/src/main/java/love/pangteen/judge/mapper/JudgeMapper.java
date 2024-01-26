@@ -1,6 +1,6 @@
 package love.pangteen.judge.mapper;
 
-import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.github.yulichang.base.MPJBaseMapper;
 import love.pangteen.judge.pojo.entity.Judge;
 
 /**
@@ -8,5 +8,5 @@ import love.pangteen.judge.pojo.entity.Judge;
  * @author: PangTeen
  * @create: 2024/1/25 16:10
  **/
-public interface JudgeMapper extends BaseMapper<Judge> {
+public interface JudgeMapper extends MPJBaseMapper<Judge> {
 }

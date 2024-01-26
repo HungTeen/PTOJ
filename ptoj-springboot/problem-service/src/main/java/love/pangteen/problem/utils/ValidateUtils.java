@@ -7,7 +7,7 @@ import love.pangteen.api.utils.RoleUtils;
 import love.pangteen.exception.StatusFailException;
 import love.pangteen.exception.StatusForbiddenException;
 import love.pangteen.pojo.AccountProfile;
-import love.pangteen.problem.pojo.entity.Problem;
+import love.pangteen.api.pojo.entity.Problem;
 
 /**
  * @program: PTOJ
@@ -47,11 +47,4 @@ public class ValidateUtils {
         }
     }
 
-    public interface Group {
-
-    }
-
-    public interface Update {
-
-    }
 }

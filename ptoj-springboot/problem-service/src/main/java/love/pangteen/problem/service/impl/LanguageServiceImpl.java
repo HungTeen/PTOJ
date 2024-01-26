@@ -2,10 +2,10 @@ package love.pangteen.problem.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import love.pangteen.api.enums.RemoteOJ;
-import love.pangteen.problem.constants.OJConstants;
+import love.pangteen.api.constant.OJConstant;
 import love.pangteen.problem.mapper.LanguageMapper;
 import love.pangteen.problem.pojo.entity.Language;
-import love.pangteen.problem.pojo.entity.Problem;
+import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.problem.service.LanguageService;
 import love.pangteen.problem.service.ProblemService;
 import org.springframework.stereotype.Service;
@@ -28,7 +28,7 @@ public class LanguageServiceImpl extends ServiceImpl<LanguageMapper, Language> i
 
     @Override
     public List<Language> getLanguages(Long pid, boolean all) {
-        String oj = OJConstants.DEFAULT_OJ;
+        String oj = OJConstant.DEFAULT_OJ;
         if (pid != null) {
             Problem problem = problemService.getById(pid);
             if (problem.getIsRemote()) {

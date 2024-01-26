@@ -1,7 +1,7 @@
 package love.pangteen.problem.controller;
 
 import love.pangteen.api.annotations.IgnoreLogin;
-import love.pangteen.problem.constants.OJConstants;
+import love.pangteen.api.constant.OJConstant;
 import love.pangteen.problem.pojo.entity.Tag;
 import love.pangteen.problem.pojo.vo.ProblemTagVO;
 import love.pangteen.problem.service.ClassificationService;
@@ -37,13 +37,13 @@ public class ProblemTagController {
 
     @GetMapping("/get-all-problem-tags")
     @IgnoreLogin
-    public CommonResult<List<Tag>> getAllProblemTagsList(@RequestParam(value = "oj", defaultValue = OJConstants.DEFAULT_TAG_SOURCE) String oj) {
+    public CommonResult<List<Tag>> getAllProblemTagsList(@RequestParam(value = "oj", defaultValue = OJConstant.DEFAULT_TAG_SOURCE) String oj) {
         return CommonResult.success(tagService.getAllProblemTagsList(oj));
     }
 
     @GetMapping("/get-problem-tags-and-classification")
     @IgnoreLogin
-    public CommonResult<List<ProblemTagVO>> getProblemTagsAndClassification(@RequestParam(value = "oj", defaultValue = OJConstants.DEFAULT_TAG_SOURCE) String oj) {
+    public CommonResult<List<ProblemTagVO>> getProblemTagsAndClassification(@RequestParam(value = "oj", defaultValue = OJConstant.DEFAULT_TAG_SOURCE) String oj) {
         return CommonResult.success(classificationService.getProblemTagsAndClassification(oj));
     }
 

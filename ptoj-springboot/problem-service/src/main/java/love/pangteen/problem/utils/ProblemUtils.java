@@ -2,7 +2,7 @@ package love.pangteen.problem.utils;
 
 import cn.hutool.core.lang.Pair;
 import love.pangteen.api.enums.JudgeCaseMode;
-import love.pangteen.problem.constants.OJConstants;
+import love.pangteen.api.constant.OJConstant;
 import love.pangteen.problem.pojo.entity.ProblemCase;
 import love.pangteen.problem.pojo.entity.TagClassification;
 import love.pangteen.problem.pojo.vo.ProblemTagVO;
@@ -31,9 +31,9 @@ public class ProblemUtils {
         if (Objects.equals(p1Classification.getOj(), p2Classification.getOj())) {
             return p1Classification.getRank().compareTo(p2Classification.getRank());
         } else {
-            if (OJConstants.DEFAULT_TAG_SOURCE.equals(p1Classification.getOj())) {
+            if (OJConstant.DEFAULT_TAG_SOURCE.equals(p1Classification.getOj())) {
                 return -1;
-            } else if (OJConstants.DEFAULT_TAG_SOURCE.equals(p2Classification.getOj())) {
+            } else if (OJConstant.DEFAULT_TAG_SOURCE.equals(p2Classification.getOj())) {
                 return 1;
             } else {
                 return p1Classification.getOj().compareTo(p2Classification.getOj());

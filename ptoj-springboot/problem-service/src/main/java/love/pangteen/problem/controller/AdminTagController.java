@@ -1,6 +1,6 @@
 package love.pangteen.problem.controller;
 
-import love.pangteen.problem.constants.OJConstants;
+import love.pangteen.api.constant.OJConstant;
 import love.pangteen.problem.pojo.entity.Tag;
 import love.pangteen.problem.pojo.entity.TagClassification;
 import love.pangteen.problem.service.ClassificationService;
@@ -44,7 +44,7 @@ public class AdminTagController {
     }
 
     @GetMapping("/classification")
-    public CommonResult<List<TagClassification>> getTagClassification(@RequestParam(value = "oj", defaultValue = OJConstants.DEFAULT_TAG_SOURCE) String oj) {
+    public CommonResult<List<TagClassification>> getTagClassification(@RequestParam(value = "oj", defaultValue = OJConstant.DEFAULT_TAG_SOURCE) String oj) {
         return CommonResult.success(classificationService.getTagClassification(oj));
     }
 

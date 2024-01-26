@@ -1,12 +1,12 @@
 package love.pangteen.problem.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import love.pangteen.api.interfaces.ValidateGroups;
 import love.pangteen.problem.pojo.dto.ProblemDTO;
-import love.pangteen.problem.pojo.entity.Problem;
+import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.problem.pojo.entity.ProblemCase;
 import love.pangteen.problem.service.ProblemCaseService;
 import love.pangteen.problem.service.ProblemService;
-import love.pangteen.problem.utils.ValidateUtils;
 import love.pangteen.result.CommonResult;
 import org.hibernate.validator.constraints.Range;
 import org.springframework.validation.annotation.Validated;
@@ -59,7 +59,7 @@ public class AdminProblemController {
     }
 
     @PutMapping("")
-    public CommonResult<Void> updateProblem(@Validated({Default.class, ValidateUtils.Update.class}) @RequestBody ProblemDTO problemDto) {
+    public CommonResult<Void> updateProblem(@Validated({Default.class, ValidateGroups.Update.class}) @RequestBody ProblemDTO problemDto) {
         problemService.updateProblem(problemDto);
         return CommonResult.success();
     }
