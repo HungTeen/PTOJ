@@ -7,11 +7,12 @@ import love.pangteen.api.utils.RoleUtils;
 import love.pangteen.exception.StatusNotFoundException;
 import love.pangteen.submission.pojo.dto.SubmitJudgeDTO;
 import love.pangteen.submission.pojo.dto.TestJudgeDTO;
-import love.pangteen.submission.pojo.entity.Judge;
+import love.pangteen.api.pojo.entity.Judge;
 import love.pangteen.submission.pojo.vo.SubmissionInfoVO;
+import love.pangteen.submission.publisher.SubmissionPublisher;
 import love.pangteen.submission.service.JudgeService;
 import love.pangteen.submission.service.SubmitService;
-import love.pangteen.submission.utils.JudgeUtils;
+import love.pangteen.api.utils.JudgeUtils;
 import love.pangteen.submission.utils.SubmitUtils;
 import love.pangteen.submission.utils.ValidateUtils;
 import love.pangteen.pojo.AccountProfile;
@@ -45,6 +46,9 @@ public class SubmitServiceImpl implements SubmitService {
 
     @Resource
     private SubmitUtils submitUtils;
+
+    @Resource
+    private SubmissionPublisher submissionPublisher;
 
     /**
      * 超级管理员与题目管理员有权限查看代码。<br>
@@ -123,13 +127,13 @@ public class SubmitServiceImpl implements SubmitService {
 //            }
         }
 
-        if (JudgeUtils.canSeeErrorMsg(judge.getStatus())) {
+        if (! JudgeUtils.canSeeErrorMsg(judge.getStatus())) {
             judge.setErrorMessage("The error message does not support viewing.");
         }
 
         SubmissionInfoVO submissionInfoVo = new SubmissionInfoVO();
         submissionInfoVo.setSubmission(judge);
-        submissionInfoVo.setCodeShare(problemService.canProblemShare(judge.getPid()));
+        submissionInfoVo.setCodeShare(problemService.getById(judge.getPid()).getCodeShare());
         return submissionInfoVo;
     }
 
@@ -171,7 +175,9 @@ public class SubmitServiceImpl implements SubmitService {
                 .setVersion(0)
                 .setIp(IpUtils.getUserIpAddr(request));
 
-        if(JudgeUtils.isContestSubmission(judgeDto.getCid())){
+        boolean isContestSubmission = JudgeUtils.isContestSubmission(judgeDto.getCid());
+
+        if(isContestSubmission){
 
         } else if(JudgeUtils.isTrainingSubmission(judgeDto.getTid())){
 
@@ -189,9 +195,7 @@ public class SubmitServiceImpl implements SubmitService {
 //                    isContestSubmission,
 //                    false);
         } else {
-//            judgeDispatcher.sendTask(judge.getSubmitId(),
-//                    judge.getPid(),
-//                    isContestSubmission);
+            submissionPublisher.sendTask(judge.getSubmitId(), judge.getPid(), isContestSubmission);
         }
         return judge;
     }

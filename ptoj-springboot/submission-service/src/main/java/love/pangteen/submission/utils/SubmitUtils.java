@@ -3,7 +3,7 @@ package love.pangteen.submission.utils;
 import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.api.service.IDubboProblemService;
 import love.pangteen.exception.StatusForbiddenException;
-import love.pangteen.submission.pojo.entity.Judge;
+import love.pangteen.api.pojo.entity.Judge;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.stereotype.Component;
 

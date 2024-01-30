@@ -1,7 +1,7 @@
 package love.pangteen.submission.mapper;
 
 import com.github.yulichang.base.MPJBaseMapper;
-import love.pangteen.submission.pojo.entity.Judge;
+import love.pangteen.api.pojo.entity.Judge;
 
 /**
  * @program: PTOJ

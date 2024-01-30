@@ -1,4 +1,4 @@
-package love.pangteen.submission.pojo.vo;
+package love.pangteen.judge.pojo.vo;
 
 import lombok.Builder;
 import lombok.Data;

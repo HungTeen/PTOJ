@@ -1,7 +1,7 @@
-package love.pangteen.submission.controller;
+package love.pangteen.judge.controller;
 
-import love.pangteen.submission.pojo.vo.JudgeServerInfoVO;
-import love.pangteen.submission.service.OJService;
+import love.pangteen.judge.pojo.vo.JudgeServerInfoVO;
+import love.pangteen.judge.service.OJService;
 import love.pangteen.result.CommonResult;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;

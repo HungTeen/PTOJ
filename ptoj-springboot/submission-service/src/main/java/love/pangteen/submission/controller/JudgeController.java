@@ -5,7 +5,7 @@ import love.pangteen.api.annotations.RequiresPermissions;
 import love.pangteen.submission.pojo.dto.SubmitIdListDTO;
 import love.pangteen.submission.pojo.dto.SubmitJudgeDTO;
 import love.pangteen.submission.pojo.dto.TestJudgeDTO;
-import love.pangteen.submission.pojo.entity.Judge;
+import love.pangteen.api.pojo.entity.Judge;
 import love.pangteen.submission.pojo.vo.JudgeCaseVO;
 import love.pangteen.submission.pojo.vo.JudgeVO;
 import love.pangteen.submission.pojo.vo.SubmissionInfoVO;

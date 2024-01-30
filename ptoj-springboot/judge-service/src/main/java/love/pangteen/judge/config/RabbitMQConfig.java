@@ -1,13 +1,9 @@
-package love.pangteen.submission.config;
+package love.pangteen.judge.config;
 
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
 import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-
-import javax.annotation.PostConstruct;
-import javax.annotation.Resource;
 
 /**
  * @program: PTOJ
@@ -16,16 +12,6 @@ import javax.annotation.Resource;
  **/
 @Configuration
 public class RabbitMQConfig {
-
-    @Resource
-    private RabbitTemplate rabbitTemplate;
-
-    @PostConstruct
-    public void init(){
-        rabbitTemplate.setReturnsCallback(returnedMessage -> {
-
-        });
-    }
 
     @Bean
     public MessageConverter messageConverter(){

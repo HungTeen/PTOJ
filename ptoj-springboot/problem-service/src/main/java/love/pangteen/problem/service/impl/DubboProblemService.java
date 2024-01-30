@@ -31,8 +31,8 @@ public class DubboProblemService implements IDubboProblemService {
     }
 
     @Override
-    public boolean canProblemShare(Long pid) {
-        return problemService.lambdaQuery().select(Problem::getCodeShare).eq(Problem::getId, pid).oneOpt().map(Problem::getCodeShare).orElse(false);
+    public Problem getById(Long pid) {
+        return problemService.lambdaQuery().select(Problem::getCodeShare).eq(Problem::getId, pid).oneOpt().orElse(null);
     }
 
     @Override

@@ -2,7 +2,7 @@ package love.pangteen.submission.pojo.vo;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import love.pangteen.submission.pojo.entity.Judge;
+import love.pangteen.api.pojo.entity.Judge;
 
 /**
  * @program: PTOJ

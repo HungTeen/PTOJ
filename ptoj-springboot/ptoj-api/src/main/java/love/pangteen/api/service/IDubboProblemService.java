@@ -14,7 +14,7 @@ public interface IDubboProblemService {
 
     Map<Long, String> getProblemTitleMap(List<Long> pidList);
 
-    boolean canProblemShare(Long pid);
+    Problem getById(Long pid);
 
     Problem getByProblemId(String problemId);
 

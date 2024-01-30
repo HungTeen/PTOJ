@@ -1,6 +1,7 @@
-package love.pangteen.submission.service;
+package love.pangteen.judge.service;
 
-import love.pangteen.submission.pojo.vo.JudgeServerInfoVO;
+
+import love.pangteen.judge.pojo.vo.JudgeServerInfoVO;
 
 /**
  * @program: PTOJ

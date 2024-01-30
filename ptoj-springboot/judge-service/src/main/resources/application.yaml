@@ -30,6 +30,9 @@ spring:
     virtual-host: ${ptoj.rabbitmq.namespace}
     username: ${ptoj.rabbitmq.username}
     password: ${ptoj.rabbitmq.password}
+    listener:
+      simple:
+        prefetch: 1 # 能者多劳。
 dubbo:
   application:
     name: dubbo-${spring.application.name}

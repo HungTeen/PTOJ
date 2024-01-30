@@ -1,9 +1,9 @@
-package love.pangteen.submission.pojo.dto;
+package love.pangteen.api.pojo.dto;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
-import love.pangteen.submission.pojo.entity.Judge;
+import love.pangteen.api.pojo.entity.Judge;
 
 import java.io.Serializable;
 

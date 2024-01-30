@@ -7,11 +7,10 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.github.yulichang.base.MPJBaseServiceImpl;
 import com.github.yulichang.query.MPJLambdaQueryWrapper;
+import love.pangteen.api.pojo.entity.Judge;
 import love.pangteen.api.service.IDubboProblemService;
 import love.pangteen.submission.mapper.JudgeMapper;
 import love.pangteen.submission.pojo.dto.SubmitIdListDTO;
-import love.pangteen.submission.pojo.dto.ToJudgeDTO;
-import love.pangteen.submission.pojo.entity.Judge;
 import love.pangteen.submission.pojo.vo.JudgeCaseVO;
 import love.pangteen.submission.pojo.vo.JudgeVO;
 import love.pangteen.submission.pojo.vo.TestJudgeVO;
@@ -39,19 +38,6 @@ public class JudgeServiceImpl extends MPJBaseServiceImpl<JudgeMapper, Judge> imp
 
     @Resource
     private ValidateUtils validateUtils;
-
-    /**
-     * 标志该判题过程进入编译阶段。
-     */
-    @Override
-    public void judge(Judge judge) {
-
-    }
-
-    @Override
-    public void remoteJudge(ToJudgeDTO toJudgeDTO) {
-
-    }
 
     /**
      * 通用查询判题记录列表。

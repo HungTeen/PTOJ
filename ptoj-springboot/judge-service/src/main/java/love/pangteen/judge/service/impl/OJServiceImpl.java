@@ -1,10 +1,10 @@
-package love.pangteen.submission.service.impl;
+package love.pangteen.judge.service.impl;
 
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.json.JSONUtil;
-import love.pangteen.submission.pojo.vo.JudgeServerInfoVO;
-import love.pangteen.submission.sandbox.SandboxRun;
-import love.pangteen.submission.service.OJService;
+import love.pangteen.judge.pojo.vo.JudgeServerInfoVO;
+import love.pangteen.judge.sandbox.SandboxRun;
+import love.pangteen.judge.service.OJService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
