@@ -3,6 +3,7 @@ package love.pangteen.problem.pojo.dto;
 import lombok.Data;
 import lombok.experimental.Accessors;
 import love.pangteen.api.pojo.entity.Problem;
+import love.pangteen.api.pojo.entity.ProblemCase;
 import love.pangteen.problem.pojo.entity.*;
 
 import javax.validation.Valid;

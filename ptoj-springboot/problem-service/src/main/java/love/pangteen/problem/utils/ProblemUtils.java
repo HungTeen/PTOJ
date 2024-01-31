@@ -3,7 +3,7 @@ package love.pangteen.problem.utils;
 import cn.hutool.core.lang.Pair;
 import love.pangteen.api.enums.JudgeCaseMode;
 import love.pangteen.api.constant.OJConstant;
-import love.pangteen.problem.pojo.entity.ProblemCase;
+import love.pangteen.api.pojo.entity.ProblemCase;
 import love.pangteen.problem.pojo.entity.TagClassification;
 import love.pangteen.problem.pojo.vo.ProblemTagVO;
 

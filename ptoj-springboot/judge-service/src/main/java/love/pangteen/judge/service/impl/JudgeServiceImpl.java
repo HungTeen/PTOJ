@@ -1,26 +1,35 @@
 package love.pangteen.judge.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
+import cn.hutool.core.util.StrUtil;
+import cn.hutool.json.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import love.pangteen.api.constant.OJFiles;
+import love.pangteen.api.enums.JudgeCaseMode;
 import love.pangteen.api.enums.JudgeStatus;
 import love.pangteen.api.pojo.dto.ToJudgeDTO;
 import love.pangteen.api.pojo.entity.Judge;
 import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.api.service.IDubboProblemService;
 import love.pangteen.api.utils.JudgeUtils;
+import love.pangteen.exception.JudgeSystemError;
 import love.pangteen.judge.config.properties.OJProperties;
+import love.pangteen.judge.exception.CompileError;
+import love.pangteen.judge.exception.SubmitError;
 import love.pangteen.judge.manager.LanguageManager;
 import love.pangteen.judge.mapper.JudgeMapper;
 import love.pangteen.judge.pojo.entity.LanguageConfig;
-import love.pangteen.judge.sandbox.SandboxRun;
+import love.pangteen.judge.result.JudgeResult;
+import love.pangteen.judge.sandbox.Compiler;
+import love.pangteen.judge.sandbox.JudgeStrategy;
+import love.pangteen.judge.sandbox.SandboxManager;
 import love.pangteen.judge.service.JudgeService;
-import love.pangteen.judge.utils.Compiler;
+import love.pangteen.judge.utils.ProblemCaseUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
-import java.io.File;
 import java.util.HashMap;
+import java.util.List;
 
 /**
  * @program: PTOJ
@@ -37,7 +46,7 @@ public class JudgeServiceImpl extends ServiceImpl<JudgeMapper, Judge> implements
     private IDubboProblemService problemService;
 
     @Resource
-    private LanguageManager languageManager;
+    private ProblemCaseUtils problemCaseUtils;
 
     /**
      * 标志该判题过程进入编译阶段。
@@ -67,7 +76,7 @@ public class JudgeServiceImpl extends ServiceImpl<JudgeMapper, Judge> implements
 
     private Judge postProblemJudge(Problem problem, Judge judge) {
         // c和c++为一倍时间和空间，其它语言为2倍时间和空间。
-        LanguageConfig languageConfig = languageManager.getLanguageConfigByName(judge.getLanguage());
+        LanguageConfig languageConfig = LanguageManager.getLanguageConfigByName(judge.getLanguage());
         if (languageConfig.getSrcName() == null || (!languageConfig.getSrcName().endsWith(".c") && !languageConfig.getSrcName().endsWith(".cpp"))) {
             problem.setTimeLimit(problem.getTimeLimit() * 2);
             problem.setMemoryLimit(problem.getMemoryLimit() * 2);
@@ -101,46 +110,49 @@ public class JudgeServiceImpl extends ServiceImpl<JudgeMapper, Judge> implements
         return finalJudgeRes;
     }
 
-    public HashMap<String, Object> judge(Problem problem, Judge judge) {
+    public JudgeResult judge(Problem problem, Judge judge) {
         HashMap<String, Object> result = new HashMap<>();
-        // 编译好的临时代码文件id
+        // 编译好的临时代码文件id。
         String userFileId = null;
         try {
-            // 对用户源代码进行编译 获取tmpfs中的fileId
-            LanguageConfig languageConfig = languageManager.getLanguageConfigByName(judge.getLanguage());
-            // 有的语言可能不支持编译, 目前有js、php不支持编译
+            // 对用户源代码进行编译 获取tmpfs中的fileId。
+            LanguageConfig languageConfig = LanguageManager.getLanguageConfigByName(judge.getLanguage());
+            // 有的语言可能不支持编译, 目前有js、php不支持编译。
             if (languageConfig.getCompileCommand() != null) {
-                userFileId = Compiler.compile(languageConfig,
+                userFileId = Compiler.compile(
+                        languageConfig,
                         judge.getCode(),
                         judge.getLanguage(),
-                        JudgeUtils.getProblemExtraFileMap(problem, "user"));
+                        JudgeUtils.getProblemExtraFileMap(problem, "user")
+                );
             }
-            // 测试数据文件所在文件夹
-            String testCasesDir = Constants.JudgeDir.TEST_CASE_DIR.getContent() + File.separator + "problem_" + problem.getId();
-            // 从文件中加载测试数据json
-            JSONObject testCasesInfo = problemTestCaseUtils.loadTestCaseInfo(problem.getId(),
+            // 测试数据文件所在文件夹。
+            String testCasesDir = OJFiles.getJudgeCaseFolder(problem.getId());
+            // 从文件中加载测试数据json。
+            JSONObject testCasesInfo = problemCaseUtils.loadTestCaseInfo(
+                    problem.getId(),
                     testCasesDir,
                     problem.getCaseVersion(),
                     problem.getJudgeMode(),
-                    problem.getJudgeCaseMode());
+                    problem.getJudgeCaseMode()
+            );
 
-            // 检查是否为spj或者interactive，同时是否有对应编译完成的文件，若不存在，就先编译生成该文件，同时也要检查版本
-            boolean isOk = checkOrCompileExtraProgram(problem);
-            if (!isOk) {
-                result.put("code", Constants.Judge.STATUS_SYSTEM_ERROR.getStatus());
-                result.put("errMsg", "The special judge or interactive program code does not exist.");
-                result.put("time", 0);
-                result.put("memory", 0);
-                return result;
+            // 检查是否为spj或者interactive，同时是否有对应编译完成的文件，若不存在，就先编译生成该文件，同时也要检查版本。
+            if (!JudgeStrategy.checkOrCompileExtraProgram(problem)) {
+                return JudgeResult.builder()
+                        .code(JudgeStatus.STATUS_SYSTEM_ERROR.getStatus())
+                        .errMsg("The special judge or interactive program code does not exist.")
+                        .time(0).memory(0)
+                        .build();
             }
-            // 更新状态为评测数据中
-            UpdateWrapper<Judge> judgeUpdateWrapper = new UpdateWrapper<>();
-            judgeUpdateWrapper.set("status", Constants.Judge.STATUS_JUDGING.getStatus())
-                    .eq("submit_id", judge.getSubmitId());
-            judgeEntityService.update(judgeUpdateWrapper);
+
+            // 更新状态为评测数据中。
+            lambdaUpdate().set(Judge::getStatus, JudgeStatus.STATUS_JUDGING.getStatus())
+                    .eq(Judge::getSubmitId, judge.getSubmitId())
+                    .update();
 
             // 获取题目数据的评测模式
-            String infoJudgeCaseMode = testCasesInfo.getStr("judgeCaseMode", Constants.JudgeCaseMode.DEFAULT.getMode());
+            String infoJudgeCaseMode = testCasesInfo.getStr("judgeCaseMode", JudgeCaseMode.DEFAULT.getMode());
             String judgeCaseMode = getFinalJudgeCaseMode(problem.getType(), problem.getJudgeCaseMode(), infoJudgeCaseMode);
 
             // 开始测试每个测试点
@@ -156,8 +168,8 @@ public class JudgeServiceImpl extends ServiceImpl<JudgeMapper, Judge> implements
 
             // 对全部测试点结果进行评判,获取最终评判结果
             return getJudgeInfo(allCaseResultList, problem, judge, judgeCaseMode);
-        } catch (SystemError systemError) {
-            result.put("code", Constants.Judge.STATUS_SYSTEM_ERROR.getStatus());
+        } catch (JudgeSystemError systemError) {
+            result.put("code", JudgeStatus.STATUS_SYSTEM_ERROR.getStatus());
             result.put("errMsg", "Oops, something has gone wrong with the judgeServer. Please report this to administrator.");
             result.put("time", 0);
             result.put("memory", 0);
@@ -175,12 +187,12 @@ public class JudgeServiceImpl extends ServiceImpl<JudgeMapper, Judge> implements
                     problem.getId(),
                     submitError);
         } catch (CompileError compileError) {
-            result.put("code", Constants.Judge.STATUS_COMPILE_ERROR.getStatus());
+            result.put("code", JudgeStatus.STATUS_COMPILE_ERROR.getStatus());
             result.put("errMsg", mergeNonEmptyStrings(compileError.getStdout(), compileError.getStderr()));
             result.put("time", 0);
             result.put("memory", 0);
         } catch (Exception e) {
-            result.put("code", Constants.Judge.STATUS_SYSTEM_ERROR.getStatus());
+            result.put("code", JudgeStatus.STATUS_SYSTEM_ERROR.getStatus());
             result.put("errMsg", "Oops, something has gone wrong with the judgeServer. Please report this to administrator.");
             result.put("time", 0);
             result.put("memory", 0);
@@ -191,8 +203,8 @@ public class JudgeServiceImpl extends ServiceImpl<JudgeMapper, Judge> implements
         } finally {
 
             // 删除tmpfs内存中的用户代码可执行文件
-            if (!StringUtils.isEmpty(userFileId)) {
-                SandboxRun.delFile(userFileId);
+            if (!StrUtil.isEmpty(userFileId)) {
+                SandboxManager.delFile(userFileId);
             }
         }
         return result;

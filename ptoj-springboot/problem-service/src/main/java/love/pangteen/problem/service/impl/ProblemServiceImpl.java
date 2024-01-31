@@ -16,7 +16,7 @@ import love.pangteen.problem.mapper.ProblemMapper;
 import love.pangteen.problem.pojo.dto.PidListDTO;
 import love.pangteen.problem.pojo.dto.ProblemDTO;
 import love.pangteen.api.pojo.entity.Problem;
-import love.pangteen.problem.pojo.entity.ProblemCase;
+import love.pangteen.api.pojo.entity.ProblemCase;
 import love.pangteen.problem.pojo.vo.*;
 import love.pangteen.problem.service.*;
 import love.pangteen.problem.utils.ProblemUtils;

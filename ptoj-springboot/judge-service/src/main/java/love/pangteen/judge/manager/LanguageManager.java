@@ -1,19 +1,15 @@
 package love.pangteen.judge.manager;
 
-import cn.hutool.core.io.resource.ResourceUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
 import lombok.extern.slf4j.Slf4j;
+import love.pangteen.api.utils.FileUtils;
 import love.pangteen.judge.pojo.entity.LanguageConfig;
-import org.springframework.stereotype.Component;
-import org.yaml.snakeyaml.Yaml;
 
-import javax.annotation.PostConstruct;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @program: PTOJ
@@ -21,62 +17,47 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @create: 2024/1/30 15:56
  **/
 @Slf4j
-@Component
 public class LanguageManager {
 
-    private static List<String> defaultEnv = Arrays.asList(
+    public static final String LANGUAGE_CONFIG_FILENAME = "language.yml";
+    private static final List<String> DEFAULT_ENV = Arrays.asList(
             "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-            "LANG=en_US.UTF-8",
-            "LC_ALL=en_US.UTF-8",
-            "LANGUAGE=en_US:en",
-            "HOME=/w");
+            "LANG=en_US.UTF-8", "LC_ALL=en_US.UTF-8", "LANGUAGE=en_US:en", "HOME=/w"
+    );
 
-    private static List<String> python3Env = Arrays.asList("LANG=en_US.UTF-8",
-            "LANGUAGE=en_US:en", "LC_ALL=en_US.UTF-8", "PYTHONIOENCODING=utf-8");
+    private static final List<String> PYTHON3_ENV = Arrays.asList(
+            "LANG=en_US.UTF-8", "LANGUAGE=en_US:en", "LC_ALL=en_US.UTF-8", "PYTHONIOENCODING=utf-8"
+    );
 
-    private static List<String> golangCompileEnv = Arrays.asList(
+    private static final List<String> GO_COMPILE_ENV = Arrays.asList(
             "GOCACHE=/w", "GOPATH=/w/go", "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+            "LANG=en_US.UTF-8", "LANGUAGE=en_US:en", "LC_ALL=en_US.UTF-8"
+    );
+
+    private static final List<String> GO_RUN_ENV = Arrays.asList(
+            "GOCACHE=off", "GODEBUG=madvdontneed=1", "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
             "LANG=en_US.UTF-8", "LANGUAGE=en_US:en", "LC_ALL=en_US.UTF-8");
 
-    private static List<String> golangRunEnv = Arrays.asList(
-            "GOCACHE=off", "GODEBUG=madvdontneed=1",
-            "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
-            "LANG=en_US.UTF-8", "LANGUAGE=en_US:en", "LC_ALL=en_US.UTF-8");
+    private static final HashMap<String, LanguageConfig> CONFIG_MAP = new HashMap<>();
 
-    private static AtomicBoolean init = new AtomicBoolean(false);
-
-    private static final HashMap<String, LanguageConfig> languageConfigMap = new HashMap<>();
-
-    @PostConstruct
-    public void init() {
-        if (init.compareAndSet(false, true)) {
-            Iterable<Object> languageConfigIter = loadYml("language.yml");
-            languageConfigMap.clear();
-            for (Object configObj : languageConfigIter) {
-                JSONObject configJson = JSONUtil.parseObj(configObj);
-                LanguageConfig languageConfig = buildLanguageConfig(configJson);
-                languageConfigMap.put(languageConfig.getLanguage(), languageConfig);
-            }
-            log.info("load language config: {}", languageConfigMap);
+    static {
+        Iterable<Object> languageConfigIter = FileUtils.loadYml(LANGUAGE_CONFIG_FILENAME);
+        for (Object configObj : languageConfigIter) {
+            JSONObject configJson = JSONUtil.parseObj(configObj);
+            LanguageConfig languageConfig = buildLanguageConfig(configJson);
+            CONFIG_MAP.put(languageConfig.getLanguage(), languageConfig);
         }
+        log.info("load language config: {}", CONFIG_MAP);
     }
 
-    public LanguageConfig getLanguageConfigByName(String langName) {
-        return languageConfigMap.get(langName);
+    public static LanguageConfig getLanguageConfigByName(String langName) {
+        return CONFIG_MAP.get(langName);
     }
 
-    private Iterable<Object> loadYml(String fileName) {
-        try {
-            Yaml yaml = new Yaml();
-            String ymlContent = ResourceUtil.readUtf8Str(fileName);
-            return yaml.loadAll(ymlContent);
-        } catch (Exception e) {
-            log.error("load language yaml error:", e);
-            throw new RuntimeException(e);
-        }
-    }
-
-    private LanguageConfig buildLanguageConfig(JSONObject configJson) {
+    /**
+     * 读取配置文件。
+     */
+    private static LanguageConfig buildLanguageConfig(JSONObject configJson) {
         LanguageConfig languageConfig = new LanguageConfig();
         languageConfig.setLanguage(configJson.getStr("language"));
         languageConfig.setSrcName(configJson.getStr("src_path"));
@@ -92,13 +73,13 @@ public class LanguageManager {
             env = env.toLowerCase();
             switch (env) {
                 case "python3":
-                    languageConfig.setCompileEnvs(python3Env);
+                    languageConfig.setCompileEnvs(PYTHON3_ENV);
                     break;
                 case "golang_compile":
-                    languageConfig.setCompileEnvs(golangCompileEnv);
+                    languageConfig.setCompileEnvs(GO_COMPILE_ENV);
                     break;
                 default:
-                    languageConfig.setCompileEnvs(defaultEnv);
+                    languageConfig.setCompileEnvs(DEFAULT_ENV);
             }
             languageConfig.setMaxCpuTime(parseTimeStr(compileJson.getStr("maxCpuTime")));
             languageConfig.setMaxRealTime(parseTimeStr(compileJson.getStr("maxRealTime")));
@@ -114,20 +95,20 @@ public class LanguageManager {
             env = env.toLowerCase();
             switch (env) {
                 case "python3":
-                    languageConfig.setRunEnvs(python3Env);
+                    languageConfig.setRunEnvs(PYTHON3_ENV);
                     break;
                 case "golang_run":
-                    languageConfig.setRunEnvs(golangRunEnv);
+                    languageConfig.setRunEnvs(GO_RUN_ENV);
                     break;
                 default:
-                    languageConfig.setRunEnvs(defaultEnv);
+                    languageConfig.setRunEnvs(DEFAULT_ENV);
             }
         }
         return languageConfig;
     }
 
 
-    private Long parseTimeStr(String timeStr) {
+    private static Long parseTimeStr(String timeStr) {
         if (StrUtil.isBlank(timeStr)) {
             return 3000L;
         }
@@ -141,7 +122,7 @@ public class LanguageManager {
         }
     }
 
-    private Long parseMemoryStr(String memoryStr) {
+    private static Long parseMemoryStr(String memoryStr) {
         if (StrUtil.isBlank(memoryStr)) {
             return 256 * 1024 * 1024L;
         }

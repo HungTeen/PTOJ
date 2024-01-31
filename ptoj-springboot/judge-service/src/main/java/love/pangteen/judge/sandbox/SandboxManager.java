@@ -16,7 +16,7 @@ import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestClientResponseException;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,18 +27,15 @@ import java.util.Map;
  * @create: 2024/1/25 15:22
  **/
 @Slf4j
-public class SandboxRun {
+public class SandboxManager {
 
-    private static final RestTemplate restTemplate;
-
-    // 单例模式
-    private static final SandboxRun instance = new SandboxRun();
-
+    public static final HashMap<String, JudgeStatus> RESULT_MAP_STATUS = new HashMap<>();
+    public static final List<String> SIGNALS = new ArrayList<>();
+    private static final SandboxManager INSTANCE = new SandboxManager();
+    private static final JSONArray COMPILE_FILES = new JSONArray();
     private static final String SANDBOX_BASE_URL = "http://localhost:5050";
-
-    public static final HashMap<String, Integer> RESULT_MAP_STATUS = new HashMap<>();
-
-    private static final int maxProcessNumber = 128;
+    private static final RestTemplate REST_TEMPLATE;
+    private static final int MAX_PROCESS_NUM = 128;
 
     private static final int TIME_LIMIT_MS = 16000;
 
@@ -48,102 +45,64 @@ public class SandboxRun {
 
     private static final int STDIO_SIZE_MB = 32;
 
-    private SandboxRun() {
-
-    }
-
     static {
         SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
         requestFactory.setConnectTimeout(20000);
         requestFactory.setReadTimeout(180000);
-        restTemplate = new RestTemplate(requestFactory);
+        REST_TEMPLATE = new RestTemplate(requestFactory);
     }
 
     static {
-        RESULT_MAP_STATUS.put("Time Limit Exceeded", JudgeStatus.STATUS_TIME_LIMIT_EXCEEDED.getStatus());
-        RESULT_MAP_STATUS.put("Memory Limit Exceeded", JudgeStatus.STATUS_MEMORY_LIMIT_EXCEEDED.getStatus());
-        RESULT_MAP_STATUS.put("Output Limit Exceeded", JudgeStatus.STATUS_RUNTIME_ERROR.getStatus());
-        RESULT_MAP_STATUS.put("Accepted", JudgeStatus.STATUS_ACCEPTED.getStatus());
-        RESULT_MAP_STATUS.put("Nonzero Exit Status", JudgeStatus.STATUS_RUNTIME_ERROR.getStatus());
-        RESULT_MAP_STATUS.put("Internal Error", JudgeStatus.STATUS_SYSTEM_ERROR.getStatus());
-        RESULT_MAP_STATUS.put("File Error", JudgeStatus.STATUS_SYSTEM_ERROR.getStatus());
-        RESULT_MAP_STATUS.put("Signalled", JudgeStatus.STATUS_RUNTIME_ERROR.getStatus());
+        RESULT_MAP_STATUS.putAll(Map.of(
+                Status.ACCEPTED, JudgeStatus.STATUS_ACCEPTED,
+                Status.MEMORY_LIMIT_EXCEEDED, JudgeStatus.STATUS_MEMORY_LIMIT_EXCEEDED,
+                Status.TIME_LIMIT_EXCEEDED, JudgeStatus.STATUS_TIME_LIMIT_EXCEEDED,
+                Status.OUTPUT_LIMIT_EXCEEDED, JudgeStatus.STATUS_RUNTIME_ERROR,
+                Status.FILE_ERROR, JudgeStatus.STATUS_SYSTEM_ERROR,
+                Status.NONZERO_EXIT_STATUS, JudgeStatus.STATUS_RUNTIME_ERROR,
+                Status.SIGNALLED, JudgeStatus.STATUS_RUNTIME_ERROR,
+                Status.INTERNAL_ERROR, JudgeStatus.STATUS_SYSTEM_ERROR
+        ));
     }
 
-    public static RestTemplate getRestTemplate() {
-        return restTemplate;
+    static {
+        SIGNALS.addAll(List.of(
+                "", // 0
+                "Hangup", // 1
+                "Interrupt", // 2
+                "Quit", // 3
+                "Illegal instruction", // 4
+                "Trace/breakpoint trap", // 5
+                "Aborted", // 6
+                "Bus error", // 7
+                "Floating point exception", // 8
+                "Killed", // 9
+                "User defined signal 1", // 10
+                "Segmentation fault", // 11
+                "User defined signal 2", // 12
+                "Broken pipe", // 13
+                "Alarm clock", // 14
+                "Terminated", // 15
+                "Stack fault", // 16
+                "Child exited", // 17
+                "Continued", // 18
+                "Stopped (signal)", // 19
+                "Stopped", // 20
+                "Stopped (tty input)", // 21
+                "Stopped (tty output)", // 22
+                "Urgent I/O condition", // 23
+                "CPU time limit exceeded", // 24
+                "File size limit exceeded", // 25
+                "Virtual timer expired", // 26
+                "Profiling timer expired", // 27
+                "Window changed", // 28
+                "I/O possible", // 29
+                "Power failure", // 30
+                "Bad system call" // 31
+        ));
     }
 
-    public static String getSandboxBaseUrl() {
-        return SANDBOX_BASE_URL;
-    }
-
-    public static final List<String> signals = Arrays.asList(
-            "", // 0
-            "Hangup", // 1
-            "Interrupt", // 2
-            "Quit", // 3
-            "Illegal instruction", // 4
-            "Trace/breakpoint trap", // 5
-            "Aborted", // 6
-            "Bus error", // 7
-            "Floating point exception", // 8
-            "Killed", // 9
-            "User defined signal 1", // 10
-            "Segmentation fault", // 11
-            "User defined signal 2", // 12
-            "Broken pipe", // 13
-            "Alarm clock", // 14
-            "Terminated", // 15
-            "Stack fault", // 16
-            "Child exited", // 17
-            "Continued", // 18
-            "Stopped (signal)", // 19
-            "Stopped", // 20
-            "Stopped (tty input)", // 21
-            "Stopped (tty output)", // 22
-            "Urgent I/O condition", // 23
-            "CPU time limit exceeded", // 24
-            "File size limit exceeded", // 25
-            "Virtual timer expired", // 26
-            "Profiling timer expired", // 27
-            "Window changed", // 28
-            "I/O possible", // 29
-            "Power failure", // 30
-            "Bad system call" // 31
-    );
-
-    public JSONArray run(String uri, JSONObject param) throws JudgeSystemError {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        HttpEntity<String> request = new HttpEntity<>(JSONUtil.toJsonStr(param), headers);
-        ResponseEntity<String> postForEntity;
-        try {
-            postForEntity = restTemplate.postForEntity(SANDBOX_BASE_URL + uri, request, String.class);
-            return JSONUtil.parseArray(postForEntity.getBody());
-        } catch (RestClientResponseException ex) {
-            if (ex.getRawStatusCode() != 200) {
-                throw new JudgeSystemError("Cannot connect to sandbox service.", null, ex.getResponseBodyAsString());
-            }
-        } catch (Exception e) {
-            throw new JudgeSystemError("Call SandBox Error.", null, e.getMessage());
-        }
-        return null;
-    }
-
-    public static void delFile(String fileId) {
-
-        try {
-            restTemplate.delete(SANDBOX_BASE_URL + "/file/{0}", fileId);
-        } catch (RestClientResponseException ex) {
-            if (ex.getRawStatusCode() != 200) {
-                log.error("安全沙箱判题的删除内存中的文件缓存操作异常----------------->{}", ex.getResponseBodyAsString());
-            }
-        }
-
-    }
-
-    /**
+    /*
      * "files": [{
      * "content": ""
      * }, {
@@ -154,8 +113,6 @@ public class SandboxRun {
      * "max": 1024 * 1024 * 32
      * }]
      */
-    private static final JSONArray COMPILE_FILES = new JSONArray();
-
     static {
         JSONObject content = new JSONObject();
         content.set("content", "");
@@ -172,7 +129,65 @@ public class SandboxRun {
         COMPILE_FILES.put(stderr);
     }
 
+    public static RestTemplate getRestTemplate() {
+        return REST_TEMPLATE;
+    }
+
+    public static String getSandboxBaseUrl() {
+        return SANDBOX_BASE_URL;
+    }
+
+    public static SandboxManager get(){
+        return INSTANCE;
+    }
+
+    public static String getSandboxUrl(String uri) {
+        return getSandboxBaseUrl() + uri;
+    }
+
+    public static Integer getStatusCode(String status){
+        return RESULT_MAP_STATUS.get(status).getStatus();
+    }
+
     /**
+     * 通过RestTemplate访问沙箱来运行代码。
+     */
+    public JSONArray run(JSONObject param) throws JudgeSystemError {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        HttpEntity<String> request = new HttpEntity<>(JSONUtil.toJsonStr(param), headers);
+        try {
+            ResponseEntity<String> response = getRestTemplate().postForEntity(getSandboxUrl("/run"), request, String.class);
+            return JSONUtil.parseArray(response.getBody());
+        } catch (RestClientResponseException ex) {
+            if (ex.getRawStatusCode() != 200) {
+                throw new JudgeSystemError("Cannot connect to sandbox service.", null, ex.getResponseBodyAsString());
+            }
+        } catch (Exception e) {
+            throw new JudgeSystemError("Call SandBox Error.", null, e.getMessage());
+        }
+        return null;
+    }
+
+    public static String version(){
+        return getRestTemplate().getForObject(getSandboxUrl("/version"), String.class);
+    }
+
+    /**
+     * 需要注意，在生产环境中 copyOutCached 产生的文件在使用完之后需要使用（DELETE /file/:id）删除避免内存泄露。
+     */
+    public static void delFile(String fileId) {
+        try {
+            getRestTemplate().delete(getSandboxUrl("/file/{0}"), fileId);
+        } catch (RestClientResponseException ex) {
+            if (ex.getRawStatusCode() != 200) {
+                log.error("安全沙箱判题的删除内存中的文件缓存操作异常----------------->{}", ex.getResponseBodyAsString());
+            }
+        }
+    }
+
+    /**
+     * 编译运行。
      * @param maxCpuTime        最大编译的cpu时间 ms
      * @param maxRealTime       最大编译的真实时间 ms
      * @param maxMemory         最大编译的空间 b
@@ -186,10 +201,7 @@ public class SandboxRun {
      * @param needCopyOutCached 是否需要生成用户程序的缓存文件，即生成用户程序id
      * @param needCopyOutExe    是否需要生成编译后的用户程序exe文件
      * @param copyOutDir        生成编译后的用户程序exe文件的指定路径
-     * @MethodName compile
-     * @Description 编译运行
      * @Return
-     * @Since 2022/1/3
      */
     public static JSONArray compile(Long maxCpuTime,
                                     Long maxRealTime,
@@ -213,7 +225,7 @@ public class SandboxRun {
         cmd.set("clockLimit", maxRealTime * 1000 * 1000L);
         // byte
         cmd.set("memoryLimit", maxMemory);
-        cmd.set("procLimit", maxProcessNumber);
+        cmd.set("procLimit", MAX_PROCESS_NUM);
         cmd.set("stackLimit", maxStack);
 
         JSONObject fileContent = new JSONObject();
@@ -246,10 +258,12 @@ public class SandboxRun {
         JSONObject param = new JSONObject();
         param.set("cmd", new JSONArray().put(cmd));
 
-        JSONArray result = instance.run("/run", param);
+        JSONArray result = get().run(param);
+
         JSONObject compileRes = (JSONObject) result.get(0);
-        compileRes.set("originalStatus", compileRes.getStr("status"));
-        compileRes.set("status", RESULT_MAP_STATUS.get(compileRes.getStr("status")));
+        String status = compileRes.getStr("status");
+        compileRes.set("originalStatus", status);
+        compileRes.set("status", getStatusCode(status));
         return result;
     }
 
@@ -321,7 +335,7 @@ public class SandboxRun {
         cmd.set("clockLimit", maxTime * 1000 * 1000L * 3);
         // byte
         cmd.set("memoryLimit", (maxMemory + 100) * 1024 * 1024L);
-        cmd.set("procLimit", maxProcessNumber);
+        cmd.set("procLimit", MAX_PROCESS_NUM);
         cmd.set("stackLimit", maxStack * 1024 * 1024L);
 
         JSONObject exeFile = new JSONObject();
@@ -350,7 +364,7 @@ public class SandboxRun {
         param.set("cmd", new JSONArray().put(cmd));
 
         // 调用判题安全沙箱
-        JSONArray result = instance.run("/run", param);
+        JSONArray result = get().run(param);
 
         JSONObject testcaseRes = (JSONObject) result.get(0);
         testcaseRes.set("originalStatus", testcaseRes.getStr("status"));
@@ -413,7 +427,7 @@ public class SandboxRun {
         cmd.set("clockLimit", TIME_LIMIT_MS * 1000 * 1000L * 3);
         // byte
         cmd.set("memoryLimit", MEMORY_LIMIT_MB * 1024 * 1024L);
-        cmd.set("procLimit", maxProcessNumber);
+        cmd.set("procLimit", MAX_PROCESS_NUM);
         cmd.set("stackLimit", STACK_LIMIT_MB * 1024 * 1024L);
 
 
@@ -445,7 +459,7 @@ public class SandboxRun {
         param.set("cmd", new JSONArray().put(cmd));
 
         // 调用判题安全沙箱
-        JSONArray result = instance.run("/run", param);
+        JSONArray result =get().run(param);
         JSONObject spjRes = (JSONObject) result.get(0);
         spjRes.set("originalStatus", spjRes.getStr("status"));
         spjRes.set("status", RESULT_MAP_STATUS.get(spjRes.getStr("status")));
@@ -521,7 +535,7 @@ public class SandboxRun {
         // byte
 
         pipeInputCmd.set("memoryLimit", (userMaxMemory + 100) * 1024 * 1024L);
-        pipeInputCmd.set("procLimit", maxProcessNumber);
+        pipeInputCmd.set("procLimit", MAX_PROCESS_NUM);
         pipeInputCmd.set("stackLimit", userMaxStack * 1024 * 1024L);
 
         JSONObject exeFile = new JSONObject();
@@ -559,7 +573,7 @@ public class SandboxRun {
         pipeOutputCmd.set("clockLimit", userMaxTime * 1000 * 1000L * 3 * 2);
         // byte
         pipeOutputCmd.set("memoryLimit", (userMaxMemory + 100) * 1024 * 1024L * 2);
-        pipeOutputCmd.set("procLimit", maxProcessNumber);
+        pipeOutputCmd.set("procLimit", MAX_PROCESS_NUM);
         pipeOutputCmd.set("stackLimit", STACK_LIMIT_MB * 1024 * 1024L);
 
         JSONObject spjExeFile = new JSONObject();
@@ -632,7 +646,7 @@ public class SandboxRun {
         param.set("pipeMapping", pipeMapping);
 
         // 调用判题安全沙箱
-        JSONArray result = instance.run("/run", param);
+        JSONArray result = get().run(param);
         JSONObject userRes = (JSONObject) result.get(0);
         JSONObject interactiveRes = (JSONObject) result.get(1);
         userRes.set("originalStatus", userRes.getStr("status"));
@@ -640,6 +654,17 @@ public class SandboxRun {
         interactiveRes.set("originalStatus", interactiveRes.getStr("status"));
         interactiveRes.set("status", RESULT_MAP_STATUS.get(interactiveRes.getStr("status")));
         return result;
+    }
+
+    private interface Status {
+        String ACCEPTED = "Accepted"; // 正常情况
+        String MEMORY_LIMIT_EXCEEDED = "Memory Limit Exceeded"; // 内存超限
+        String TIME_LIMIT_EXCEEDED = "Time Limit Exceeded"; // 时间超限
+        String OUTPUT_LIMIT_EXCEEDED = "Output Limit Exceeded"; // 输出超限
+        String FILE_ERROR = "File Error"; // 文件错误
+        String NONZERO_EXIT_STATUS = "Nonzero Exit Status"; // 非 0 退出值
+        String SIGNALLED = "Signalled"; // 进程被信号终止
+        String INTERNAL_ERROR = "Internal Error"; // 内部错误
     }
 
 }

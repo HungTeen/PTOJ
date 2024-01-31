@@ -1,7 +1,7 @@
 package love.pangteen.problem.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import love.pangteen.problem.pojo.entity.ProblemCase;
+import love.pangteen.api.pojo.entity.ProblemCase;
 
 /**
  * @program: PTOJ

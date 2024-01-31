@@ -1,5 +1,6 @@
 package love.pangteen.judge.result;
 
+import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -8,6 +9,7 @@ import lombok.Data;
  * @create: 2024/1/30 16:56
  **/
 @Data
+@Builder
 public class JudgeResult {
 
     private Integer code;

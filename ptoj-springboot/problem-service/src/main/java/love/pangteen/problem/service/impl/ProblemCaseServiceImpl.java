@@ -5,9 +5,9 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import love.pangteen.problem.mapper.ProblemCaseMapper;
 import love.pangteen.api.pojo.entity.Problem;
-import love.pangteen.problem.pojo.entity.ProblemCase;
+import love.pangteen.api.pojo.entity.ProblemCase;
 import love.pangteen.problem.service.ProblemCaseService;
-import love.pangteen.problem.utils.FileUtils;
+import love.pangteen.problem.utils.ProblemCaseUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 public class ProblemCaseServiceImpl extends ServiceImpl<ProblemCaseMapper, ProblemCase> implements ProblemCaseService {
 
     @Resource
-    private FileUtils fileUtils;
+    private ProblemCaseUtils problemCaseUtils;
 
     @Override
     public List<ProblemCase> getProblemCases(Long pid, Boolean isUpload) {
@@ -48,9 +48,9 @@ public class ProblemCaseServiceImpl extends ServiceImpl<ProblemCaseMapper, Probl
                     problemCase.setOutput(filePreName + ".out");
                 }
             }
-            fileUtils.initUploadTestCase(problem.getJudgeMode(), problem.getJudgeCaseMode(), problem.getCaseVersion(), problem.getId(), uploadTestcaseDir, problemCases);
+            problemCaseUtils.initUploadTestCase(problem.getJudgeMode(), problem.getJudgeCaseMode(), problem.getCaseVersion(), problem.getId(), uploadTestcaseDir, problemCases);
         } else {
-            fileUtils.initHandTestCase(problem.getJudgeMode(), problem.getJudgeCaseMode(), problem.getCaseVersion(), problem.getId(), problemCases);
+            problemCaseUtils.initHandTestCase(problem.getJudgeMode(), problem.getJudgeCaseMode(), problem.getCaseVersion(), problem.getId(), problemCases);
         }
         saveBatch(problemCases);
     }
@@ -77,9 +77,9 @@ public class ProblemCaseServiceImpl extends ServiceImpl<ProblemCaseMapper, Probl
 
             //TODO 有问题？？？
             if (isUploadTestCase) { // 如果是选择上传测试文件的，则需要遍历对应文件夹，读取数据。。
-                fileUtils.initUploadTestCase(problem.getJudgeMode(), problem.getJudgeCaseMode(), problem.getCaseVersion(), problem.getId(), uploadTestcaseDir, problemCases);
+                problemCaseUtils.initUploadTestCase(problem.getJudgeMode(), problem.getJudgeCaseMode(), problem.getCaseVersion(), problem.getId(), uploadTestcaseDir, problemCases);
             } else {
-                fileUtils.initHandTestCase(problem.getJudgeMode(), problem.getJudgeCaseMode(), problem.getCaseVersion(), problem.getId(), problemCases);
+                problemCaseUtils.initHandTestCase(problem.getJudgeMode(), problem.getJudgeCaseMode(), problem.getCaseVersion(), problem.getId(), problemCases);
             }
         }
     }

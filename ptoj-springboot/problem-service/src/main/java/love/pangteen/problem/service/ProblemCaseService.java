@@ -2,7 +2,7 @@ package love.pangteen.problem.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import love.pangteen.api.pojo.entity.Problem;
-import love.pangteen.problem.pojo.entity.ProblemCase;
+import love.pangteen.api.pojo.entity.ProblemCase;
 
 import java.util.List;
 

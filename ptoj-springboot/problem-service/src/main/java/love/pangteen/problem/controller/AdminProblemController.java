@@ -4,7 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import love.pangteen.api.interfaces.ValidateGroups;
 import love.pangteen.problem.pojo.dto.ProblemDTO;
 import love.pangteen.api.pojo.entity.Problem;
-import love.pangteen.problem.pojo.entity.ProblemCase;
+import love.pangteen.api.pojo.entity.ProblemCase;
 import love.pangteen.problem.service.ProblemCaseService;
 import love.pangteen.problem.service.ProblemService;
 import love.pangteen.result.CommonResult;

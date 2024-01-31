@@ -19,7 +19,7 @@ import love.pangteen.user.pojo.vo.UserInfoVO;
 import love.pangteen.user.pojo.vo.UserRolesVO;
 import love.pangteen.user.service.UserInfoService;
 import love.pangteen.user.service.UserRoleService;
-import love.pangteen.user.utils.FileUtils;
+import love.pangteen.user.utils.ExcelUtils;
 import love.pangteen.utils.RedisUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -45,7 +45,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
     private RedisUtils redisUtils;
 
     @Resource
-    private FileUtils fileUtils;
+    private ExcelUtils excelUtils;
 
     @Resource
     private UserRoleService userRoleService;
@@ -124,7 +124,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
 
     @Override
     public void generateUserExcel(String key, HttpServletResponse response) throws IOException {
-        fileUtils.generateUserExcel(key, response);
+        excelUtils.generateUserExcel(key, response);
     }
 
     @Override

@@ -7,4 +7,5 @@ package love.pangteen.api.service;
  **/
 public interface IDubboJudgeService {
 
+
 }

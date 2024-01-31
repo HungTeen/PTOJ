@@ -34,4 +34,8 @@ public enum JudgeCaseMode {
         }
         return DEFAULT;
     }
+
+    public static boolean hasGroup(String judgeCaseMode){
+        return judgeCaseMode.equals(JudgeCaseMode.SUBTASK_AVERAGE.getMode()) || judgeCaseMode.equals(JudgeCaseMode.SUBTASK_LOWEST.getMode());
+    }
 }

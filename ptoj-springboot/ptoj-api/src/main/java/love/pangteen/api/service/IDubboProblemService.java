@@ -1,6 +1,7 @@
 package love.pangteen.api.service;
 
 import love.pangteen.api.pojo.entity.Problem;
+import love.pangteen.api.pojo.entity.ProblemCase;
 
 import java.util.List;
 import java.util.Map;
@@ -17,5 +18,7 @@ public interface IDubboProblemService {
     Problem getById(Long pid);
 
     Problem getByProblemId(String problemId);
+
+    List<ProblemCase> getProblemCases(Long pid);
 
 }

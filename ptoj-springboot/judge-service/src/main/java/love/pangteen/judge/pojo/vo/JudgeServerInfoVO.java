@@ -31,6 +31,6 @@ public class JudgeServerInfoVO {
 
     int remoteJudgeMaxTaskNum;
 
-    Object SandBoxMsg;
+    Object sandBoxMsg;
 
 }

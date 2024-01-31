@@ -1,8 +1,10 @@
 package love.pangteen.problem.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import love.pangteen.api.pojo.entity.ProblemCase;
 import love.pangteen.api.service.IDubboProblemService;
 import love.pangteen.api.pojo.entity.Problem;
+import love.pangteen.problem.service.ProblemCaseService;
 import love.pangteen.problem.service.ProblemService;
 import org.apache.dubbo.config.annotation.DubboService;
 
@@ -22,6 +24,9 @@ public class DubboProblemService implements IDubboProblemService {
     @Resource
     private ProblemService problemService;
 
+    @Resource
+    private ProblemCaseService problemCaseService;
+
     @Override
     public Map<Long, String> getProblemTitleMap(List<Long> pidList) {
         List<Problem> list = problemService.lambdaQuery()
@@ -38,6 +43,11 @@ public class DubboProblemService implements IDubboProblemService {
     @Override
     public Problem getByProblemId(String problemId) {
         return problemService.lambdaQuery().eq(Problem::getProblemId, problemId).oneOpt().orElse(null);
+    }
+
+    @Override
+    public List<ProblemCase> getProblemCases(Long pid) {
+        return problemCaseService.getProblemCases(pid, false);
     }
 
 }

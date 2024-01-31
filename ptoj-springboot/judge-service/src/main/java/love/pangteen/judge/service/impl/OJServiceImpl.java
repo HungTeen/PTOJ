@@ -3,7 +3,7 @@ package love.pangteen.judge.service.impl;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.json.JSONUtil;
 import love.pangteen.judge.pojo.vo.JudgeServerInfoVO;
-import love.pangteen.judge.sandbox.SandboxRun;
+import love.pangteen.judge.sandbox.SandboxManager;
 import love.pangteen.judge.service.OJService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -51,10 +51,9 @@ public class OJServiceImpl implements OJService {
         }
 
         try {
-            String versionResp = SandboxRun.getRestTemplate().getForObject(SandboxRun.getSandboxBaseUrl() + "/version", String.class);
-            builder.SandBoxMsg(JSONUtil.parseObj(versionResp));
+            builder.sandBoxMsg(JSONUtil.parseObj(SandboxManager.version()));
         } catch (Exception e) {
-            builder.SandBoxMsg(MapUtil.builder().put("error", e.getMessage()).map());
+            builder.sandBoxMsg(MapUtil.builder().put("error", e.getMessage()).map());
         }
 
         return builder.build();

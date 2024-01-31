@@ -12,7 +12,8 @@ import cn.hutool.json.JSONUtil;
 import love.pangteen.api.constant.OJFiles;
 import love.pangteen.api.enums.JudgeCaseMode;
 import love.pangteen.api.enums.JudgeMode;
-import love.pangteen.problem.pojo.entity.ProblemCase;
+import love.pangteen.api.utils.FileUtils;
+import love.pangteen.api.pojo.entity.ProblemCase;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.springframework.util.DigestUtils;
@@ -20,7 +21,6 @@ import org.springframework.util.DigestUtils;
 import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
-import java.util.regex.Pattern;
 
 /**
  * @program: PTOJ
@@ -28,9 +28,7 @@ import java.util.regex.Pattern;
  * @create: 2024/1/22 19:04
  **/
 @Component
-public class FileUtils {
-
-    private final static Pattern EOL_PATTERN = Pattern.compile("[^\\S\\n]+(?=\\n)");
+public class ProblemCaseUtils {
 
     /**
      * 初始化上传文件的测试数据，写成json文件。
@@ -103,7 +101,7 @@ public class FileUtils {
                 // 去掉全部空格的MD5，用来判断pe
                 jsonObject.set("allStrippedOutputMd5", DigestUtils.md5DigestAsHex(output.replaceAll("\\s+", "").getBytes(StandardCharsets.UTF_8)));
                 // 默认去掉文末空格的MD5
-                jsonObject.set("EOFStrippedOutputMd5", DigestUtils.md5DigestAsHex(rtrim(output).getBytes(StandardCharsets.UTF_8)));
+                jsonObject.set("EOFStrippedOutputMd5", DigestUtils.md5DigestAsHex(FileUtils.rtrim(output).getBytes(StandardCharsets.UTF_8)));
             }
 
             testCaseList.add(jsonObject);
@@ -182,7 +180,7 @@ public class FileUtils {
                 // 去掉全部空格的MD5，用来判断pe
                 jsonObject.set("allStrippedOutputMd5", DigestUtils.md5DigestAsHex(outputData.replaceAll("\\s+", "").getBytes(StandardCharsets.UTF_8)));
                 // 默认去掉文末空格的MD5
-                jsonObject.set("EOFStrippedOutputMd5", DigestUtils.md5DigestAsHex(rtrim(outputData).getBytes(StandardCharsets.UTF_8)));
+                jsonObject.set("EOFStrippedOutputMd5", DigestUtils.md5DigestAsHex(FileUtils.rtrim(outputData).getBytes(StandardCharsets.UTF_8)));
             }
 
             testCaseList.add(jsonObject);
@@ -193,14 +191,6 @@ public class FileUtils {
         FileWriter infoFile = new FileWriter(testCasesDir + "/info", CharsetUtil.UTF_8);
         // 写入记录文件
         infoFile.write(JSONUtil.toJsonStr(result));
-    }
-
-    /**
-     * 去除每行末尾的空白符。
-     */
-    public static String rtrim(String value) {
-        if (value == null) return null;
-        return EOL_PATTERN.matcher(StrUtil.trimEnd(value)).replaceAll("");
     }
 
 }

@@ -33,8 +33,22 @@ public interface OJFiles {
 
     String CONTEST_AC_SUBMISSION_TMP_FOLDER = "/ptoj/file/zip/contest_ac";
 
+    String RUN_WORKPLACE_DIR = "/judge/run";
+
+    String TEST_CASE_DIR = "/judge/test_case";
+
+    String SPJ_WORKPLACE_DIR = "/judge/spj";
+
+    String INTERACTIVE_WORKPLACE_DIR = "/judge/interactive";
+
+    String TMPFS_DIR = "/w";
+
     static String getTestCaseFolder(Long problemId){
         return OJFiles.TESTCASE_BASE_FOLDER + File.separator + "problem_" + problemId;
+    }
+
+    static String getJudgeCaseFolder(Long problemId){
+        return OJFiles.TEST_CASE_DIR + File.separator + "problem_" + problemId;
     }
     
 }

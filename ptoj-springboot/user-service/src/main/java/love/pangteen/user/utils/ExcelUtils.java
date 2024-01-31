@@ -20,7 +20,7 @@ import java.util.Map;
  * @create: 2024/1/21 19:15
  **/
 @Component
-public class FileUtils {
+public class ExcelUtils {
 
     @Resource
     private RedisUtils redisUtils;
