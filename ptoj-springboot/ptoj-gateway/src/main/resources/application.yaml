@@ -27,6 +27,14 @@ spring:
           uri: lb://problem-service
           predicates:
             - Path=/admin/problem/**,/admin/tag/**,/problem/**,/tag/**,/language/**
+        - id: submit
+          uri: lb://submit-service
+          predicates:
+            - Path=/submit/**
+        - id: judge
+          uri: lb://judge-service
+          predicates:
+            - Path=/judge/**
 security:
   ignore:
     whitelist:

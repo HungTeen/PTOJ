@@ -332,13 +332,13 @@ const ojApi = {
 
   // 提交评测模块
   submitCode(data) {
-    return ajax('/api/judge/submit-problem-judge', 'post', {
+    return ajax('/api/submit/submit-problem-judge', 'post', {
       data
     })
   },
   // 获取单个提交的信息
   getSubmission(submitId) {
-    return ajax('/api/judge/get-submission-detail', 'get', {
+    return ajax('/api/submit/get-submission-detail', 'get', {
       params: {
         submitId
       }
@@ -346,13 +346,13 @@ const ojApi = {
   },
   // 在线调试
   submitTestJudge(data) {
-    return ajax('/api/judge/submit-problem-test-judge', 'post', {
+    return ajax('/api/submit/submit-problem-test-judge', 'post', {
       data
     })
   },
   // 获取调试结果
   getTestJudgeResult(testJudgeKey) {
-    return ajax('/api/judge/get-test-judge-result', 'get', {
+    return ajax('/api/submit/get-test-judge-result', 'get', {
       params: {
         testJudgeKey
       }
@@ -379,7 +379,7 @@ const ojApi = {
   },
   // 获取单个提交的全部测试点详情
   getAllCaseResult(submitId) {
-    return ajax('/api/judge/get-all-case-result', 'get', {
+    return ajax('/api/submit/get-all-case-result', 'get', {
       params: {
         submitId,
       }
@@ -387,7 +387,7 @@ const ojApi = {
   },
   // 远程虚拟判题失败进行重新提交
   reSubmitRemoteJudge(submitId) {
-    return ajax("/api/judge/resubmit", 'get', {
+    return ajax("/api/submit/resubmit", 'get', {
       params: {
         submitId,
       }
@@ -395,23 +395,23 @@ const ojApi = {
   },
   // 更新提交详情
   updateSubmission(data) {
-    return ajax('/api/judge/submission', 'put', {
+    return ajax('/api/submit/submission', 'put', {
       data
     })
   },
   getSubmissionList(limit, params) {
     params.limit = limit
-    return ajax('/api/judge/get-submission-list', 'get', {
+    return ajax('/api/submit/get-submission-list', 'get', {
       params
     })
   },
   checkSubmissonsStatus(submitIds, cid) {
-    return ajax('/api/judge/check-submissions-status', 'post', {
+    return ajax('/api/submit/check-submissions-status', 'post', {
       data: { submitIds, cid }
     })
   },
   checkContestSubmissonsStatus(submitIds, cid) {
-    return ajax('/api/judge/check-contest-submissions-status', 'post', {
+    return ajax('/api/submit/check-contest-submissions-status', 'post', {
       data: { submitIds, cid }
     })
   },

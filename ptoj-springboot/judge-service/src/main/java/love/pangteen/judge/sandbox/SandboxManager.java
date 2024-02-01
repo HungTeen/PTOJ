@@ -30,7 +30,7 @@ import java.util.Map;
 public class SandboxManager {
 
     public static final HashMap<String, JudgeStatus> RESULT_MAP_STATUS = new HashMap<>();
-    public static final List<String> SIGNALS = new ArrayList<>();
+    private static final List<String> SIGNALS = new ArrayList<>();
     private static final SandboxManager INSTANCE = new SandboxManager();
     private static final JSONArray COMPILE_FILES = new JSONArray();
     private static final String SANDBOX_BASE_URL = "http://localhost:5050";
@@ -147,6 +147,10 @@ public class SandboxManager {
 
     public static Integer getStatusCode(String status){
         return RESULT_MAP_STATUS.get(status).getStatus();
+    }
+
+    public static String getSignal(int signal) {
+        return SIGNALS.get(signal);
     }
 
     /**

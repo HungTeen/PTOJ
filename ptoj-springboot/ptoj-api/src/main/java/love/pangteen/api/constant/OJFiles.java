@@ -44,11 +44,23 @@ public interface OJFiles {
     String TMPFS_DIR = "/w";
 
     static String getTestCaseFolder(Long problemId){
-        return OJFiles.TESTCASE_BASE_FOLDER + File.separator + "problem_" + problemId;
+        return join(TESTCASE_BASE_FOLDER, "problem_" + problemId);
     }
 
     static String getJudgeCaseFolder(Long problemId){
-        return OJFiles.TEST_CASE_DIR + File.separator + "problem_" + problemId;
+        return join(TEST_CASE_DIR, "problem_" + problemId);
+    }
+
+    static String getSubmitFolder(Long submitId){
+        return join(RUN_WORKPLACE_DIR, String.valueOf(submitId));
+    }
+
+    static String tmpfsFolder(String name){
+        return join(TMPFS_DIR, name);
+    }
+
+    static String join(String folder, String path){
+        return folder + File.separator + path;
     }
     
 }

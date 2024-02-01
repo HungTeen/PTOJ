@@ -2,6 +2,7 @@ package love.pangteen.judge.service;
 
 
 import love.pangteen.judge.pojo.vo.JudgeServerInfoVO;
+import love.pangteen.judge.pojo.vo.SystemConfigVO;
 
 /**
  * @program: PTOJ
@@ -10,4 +11,6 @@ import love.pangteen.judge.pojo.vo.JudgeServerInfoVO;
  **/
 public interface OJService {
     JudgeServerInfoVO getJudgeServerInfo();
+
+    SystemConfigVO getSystemConfig();
 }

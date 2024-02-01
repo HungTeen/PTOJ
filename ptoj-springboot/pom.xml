@@ -15,7 +15,7 @@
         <module>ptoj-gateway</module>
         <module>problem-service</module>
         <module>judge-service</module>
-        <module>submission-service</module>
+        <module>submit-service</module>
     </modules>
 
     <parent>
@@ -40,8 +40,8 @@
         <swagger.version>4.1.0</swagger.version>
         <mysql.version>8.0.23</mysql.version>
         <jjwt.version>0.9.1</jjwt.version>
-<!--        <shiro.version>1.13.0</shiro.version>-->
         <sa-token.version>1.37.0</sa-token.version>
+        <oshi.version>6.4.11</oshi.version>
     </properties>
 
     <!-- 对依赖包进行管理 -->
@@ -125,6 +125,12 @@
                 <groupId>cn.dev33</groupId>
                 <artifactId>sa-token-dubbo3</artifactId>
                 <version>${sa-token.version}</version>
+            </dependency>
+            <!--性能监控-->
+            <dependency>
+                <groupId>com.github.oshi</groupId>
+                <artifactId>oshi-core</artifactId>
+                <version>${oshi.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
