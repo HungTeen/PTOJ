@@ -81,7 +81,17 @@ services:
       - "5672:5672"
     networks:
       ptoj-network:
-        ipv4_address: ${ES:-172.21.0.5}
+        ipv4_address: ${MQ_HOST:-172.21.0.5}
+
+  ptoj-judge:
+    image: criyle/go-judge
+    environment:
+    - shm-size=256m
+    ports:
+      - "5050:5050"
+    networks:
+      ptoj-network:
+        ipv4_address: ${JUDGE_HOST:-172.21.0.6}
 
 #  ptoj-es:
 #    image: elasticsearch:7.14.0

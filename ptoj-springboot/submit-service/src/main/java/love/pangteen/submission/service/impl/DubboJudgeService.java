@@ -8,7 +8,7 @@ import org.apache.dubbo.config.annotation.DubboService;
  * @author: PangTeen
  * @create: 2024/1/30 10:50
  **/
-@DubboService
+//@DubboService
 public class DubboJudgeService implements IDubboJudgeService {
 
 }

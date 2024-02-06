@@ -16,13 +16,13 @@
     <select id="getProblemList" resultMap="map_ProblemList" useCache="true">
         SELECT DISTINCT p.id AS pid, p.problem_id, p.title, p.difficulty, p.type
         FROM problem p
-        <if test="tid != null and tid.size() > 0">
+        <if test="tagIds != null and tagIds.size() > 0">
             RIGHT JOIN
             (
             SELECT pid FROM
             problem_tag
             <where>
-                <foreach collection="tid" item="id" open="" separator=" or" close="">
+                <foreach collection="tagIds" item="id" open="" separator=" or" close="">
                     tid = #{id}
                 </foreach>
             </where>

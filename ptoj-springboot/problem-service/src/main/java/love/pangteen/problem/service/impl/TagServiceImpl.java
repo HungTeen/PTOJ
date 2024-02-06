@@ -22,6 +22,11 @@ import java.util.stream.Collectors;
 @Service
 public class TagServiceImpl extends ServiceImpl<TagMapper, Tag> implements TagService {
 
+    @Override
+    public Long getTagId(String name, String oj) {
+        return lambdaQuery().eq(name != null, Tag::getName, name).eq(oj != null, Tag::getOj, oj).one().getId();
+    }
+
     @Transactional
     @Override
     public void saveNewTags(List<Tag> tags) {

@@ -41,4 +41,6 @@ public interface ProblemService extends IService<Problem> {
     LastAcceptedCodeVO getUserLastAcceptedCode(Long pid, Long cid);
 
     List<ProblemFullScreenListVO> getFullScreenProblemList(Long tid, Long cid);
+
+    String getProblemOJ(Long pid);
 }

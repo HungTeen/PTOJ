@@ -71,9 +71,9 @@ public class JudgeServiceImpl extends ServiceImpl<JudgeMapper, Judge> implements
         // 标志该判题过程进入编译阶段，写入当前判题服务的名字。
         boolean result = lambdaUpdate()
                 .eq(Judge::getSubmitId, judge.getSubmitId())
-                .ne(Judge::getStatus, JudgeStatus.STATUS_CANCELLED)
+                .ne(Judge::getStatus, JudgeStatus.STATUS_CANCELLED.getStatus())
                 .set(Judge::getJudger, ojProperties.getName())
-                .set(Judge::getStatus, JudgeStatus.STATUS_COMPILING)
+                .set(Judge::getStatus, JudgeStatus.STATUS_COMPILING.getStatus())
                 .update();
         // 没更新成功，则可能表示该评测被取消 或者 judge记录被删除了，则结束评测。
         if(! result){
@@ -123,9 +123,9 @@ public class JudgeServiceImpl extends ServiceImpl<JudgeMapper, Judge> implements
         finalJudgeRes.setStatus(judgeResult.getCode());
         // 设置最大时间和最大空间不超过题目限制时间和空间
         // kb
-        finalJudgeRes.setMemory(Math.min(judge.getMemory(), problem.getMemoryLimit() * 1024));
+        finalJudgeRes.setMemory(problem.getMemoryLimit() * 1024);
         // ms
-        finalJudgeRes.setTime(Math.min(judge.getTime(), problem.getTimeLimit()));
+        finalJudgeRes.setTime(problem.getTimeLimit());
         // score
         finalJudgeRes.setScore(judgeResult.getScore());
         // oi_rank_score

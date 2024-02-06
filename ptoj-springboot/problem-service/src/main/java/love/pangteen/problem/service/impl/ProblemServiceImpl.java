@@ -5,18 +5,23 @@ import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import love.pangteen.api.constant.OJConstant;
 import love.pangteen.api.enums.JudgeMode;
 import love.pangteen.api.enums.ProblemAuth;
 import love.pangteen.api.enums.ProblemType;
 import love.pangteen.api.enums.RemoteOJ;
+import love.pangteen.api.pojo.entity.Problem;
+import love.pangteen.api.pojo.entity.ProblemCase;
 import love.pangteen.api.utils.RandomUtils;
 import love.pangteen.exception.StatusFailException;
+import love.pangteen.exception.StatusForbiddenException;
+import love.pangteen.exception.StatusNotFoundException;
 import love.pangteen.pojo.AccountProfile;
 import love.pangteen.problem.mapper.ProblemMapper;
 import love.pangteen.problem.pojo.dto.PidListDTO;
 import love.pangteen.problem.pojo.dto.ProblemDTO;
-import love.pangteen.api.pojo.entity.Problem;
-import love.pangteen.api.pojo.entity.ProblemCase;
+import love.pangteen.problem.pojo.entity.Language;
+import love.pangteen.problem.pojo.entity.Tag;
 import love.pangteen.problem.pojo.vo.*;
 import love.pangteen.problem.service.*;
 import love.pangteen.problem.utils.ProblemUtils;
@@ -28,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @program: PTOJ
@@ -100,7 +106,7 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 
     @Override
     public Problem getProblem(Long pid) {
-        return lambdaQuery().eq(Problem::getProblemId, pid).oneOpt().orElseThrow(() -> new StatusFailException("查询失败！"));
+        return lambdaQuery().eq(Problem::getId, pid).oneOpt().orElseThrow(() -> new StatusFailException("查询失败！"));
     }
 
     @Transactional
@@ -204,7 +210,23 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 
     @Override
     public ProblemInfoVO getProblemInfo(String problemId, Long gid) {
-        return null;
+        Problem problem = lambdaQuery().eq(Problem::getProblemId, problemId)
+                .oneOpt().orElseThrow(() -> new StatusNotFoundException("该题号对应的题目不存在"));
+        if (problem.getAuth() != 1) {
+            throw new StatusForbiddenException("该题号对应题目并非公开题目，不支持访问！");
+        }
+        // Check Group.
+
+        List<Tag> tags = problemTagService.getProblemTags(problem.getId());
+        List<Language> languages = problemLanguageService.getLanguages(problem.getId());
+        HashMap<String, String> langTemplateMap = codeTemplateService.getLangTemplateMap(problem.getId(), languages);
+        //TODO 题目提交统计情况。
+        return ProblemInfoVO.builder()
+                .problem(problem)
+                .tags(tags)
+                .languages(languages.stream().map(Language::getName).collect(Collectors.toList()))
+                .codeTemplate(langTemplateMap)
+                .build();
     }
 
     @Override
@@ -215,6 +237,21 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
     @Override
     public List<ProblemFullScreenListVO> getFullScreenProblemList(Long tid, Long cid) {
         return null;
+    }
+
+    @Override
+    public String getProblemOJ(Long pid) {
+        String oj = OJConstant.DEFAULT_OJ;
+        if (pid != null) {
+            Problem problem = getById(pid);
+            if (problem.getIsRemote()) {
+                oj = problem.getProblemId().split("-")[0];
+            }
+            if (oj.equals(RemoteOJ.GYM.getName())) {  // GYM用与CF一样的编程语言列表
+                oj = RemoteOJ.CODEFORCES.getName();
+            }
+        }
+        return oj;
     }
 
     /**

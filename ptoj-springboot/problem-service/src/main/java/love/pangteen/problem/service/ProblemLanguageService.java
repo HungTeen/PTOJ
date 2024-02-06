@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import love.pangteen.problem.pojo.entity.Language;
 import love.pangteen.problem.pojo.entity.ProblemLanguage;
 
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -19,5 +18,7 @@ public interface ProblemLanguageService extends IService<ProblemLanguage> {
 
     void deleteProblemLanguages(Long pid);
 
-    Collection<Language> getProblemLanguages(Long pid);
+    List<Language> getLanguages(Long pid);
+
+    List<ProblemLanguage> getProblemLanguages(Long pid);
 }

@@ -11,8 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Collection;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -58,10 +56,14 @@ public class ProblemLanguageServiceImpl extends ServiceImpl<ProblemLanguageMappe
     }
 
     @Override
-    public Collection<Language> getProblemLanguages(Long pid) {
-        List<Long> lids = lambdaQuery().eq(ProblemLanguage::getPid, pid).list().stream().map(ProblemLanguage::getLid).collect(Collectors.toList());
-        return languageService.listByIds(lids).stream().sorted(Comparator.comparing(Language::getSeq, Comparator.reverseOrder())
-                        .thenComparing(Language::getId))
-                .collect(Collectors.toList());
+    public List<Language> getLanguages(Long pid) {
+        List<Long> lids = getProblemLanguages(pid).stream().map(ProblemLanguage::getLid).collect(Collectors.toList());
+        return languageService.getLanguages(lids);
     }
+
+    @Override
+    public List<ProblemLanguage> getProblemLanguages(Long pid) {
+        return lambdaQuery().eq(ProblemLanguage::getPid, pid).list();
+    }
+
 }

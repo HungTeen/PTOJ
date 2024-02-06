@@ -4,6 +4,7 @@ import love.pangteen.api.annotations.IgnoreLogin;
 import love.pangteen.problem.pojo.entity.Language;
 import love.pangteen.problem.service.LanguageService;
 import love.pangteen.problem.service.ProblemLanguageService;
+import love.pangteen.problem.service.ProblemService;
 import love.pangteen.result.CommonResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +25,9 @@ import java.util.List;
 public class LanguageController {
 
     @Resource
+    private ProblemService problemService;
+
+    @Resource
     private LanguageService languageService;
 
     @Resource
@@ -36,7 +40,8 @@ public class LanguageController {
     @IgnoreLogin
     public CommonResult<List<Language>> getLanguages(@RequestParam(value = "pid", required = false) Long pid,
                                                      @RequestParam(value = "all", defaultValue = "false") Boolean all) {
-        return CommonResult.success(languageService.getLanguages(pid, all));
+        String oj = problemService.getProblemOJ(pid);
+        return CommonResult.success(languageService.getLanguages(oj, all));
     }
 
     /**
@@ -45,6 +50,6 @@ public class LanguageController {
     @GetMapping("/get-problem-languages")
     @IgnoreLogin
     public CommonResult<Collection<Language>> getProblemLanguages(@RequestParam("pid") Long pid) {
-        return CommonResult.success(problemLanguageService.getProblemLanguages(pid));
+        return CommonResult.success(problemLanguageService.getLanguages(pid));
     }
 }

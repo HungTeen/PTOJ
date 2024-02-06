@@ -1,6 +1,7 @@
 package love.pangteen.problem.pojo.vo;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.problem.pojo.entity.Tag;
@@ -14,6 +15,7 @@ import java.util.List;
  * @create: 2024/1/24 22:42
  **/
 @Data
+@Builder
 @AllArgsConstructor
 public class ProblemInfoVO {
     /**

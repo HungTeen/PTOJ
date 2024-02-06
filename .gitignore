@@ -11,5 +11,5 @@ ptoj-deploy/ptoj
 /ptoj-springboot/ptoj-gateway/target/
 /ptoj-springboot/user-service/target/
 /ptoj-springboot/problem-service/target/
-/ptoj-springboot/submission-service/target/
+/ptoj-springboot/submit-service/target/
 /ptoj-springboot/judge-service/target/

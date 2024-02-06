@@ -5,11 +5,14 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import love.pangteen.problem.mapper.CodeTemplateMapper;
 import love.pangteen.problem.pojo.entity.CodeTemplate;
+import love.pangteen.problem.pojo.entity.Language;
 import love.pangteen.problem.service.CodeTemplateService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -53,5 +56,20 @@ public class CodeTemplateServiceImpl extends ServiceImpl<CodeTemplateMapper, Cod
     @Override
     public List<CodeTemplate> getProblemCodeTemplate(Long pid) {
         return lambdaQuery().eq(CodeTemplate::getPid, pid).list();
+    }
+
+    @Override
+    public HashMap<String, String> getLangTemplateMap(Long pid, List<Language> languages) {
+        List<CodeTemplate> codeTemplates = getProblemCodeTemplate(pid);
+        HashMap<String, String> map = new HashMap<>();
+        Map<Long, Language> languageMap = CollUtil.toMap(languages, new HashMap<>(), Language::getId);
+        if(CollUtil.isNotEmpty(codeTemplates)){
+            codeTemplates.forEach(codeTemplate -> {
+                if(languageMap.containsKey(codeTemplate.getLid())){
+                    map.put(languageMap.get(codeTemplate.getLid()).getName(), codeTemplate.getCode());
+                }
+            });
+        }
+        return map;
     }
 }

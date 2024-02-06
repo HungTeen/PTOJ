@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -34,7 +33,8 @@ public class ProblemTagServiceImpl extends ServiceImpl<ProblemTagMapper, Problem
         if (CollUtil.isNotEmpty(tags)) {
             tagService.saveNewTags(tags);
             List<ProblemTag> problemTagList = tags.stream().map(tag -> {
-                return new ProblemTag().setTid(tag.getId()).setPid(pid);
+                Long tid = tag.getId() == null ? tagService.getTagId(tag.getName(), tag.getOj()) : tag.getId();
+                return new ProblemTag().setTid(tid).setPid(pid);
             }).collect(Collectors.toList());
 
             saveOrUpdateBatch(problemTagList);
@@ -57,9 +57,9 @@ public class ProblemTagServiceImpl extends ServiceImpl<ProblemTagMapper, Problem
     }
 
     @Override
-    public Collection<Tag> getProblemTags(Long pid) {
+    public List<Tag> getProblemTags(Long pid) {
         List<Long> tids = lambdaQuery().eq(ProblemTag::getPid, pid).list().stream().map(ProblemTag::getTid).collect(Collectors.toList());
-        return tagService.listByIds(tids);
+        return tids.isEmpty() ? List.of() : tagService.listByIds(tids);
     }
 
 }

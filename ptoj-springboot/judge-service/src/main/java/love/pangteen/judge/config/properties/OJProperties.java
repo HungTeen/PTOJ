@@ -14,6 +14,14 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "ptoj-judge-server")
 public class OJProperties {
 
+    private Integer maxTaskNum;
+
+//    @Value("${remote-judge.open}")
+//    private Boolean isOpenRemoteJudge;
+//
+//    @Value("${remote-judge.max-task-num}")
+//    private Integer RemoteJudgeMaxTaskNum;
+
     /**
      * 判题机名称。
      */

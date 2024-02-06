@@ -2,7 +2,9 @@ package love.pangteen.problem.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import love.pangteen.problem.pojo.entity.CodeTemplate;
+import love.pangteen.problem.pojo.entity.Language;
 
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -18,4 +20,6 @@ public interface CodeTemplateService extends IService<CodeTemplate> {
     void deleteCodeTemplates(Long pid);
 
     List<CodeTemplate> getProblemCodeTemplate(Long pid);
+
+    HashMap<String, String> getLangTemplateMap(Long pid, List<Language> languages);
 }

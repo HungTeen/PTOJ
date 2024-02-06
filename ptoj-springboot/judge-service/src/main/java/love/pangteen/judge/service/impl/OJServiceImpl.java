@@ -3,14 +3,15 @@ package love.pangteen.judge.service.impl;
 import cn.hutool.core.map.MapUtil;
 import cn.hutool.json.JSONUtil;
 import cn.hutool.system.oshi.OshiUtil;
+import love.pangteen.judge.config.properties.OJProperties;
 import love.pangteen.judge.pojo.vo.JudgeServerInfoVO;
 import love.pangteen.judge.pojo.vo.SystemConfigVO;
 import love.pangteen.judge.sandbox.SandboxManager;
 import love.pangteen.judge.service.OJService;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -23,24 +24,18 @@ import java.util.Date;
 @RefreshScope
 public class OJServiceImpl implements OJService {
 
-    @Value("${ptoj-judge-server.max-task-num}")
-    private Integer maxTaskNum;
-
-    @Value("${ptoj-judge-server.remote-judge.open}")
-    private Boolean isOpenRemoteJudge;
-
-    @Value("${ptoj-judge-server.remote-judge.max-task-num}")
-    private Integer RemoteJudgeMaxTaskNum;
-
-    @Value("${ptoj-judge-server.name}")
-    private String name;
+    @Resource
+    private OJProperties ojProperties;
 
     @Override
     public JudgeServerInfoVO getJudgeServerInfo() {
         JudgeServerInfoVO.JudgeServerInfoVOBuilder builder = JudgeServerInfoVO.builder();
+        int maxTaskNum = 2;
+        boolean isOpenRemoteJudge = false;
+        int RemoteJudgeMaxTaskNum = 1;
         builder.version("20240202")
                 .currentTime(new Date())
-                .judgeServerName(name)
+                .judgeServerName(ojProperties.getName())
                 .cpu(Runtime.getRuntime().availableProcessors())
                 .languages(Arrays.asList("G++ 9.4.0", "GCC 9.4.0", "Python 3.7.5",
                         "Python 2.7.17", "OpenJDK 1.8", "Golang 1.19", "C# Mono 4.6.2",

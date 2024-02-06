@@ -11,6 +11,9 @@ import java.util.List;
  * @create: 2024/1/24 9:15
  **/
 public interface TagService extends IService<Tag> {
+
+    Long getTagId(String name, String oj);
+
     void saveNewTags(List<Tag> tags);
 
     Tag addTag(Tag tag);

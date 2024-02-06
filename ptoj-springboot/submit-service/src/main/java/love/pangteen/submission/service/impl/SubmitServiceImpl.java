@@ -168,7 +168,7 @@ public class SubmitServiceImpl implements SubmitService {
                 .setGid(judgeDto.getGid())
                 .setLanguage(judgeDto.getLanguage())
                 .setLength(judgeDto.getCode().length())
-                .setUid(profile.getUid())
+                .setUid(profile.getUuid())
                 .setUsername(profile.getUsername())
                 .setStatus(JudgeStatus.STATUS_PENDING.getStatus()) // 开始进入判题队列
                 .setSubmitTime(new Date())

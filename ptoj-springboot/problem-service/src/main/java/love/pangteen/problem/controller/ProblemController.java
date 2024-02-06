@@ -3,6 +3,7 @@ package love.pangteen.problem.controller;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import love.pangteen.api.annotations.IgnoreLogin;
 import love.pangteen.problem.pojo.entity.CodeTemplate;
+import love.pangteen.problem.pojo.vo.ProblemInfoVO;
 import love.pangteen.problem.pojo.vo.ProblemVO;
 import love.pangteen.problem.pojo.vo.RandomProblemVO;
 import love.pangteen.problem.service.CodeTemplateService;
@@ -53,13 +54,13 @@ public class ProblemController {
 //    public CommonResult<HashMap<Long, Object>> getUserProblemStatus(@Validated @RequestBody PidListDTO pidListDto) {
 //        return CommonResult.success(problemService.getUserProblemStatus(pidListDto));
 //    }
-//
-//    @RequestMapping(value = "/get-problem-detail", method = RequestMethod.GET)
-//    @IgnoreLogin
-//    public CommonResult<ProblemInfoVO> getProblemInfo(@RequestParam(value = "problemId", required = true) String problemId,
-//                                                      @RequestParam(value = "gid", required = false) Long gid) {
-//        return CommonResult.success(problemService.getProblemInfo(problemId, gid));
-//    }
+
+    @RequestMapping(value = "/get-problem-detail", method = RequestMethod.GET)
+    @IgnoreLogin
+    public CommonResult<ProblemInfoVO> getProblemInfo(@RequestParam(value = "problemId", required = true) String problemId,
+                                                      @RequestParam(value = "gid", required = false) Long gid) {
+        return CommonResult.success(problemService.getProblemInfo(problemId, gid));
+    }
 //
 //    @GetMapping("/get-last-ac-code")
 //    public CommonResult<LastAcceptedCodeVO> getUserLastAcceptedCode(@RequestParam(value = "pid") Long pid,

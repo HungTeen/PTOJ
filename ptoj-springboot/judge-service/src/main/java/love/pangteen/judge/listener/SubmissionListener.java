@@ -7,7 +7,6 @@ import love.pangteen.api.pojo.dto.ToJudgeDTO;
 import love.pangteen.api.pojo.entity.Judge;
 import love.pangteen.judge.manager.JudgeManager;
 import love.pangteen.judge.service.JudgeService;
-import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.amqp.core.ExchangeTypes;
 import org.springframework.amqp.rabbit.annotation.Exchange;
 import org.springframework.amqp.rabbit.annotation.Queue;
@@ -26,7 +25,7 @@ import java.util.Objects;
 @Component
 public class SubmissionListener {
 
-    @DubboReference
+    @Resource
     private JudgeService judgeService;
 
     @Resource

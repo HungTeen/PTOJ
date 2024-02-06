@@ -1,7 +1,6 @@
 package love.pangteen.api.message;
 
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 
 /**
  * @program: PTOJ
@@ -9,10 +8,9 @@ import lombok.RequiredArgsConstructor;
  * @create: 2024/1/30 9:37
  **/
 @Data
-@RequiredArgsConstructor
 public class SubmissionMessage {
 
-    private final Long judgeId;
+    private Long judgeId;
 
-    private final Boolean isContest;
+    private Boolean isContest;
 }

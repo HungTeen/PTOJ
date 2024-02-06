@@ -23,6 +23,12 @@
             <groupId>love.pangteen</groupId>
             <artifactId>ptoj-api</artifactId>
             <version>1.0-SNAPSHOT</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.baomidou</groupId>
+                    <artifactId>mybatis-plus-boot-starter</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <!--网关-->
         <dependency>

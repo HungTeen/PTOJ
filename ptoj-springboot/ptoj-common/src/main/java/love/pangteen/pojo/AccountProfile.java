@@ -12,7 +12,7 @@ import java.io.Serializable;
 @Data
 public class AccountProfile implements Serializable {
 
-    private String uid;
+    private String uuid;
 
     private String username;
 
