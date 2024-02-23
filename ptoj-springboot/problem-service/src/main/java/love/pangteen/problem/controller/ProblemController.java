@@ -2,6 +2,7 @@ package love.pangteen.problem.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import love.pangteen.api.annotations.IgnoreLogin;
+import love.pangteen.problem.pojo.dto.PidListDTO;
 import love.pangteen.problem.pojo.entity.CodeTemplate;
 import love.pangteen.problem.pojo.vo.ProblemInfoVO;
 import love.pangteen.problem.pojo.vo.ProblemVO;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.validation.constraints.NotBlank;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -50,10 +52,10 @@ public class ProblemController {
         return CommonResult.success(problemService.getRandomProblem());
     }
 
-//    @PostMapping("/get-user-problem-status")
-//    public CommonResult<HashMap<Long, Object>> getUserProblemStatus(@Validated @RequestBody PidListDTO pidListDto) {
-//        return CommonResult.success(problemService.getUserProblemStatus(pidListDto));
-//    }
+    @PostMapping("/get-user-problem-status")
+    public CommonResult<HashMap<Long, Object>> getUserProblemStatus(@Validated @RequestBody PidListDTO pidListDto) {
+        return CommonResult.success(problemService.getUserProblemStatus(pidListDto));
+    }
 
     @RequestMapping(value = "/get-problem-detail", method = RequestMethod.GET)
     @IgnoreLogin

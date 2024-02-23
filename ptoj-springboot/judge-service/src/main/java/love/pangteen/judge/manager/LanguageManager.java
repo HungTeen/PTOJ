@@ -50,6 +50,14 @@ public class LanguageManager {
         log.info("load language config: {}", CONFIG_MAP);
     }
 
+    /**
+     * c和c++为一倍时间和空间，其它语言为2倍时间和空间。
+     */
+    public static boolean doubleLanguageLimit(String language) {
+        LanguageConfig languageConfig = getLanguageConfigByName(language);
+        return languageConfig.getSrcName() == null || (!languageConfig.getSrcName().endsWith(".c") && !languageConfig.getSrcName().endsWith(".cpp"));
+    }
+
     public static LanguageConfig getLanguageConfigByName(String langName) {
         return CONFIG_MAP.get(langName);
     }
@@ -137,4 +145,5 @@ public class LanguageManager {
             return Long.parseLong(memoryStr) * 1024 * 1024;
         }
     }
+
 }

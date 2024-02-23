@@ -30,12 +30,12 @@ public class CommonResult<T> implements Serializable {
         return success(data, "success");
     }
 
-    public static <T> CommonResult<T> success(String msg) {
-        return success(null, msg);
+    public static <T> CommonResult<T> success() {
+        return successMsg("success");
     }
 
-    public static <T> CommonResult<T> success() {
-        return success("success");
+    public static <T> CommonResult<T> successMsg(String msg) {
+        return success(null, msg);
     }
 
     /* 失败 */

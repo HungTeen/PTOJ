@@ -1,7 +1,5 @@
 package love.pangteen.api.constant;
 
-import java.io.File;
-
 /**
  * @program: PTOJ
  * @author: PangTeen
@@ -60,7 +58,8 @@ public interface OJFiles {
     }
 
     static String join(String folder, String path){
-        return folder + File.separator + path;
+        return folder + "/" + path;
+//        return folder + File.separator + path;
     }
     
 }

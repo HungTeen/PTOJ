@@ -24,11 +24,10 @@ public class SubmissionPublisher {
     @Resource
     private JudgeService judgeService;
 
-    public void sendTask(Long judgeId, Long pid, Boolean isContest) {
-        SubmissionMessage message = new SubmissionMessage(judgeId, isContest);
+    public void sendTask(SubmissionMessage message, boolean isContest) {
         // 优先处理比赛的提交任务，其次处理普通提交的提交任务。
         rabbitTemplate.convertAndSend(MQConstants.JUDGE_WAITING_QUEUE, message, msg -> {
-            msg.getMessageProperties().setPriority(isContest ? 10 : 5);
+            msg.getMessageProperties().setPriority(isContest ? 2 : 1);
             return msg;
         });
 

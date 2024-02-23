@@ -78,6 +78,10 @@ public class RedisUtils {
 
     /* String */
 
+    public Object get(String key) {
+        return key == null ? null : redisTemplate.opsForValue().get(key);
+    }
+
     public boolean set(String key, Object value) {
         try {
             redisTemplate.opsForValue().set(key, value);

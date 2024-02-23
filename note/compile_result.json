@@ -1,0 +1,18 @@
+{
+  "result": [
+    {
+      "status": "Accepted",
+      "exitStatus": 0,
+      "time": 169992000,
+      "memory": 50282496,
+      "runTime": 256151358,
+      "files": {
+        "stderr": "",
+        "stdout": ""
+      },
+      "fileIds": {
+        "main": "R6AXSVRS"
+      }
+    }
+  ]
+}

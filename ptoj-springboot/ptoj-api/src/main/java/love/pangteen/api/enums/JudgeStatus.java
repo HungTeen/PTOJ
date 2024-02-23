@@ -54,10 +54,19 @@ public enum JudgeStatus {
     private final String name;
     private final String columnName;
 
-    private JudgeStatus(Integer status, String name, String columnName) {
+    JudgeStatus(Integer status, String name, String columnName) {
         this.status = status;
         this.name = name;
         this.columnName = columnName;
+    }
+
+    public static JudgeStatus getTypeByStatus(int status) {
+        for (JudgeStatus judge : JudgeStatus.values()) {
+            if (judge.getStatus() == status) {
+                return judge;
+            }
+        }
+        return STATUS_NULL;
     }
 
 }

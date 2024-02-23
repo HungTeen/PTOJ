@@ -4,6 +4,7 @@ import cn.hutool.json.JSONArray;
 import cn.hutool.json.JSONObject;
 import love.pangteen.api.constant.OJFiles;
 import love.pangteen.api.enums.JudgeMode;
+import love.pangteen.api.pojo.dto.TestJudgeDTO;
 import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.api.utils.JudgeUtils;
 import love.pangteen.exception.JudgeSystemError;
@@ -11,13 +12,14 @@ import love.pangteen.judge.manager.LanguageManager;
 import love.pangteen.judge.pojo.dto.JudgeDTO;
 import love.pangteen.judge.pojo.dto.JudgeGlobalDTO;
 import love.pangteen.judge.pojo.entity.LanguageConfig;
+import love.pangteen.api.pojo.entity.TestJudgeResult;
 import love.pangteen.judge.sandbox.judge.AbstractJudge;
 import love.pangteen.judge.sandbox.judge.DefaultJudge;
+import love.pangteen.judge.sandbox.judge.TestJudge;
 import love.pangteen.judge.utils.ThreadPoolUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -34,7 +36,54 @@ import java.util.concurrent.FutureTask;
 public class JudgeRunner {
 
     @Resource
+    private TestJudge testJudge;
+
+    @Resource
     private DefaultJudge defaultJudge;
+
+    /**
+     * 运行自测评测单个测试点（由接口传入 输入与输出的数据）。
+     */
+    public TestJudgeResult testJudgeCase(String userFileId, TestJudgeDTO testJudgeDTO) throws ExecutionException, InterruptedException {
+        // 默认给限制时间+200ms用来测评
+        Long testTime = testJudgeDTO.getTimeLimit() + 200L;
+
+        LanguageConfig runConfig = LanguageManager.getLanguageConfigByName(testJudgeDTO.getLanguage());
+
+        JudgeGlobalDTO judgeGlobalDTO = JudgeGlobalDTO.builder()
+                .judgeMode(JudgeMode.TEST)
+                .userFileId(userFileId)
+                .userFileContent(testJudgeDTO.getCode())
+                .testTime(testTime)
+                .maxMemory((long) testJudgeDTO.getMemoryLimit())
+                .maxTime((long) testJudgeDTO.getTimeLimit())
+                .maxStack(testJudgeDTO.getStackLimit())
+                .removeEOLBlank(testJudgeDTO.getIsRemoveEndBlank())
+                .isFileIO(testJudgeDTO.getIsFileIO())
+                .ioReadFileName(testJudgeDTO.getIoReadFileName())
+                .ioWriteFileName(testJudgeDTO.getIoWriteFileName())
+                .runConfig(runConfig)
+                .build();
+
+        Long maxOutputSize = Math.max(testJudgeDTO.getTestCaseInput().length() * 2L, 32 * 1024 * 1024L);
+
+        JudgeDTO judgeDTO = JudgeDTO.builder()
+                .testCaseInputContent(testJudgeDTO.getTestCaseInput() + "\n")
+                .maxOutputSize(maxOutputSize)
+                .testCaseOutputContent(testJudgeDTO.getExpectedOutput())
+                .build();
+
+        FutureTask<JSONObject> testJudgeFutureTask = new FutureTask<>(() -> testJudge.judge(judgeDTO, judgeGlobalDTO));
+
+        JSONObject judgeRes = SubmitTask2ThreadPool(testJudgeFutureTask);
+        return TestJudgeResult.builder()
+                .status(judgeRes.getInt("status"))
+                .memory(judgeRes.getLong("memory"))
+                .time(judgeRes.getLong("time"))
+                .stdout(judgeRes.getStr("output"))
+                .stderr(judgeRes.getStr("errMsg"))
+                .build();
+    }
 
     public List<JSONObject> judgeAllCase(Long submitId,
                                          Problem problem,
@@ -126,9 +175,9 @@ public class JudgeRunner {
             // 输出文件名
             final String outputFileName = testcase.getStr("outputName");
             // 题目数据的输入文件的路径
-            final String testCaseInputPath = testCasesDir + File.separator + inputFileName;
+            final String testCaseInputPath = OJFiles.join(testCasesDir, inputFileName);
             // 题目数据的输出文件的路径
-            final String testCaseOutputPath = testCasesDir + File.separator + outputFileName;
+            final String testCaseOutputPath = OJFiles.join(testCasesDir, outputFileName);
             // 数据库表的测试样例id
             final Long caseId = testcase.getLong("caseId", null);
             // 该测试点的满分
@@ -161,6 +210,20 @@ public class JudgeRunner {
 
         }
         return SubmitBatchTask2ThreadPool(futureTasks);
+    }
+
+    private JSONObject SubmitTask2ThreadPool(FutureTask<JSONObject> futureTask)
+            throws InterruptedException, ExecutionException {
+        // 提交到线程池进行执行
+        ThreadPoolUtils.getInstance().getThreadPool().submit(futureTask);
+        while (true) {
+            if (futureTask.isDone() && !futureTask.isCancelled()) {
+                // 获取线程返回结果
+                return futureTask.get();
+            } else {
+                Thread.sleep(10); // 避免CPU高速运转，这里休息10毫秒
+            }
+        }
     }
 
     private List<JSONObject> SubmitBatchTask2ThreadPool(List<FutureTask<JSONObject>> futureTasks)

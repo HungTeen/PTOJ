@@ -1,0 +1,54 @@
+{
+  "cmd": [
+    {
+      "args": [
+        "/usr/bin/g++",
+        "-DONLINE_JUDGE",
+        "-w",
+        "-fmax-errors=1",
+        "-std=c++14",
+        "main.cpp",
+        "-lm",
+        "-o",
+        "main"
+      ],
+      "env": [
+        "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "LANG=en_US.UTF-8",
+        "LC_ALL=en_US.UTF-8",
+        "LANGUAGE=en_US:en",
+        "HOME=/w"
+      ],
+      "files": [
+        {
+          "content": ""
+        },
+        {
+          "name": "stdout",
+          "max": 33554432
+        },
+        {
+          "name": "stderr",
+          "max": 33554432
+        }
+      ],
+      "cpuLimit": 10000000000,
+      "clockLimit": 20000000000,
+      "memoryLimit": 536870912,
+      "procLimit": 128,
+      "stackLimit": 268435456,
+      "copyIn": {
+        "main.cpp": {
+          "content": "#include<iostream>\nusing namespace std;\nint main(){\n    string s;\n    cin >> s;\n    cout << \"Hello World!\" << endl;\n    return 0;\n}"
+        }
+      },
+      "copyOut": [
+        "stdout",
+        "stderr"
+      ],
+      "copyOutCached": [
+        "main"
+      ]
+    }
+  ]
+}

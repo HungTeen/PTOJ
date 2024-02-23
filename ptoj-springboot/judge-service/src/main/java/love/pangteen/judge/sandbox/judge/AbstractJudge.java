@@ -35,7 +35,7 @@ public abstract class AbstractJudge {
 
         switch (judgeGlobalDTO.getJudgeMode()) {
             case SPJ:
-//            case TEST:
+            case TEST:
             case DEFAULT:
                 return process(judgeDTO, judgeGlobalDTO, judgeResultList);
 //            case INTERACTIVE:

@@ -10,6 +10,8 @@ import lombok.Getter;
 @Getter
 public enum JudgeMode {
 
+    TEST("test"),
+
     DEFAULT("default"),
 
     SPJ("spj"),

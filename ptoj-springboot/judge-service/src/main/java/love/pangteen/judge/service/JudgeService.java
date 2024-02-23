@@ -1,8 +1,10 @@
 package love.pangteen.judge.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
+import love.pangteen.api.pojo.dto.TestJudgeDTO;
 import love.pangteen.api.pojo.dto.ToJudgeDTO;
 import love.pangteen.api.pojo.entity.Judge;
+import love.pangteen.api.pojo.entity.TestJudgeResult;
 
 /**
  * @program: PTOJ
@@ -14,4 +16,6 @@ public interface JudgeService extends IService<Judge> {
     void judge(Judge judge);
 
     void remoteJudge(ToJudgeDTO toJudgeDTO);
+
+    TestJudgeResult testJudge(TestJudgeDTO testJudgeDTO);
 }

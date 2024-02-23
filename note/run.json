@@ -1,0 +1,43 @@
+{
+  "cmd": [
+    {
+      "args": [
+        "/w/main"
+      ],
+      "env": [
+        "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
+        "LANG=en_US.UTF-8",
+        "LC_ALL=en_US.UTF-8",
+        "LANGUAGE=en_US:en",
+        "HOME=/w"
+      ],
+      "files": [
+        {
+          "src": "/judge/test_case/problem_1000/1.in"
+        },
+        {
+          "name": "stdout",
+          "max": 33554432
+        },
+        {
+          "name": "stderr",
+          "max": 16777216
+        }
+      ],
+      "cpuLimit": 1200000000,
+      "clockLimit": 3600000000,
+      "memoryLimit": 373293056,
+      "procLimit": 128,
+      "stackLimit": 134217728,
+      "copyIn": {
+        "main": {
+          "fileId": "R6AXSVRS"
+        }
+      },
+      "copyOut": [
+        "stderr",
+        "stdout"
+      ]
+    }
+  ]
+}

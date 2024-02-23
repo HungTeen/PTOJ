@@ -149,14 +149,14 @@ public class ProblemCaseUtils {
             // 生成输入对应文件
             String inputName = (index + 1) + ".in";
             jsonObject.set("inputName", inputName);
-            FileWriter inFileWriter = new FileWriter(testCasesDir + File.separator + inputName, CharsetUtil.UTF_8);
+            FileWriter inFileWriter = new FileWriter(OJFiles.join(testCasesDir, inputName), CharsetUtil.UTF_8);
             // 将该测试数据的输入写入到文件
             inFileWriter.write(testCase.getInput());
 
             // 生成输出对应文件
             String outputName = (index + 1) + ".out";
             jsonObject.set("outputName", outputName);
-            FileWriter outFileWriter = new FileWriter(testCasesDir + File.separator + outputName, CharsetUtil.UTF_8);
+            FileWriter outFileWriter = new FileWriter(OJFiles.join(testCasesDir, outputName), CharsetUtil.UTF_8);
             outFileWriter.write(testCase.getOutput());
 
             commonHandle(jsonObject, judgeMode, testCase.getOutput());

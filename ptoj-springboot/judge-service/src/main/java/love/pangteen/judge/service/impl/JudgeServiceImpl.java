@@ -4,11 +4,13 @@ import cn.hutool.core.lang.Pair;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.json.JSONObject;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import io.micrometer.core.lang.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import love.pangteen.api.constant.OJFiles;
 import love.pangteen.api.enums.JudgeCaseMode;
 import love.pangteen.api.enums.JudgeStatus;
 import love.pangteen.api.enums.ProblemType;
+import love.pangteen.api.pojo.dto.TestJudgeDTO;
 import love.pangteen.api.pojo.dto.ToJudgeDTO;
 import love.pangteen.api.pojo.entity.Judge;
 import love.pangteen.api.pojo.entity.JudgeCase;
@@ -24,6 +26,7 @@ import love.pangteen.judge.manager.LanguageManager;
 import love.pangteen.judge.mapper.JudgeMapper;
 import love.pangteen.judge.pojo.entity.JudgeResult;
 import love.pangteen.judge.pojo.entity.LanguageConfig;
+import love.pangteen.api.pojo.entity.TestJudgeResult;
 import love.pangteen.judge.sandbox.Compiler;
 import love.pangteen.judge.sandbox.JudgeRunner;
 import love.pangteen.judge.sandbox.JudgeStrategy;
@@ -102,11 +105,61 @@ public class JudgeServiceImpl extends ServiceImpl<JudgeMapper, Judge> implements
 
     }
 
+    @Override
+    public TestJudgeResult testJudge(TestJudgeDTO testJudgeDTO) {
+        TestJudgeResult.TestJudgeResultBuilder builder = TestJudgeResult.builder();
+        if(LanguageManager.doubleLanguageLimit(testJudgeDTO.getLanguage())){
+            testJudgeDTO.setTimeLimit(testJudgeDTO.getTimeLimit() * 2);
+            testJudgeDTO.setMemoryLimit(testJudgeDTO.getMemoryLimit() * 2);
+        }
+
+        // 编译好的临时代码文件id
+        String userFileId = null;
+        try {
+            userFileId = compile(testJudgeDTO.getLanguage(), testJudgeDTO.getCode(), testJudgeDTO.getExtraFile());
+            return judgeRunner.testJudgeCase(userFileId, testJudgeDTO);
+        } catch (JudgeSystemError systemError) {
+            log.error("[Test Judge] [System Error] [{}]", systemError.toString());
+            return builder
+                    .memory(0L)
+                    .time(0L)
+                    .status(JudgeStatus.STATUS_COMPILE_ERROR.getStatus())
+                    .stderr("Oops, something has gone wrong with the judgeServer. Please report this to administrator.")
+                    .build();
+        } catch (SubmitError submitError) {
+            log.error("[Test Judge] [Submit Error] [{}]", submitError.toString());
+            return builder
+                    .memory(0L)
+                    .time(0L)
+                    .status(JudgeStatus.STATUS_SUBMITTED_FAILED.getStatus())
+                    .stderr(Utils.mergeNonEmptyStrings(submitError.getMessage(), submitError.getStdout(), submitError.getStderr()))
+                    .build();
+        } catch (CompileError compileError) {
+            return builder
+                    .memory(0L)
+                    .time(0L)
+                    .status(JudgeStatus.STATUS_COMPILE_ERROR.getStatus())
+                    .stderr(Utils.mergeNonEmptyStrings(compileError.getStdout(), compileError.getStderr()))
+                    .build();
+        } catch (Exception e) {
+            log.error("[Test Judge] [Error] [{}]", e.toString());
+            return builder
+                    .memory(0L)
+                    .time(0L)
+                    .status(JudgeStatus.STATUS_COMPILE_ERROR.getStatus())
+                    .stderr("Oops, something has gone wrong with the judgeServer. Please report this to administrator.")
+                    .build();
+        } finally {
+            // 删除tmpfs内存中的用户代码可执行文件
+            if (!StrUtil.isEmpty(userFileId)) {
+                SandboxManager.delFile(userFileId);
+            }
+        }
+    }
+
     @Transactional
     public Judge postProblemJudge(Problem problem, Judge judge) {
-        // c和c++为一倍时间和空间，其它语言为2倍时间和空间。
-        LanguageConfig languageConfig = LanguageManager.getLanguageConfigByName(judge.getLanguage());
-        if (languageConfig.getSrcName() == null || (!languageConfig.getSrcName().endsWith(".c") && !languageConfig.getSrcName().endsWith(".cpp"))) {
+        if(LanguageManager.doubleLanguageLimit(judge.getLanguage())){
             problem.setTimeLimit(problem.getTimeLimit() * 2);
             problem.setMemoryLimit(problem.getMemoryLimit() * 2);
         }
@@ -134,23 +187,30 @@ public class JudgeServiceImpl extends ServiceImpl<JudgeMapper, Judge> implements
         return finalJudgeRes;
     }
 
+    @Nullable
+    public String compile(String language, String code, HashMap<String, String> extraFiles) throws JudgeSystemError, CompileError, SubmitError {
+        // 对用户源代码进行编译 获取tmpfs中的fileId。
+        LanguageConfig languageConfig = LanguageManager.getLanguageConfigByName(language);
+        // 有的语言可能不支持编译, 目前有js、php不支持编译。
+        if (languageConfig.getCompileCommand() != null) {
+            return Compiler.compile(
+                    languageConfig,
+                    code,
+                    language,
+                    extraFiles
+            );
+        }
+        return null;
+    }
+
     @Transactional
     public JudgeResult judge(Problem problem, Judge judge) {
         JudgeResult.JudgeResultBuilder builder = JudgeResult.builder();
         // 编译好的临时代码文件id。
         String userFileId = null;
         try {
-            // 对用户源代码进行编译 获取tmpfs中的fileId。
-            LanguageConfig languageConfig = LanguageManager.getLanguageConfigByName(judge.getLanguage());
-            // 有的语言可能不支持编译, 目前有js、php不支持编译。
-            if (languageConfig.getCompileCommand() != null) {
-                userFileId = Compiler.compile(
-                        languageConfig,
-                        judge.getCode(),
-                        judge.getLanguage(),
-                        JudgeUtils.getProblemExtraFileMap(problem, "user")
-                );
-            }
+            userFileId = compile(judge.getLanguage(), judge.getCode(), JudgeUtils.getProblemExtraFileMap(problem, "user"));
+
             // 测试数据文件所在文件夹。
             String testCasesDir = OJFiles.getJudgeCaseFolder(problem.getId());
             // 从文件中加载测试数据json。

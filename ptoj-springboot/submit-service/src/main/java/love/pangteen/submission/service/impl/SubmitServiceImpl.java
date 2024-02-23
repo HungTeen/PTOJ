@@ -1,23 +1,29 @@
 package love.pangteen.submission.service.impl;
 
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.util.IdUtil;
 import love.pangteen.api.enums.JudgeStatus;
+import love.pangteen.api.message.SubmissionMessage;
+import love.pangteen.api.pojo.entity.Judge;
+import love.pangteen.api.pojo.entity.Problem;
+import love.pangteen.api.pojo.entity.TestJudgeResult;
 import love.pangteen.api.service.IDubboProblemService;
+import love.pangteen.api.utils.JudgeUtils;
 import love.pangteen.api.utils.RoleUtils;
+import love.pangteen.exception.StatusFailException;
 import love.pangteen.exception.StatusNotFoundException;
+import love.pangteen.pojo.AccountProfile;
 import love.pangteen.submission.pojo.dto.SubmitJudgeDTO;
 import love.pangteen.submission.pojo.dto.TestJudgeDTO;
-import love.pangteen.api.pojo.entity.Judge;
 import love.pangteen.submission.pojo.vo.SubmissionInfoVO;
 import love.pangteen.submission.publisher.SubmissionPublisher;
 import love.pangteen.submission.service.JudgeService;
 import love.pangteen.submission.service.SubmitService;
-import love.pangteen.api.utils.JudgeUtils;
 import love.pangteen.submission.utils.SubmitUtils;
 import love.pangteen.submission.utils.ValidateUtils;
-import love.pangteen.pojo.AccountProfile;
 import love.pangteen.utils.AccountUtils;
 import love.pangteen.utils.IpUtils;
+import love.pangteen.utils.RedisUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -50,6 +56,9 @@ public class SubmitServiceImpl implements SubmitService {
     @Resource
     private SubmissionPublisher submissionPublisher;
 
+    @Resource
+    private RedisUtils redisUtils;
+
     /**
      * 超级管理员与题目管理员有权限查看代码。<br>
      * 如果不是本人或者并未分享代码，则不可查看。<br>
@@ -59,7 +68,7 @@ public class SubmitServiceImpl implements SubmitService {
     @Override
     public SubmissionInfoVO getSubmission(Long submitId) {
         Judge judge = judgeService.getById(submitId);
-        if(judge == null) throw new StatusNotFoundException("此提交数据不存在！");
+        if (judge == null) throw new StatusNotFoundException("此提交数据不存在！");
 
 //        boolean isRoot = StpUtil.hasRole(RoleUtils.getRoot());
         boolean self = judge.getUid().equals(StpUtil.getLoginIdAsString());
@@ -106,7 +115,7 @@ public class SubmitServiceImpl implements SubmitService {
         } else {
             boolean isProblemAdmin = StpUtil.hasRoleOr(RoleUtils.getProblemAdmins()); // 是否为题目管理员。
 
-            if(!(judge.getShare() || isProblemAdmin || self)){
+            if (!(judge.getShare() || isProblemAdmin || self)) {
                 judge.setCode(null);
             }
 //            if (!judge.getShare() && !isProblemAdmin && !(judge.getGid() != null && groupValidator.isGroupRoot(userRolesVo.getUid(), judge.getGid()))) {
@@ -127,7 +136,7 @@ public class SubmitServiceImpl implements SubmitService {
 //            }
         }
 
-        if (! JudgeUtils.canSeeErrorMsg(judge.getStatus())) {
+        if (!JudgeUtils.canSeeErrorMsg(judge.getStatus())) {
             judge.setErrorMessage("The error message does not support viewing.");
         }
 
@@ -177,9 +186,9 @@ public class SubmitServiceImpl implements SubmitService {
 
         boolean isContestSubmission = JudgeUtils.isContestSubmission(judgeDto.getCid());
 
-        if(isContestSubmission){
+        if (isContestSubmission) {
 
-        } else if(JudgeUtils.isTrainingSubmission(judgeDto.getTid())){
+        } else if (JudgeUtils.isTrainingSubmission(judgeDto.getTid())) {
 
         } else {
             submitUtils.initCommonSubmission(judgeDto.getPid(), judgeDto.getGid(), judge);
@@ -195,14 +204,54 @@ public class SubmitServiceImpl implements SubmitService {
 //                    isContestSubmission,
 //                    false);
         } else {
-            submissionPublisher.sendTask(judge.getSubmitId(), judge.getPid(), isContestSubmission);
+            SubmissionMessage message = SubmissionMessage.builder()
+                    .isLocalTest(false)
+                    .pid(judge.getPid())
+                    .judgeId(judge.getSubmitId()).build();
+            submissionPublisher.sendTask(message, isContestSubmission);
         }
         return judge;
     }
 
     @Override
     public String submitProblemTestJudge(TestJudgeDTO testJudgeDto) {
-        return null;
+        validateUtils.validateTestJudge(testJudgeDto);
+
+        HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes())).getRequest();
+        AccountProfile profile = AccountUtils.getProfile();
+
+        // TODO 提交频率限制。
+//        String lockKey = Constants.Account.TEST_JUDGE_LOCK.getCode() + userRolesVo.getUid();
+//        long count = redisUtils.incr(lockKey, 1);
+//        if (count > 1) {
+//            Long expireTime = redisUtils.getExpire(lockKey);
+//            if (expireTime == null || expireTime == 0L){
+//                redisUtils.expire(lockKey, 3);
+//            }
+//            throw new StatusForbiddenException("对不起，您使用在线调试过于频繁，请稍后再尝试！");
+//        }
+//        redisUtils.expire(lockKey, 3);
+
+        Problem problem = problemService.getById(testJudgeDto.getPid());
+        if (problem == null) {
+            throw new StatusFailException("当前题目不存在！不支持在线调试！");
+        }
+
+        String uniqueKey = "TEST_JUDGE_" + IdUtil.simpleUUID();
+        SubmissionMessage message = SubmissionMessage.builder()
+                .isLocalTest(true)
+                .pid(testJudgeDto.getPid())
+                .code(testJudgeDto.getCode())
+                .language(testJudgeDto.getLanguage())
+                .uniqueKey(uniqueKey)
+                .expectedOutput(testJudgeDto.getExpectedOutput())
+                .userInput(testJudgeDto.getUserInput())
+                .build();
+        submissionPublisher.sendTask(message, false);
+        redisUtils.set(uniqueKey, TestJudgeResult.builder()
+                .status(JudgeStatus.STATUS_PENDING.getStatus())
+                .build(), 10 * 60);
+        return uniqueKey;
     }
 
     @Override

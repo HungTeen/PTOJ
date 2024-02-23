@@ -191,6 +191,16 @@ public class SandboxManager {
     }
 
     /**
+     * 替换SandBox输出的Json结果。
+     */
+    public static void postProcessResult(JSONArray result){
+        JSONObject res = (JSONObject) result.get(0);
+        String status = res.getStr("status");
+        res.set("originalStatus", status);
+        res.set("status", getStatusCode(status));
+    }
+
+    /**
      * 编译运行。
      * @param maxCpuTime        最大编译的cpu时间 ms
      * @param maxRealTime       最大编译的真实时间 ms
@@ -264,10 +274,7 @@ public class SandboxManager {
 
         JSONArray result = get().run(param);
 
-        JSONObject compileRes = (JSONObject) result.get(0);
-        String status = compileRes.getStr("status");
-        compileRes.set("originalStatus", status);
-        compileRes.set("status", getStatusCode(status));
+        postProcessResult(result);
         return result;
     }
 
@@ -370,9 +377,7 @@ public class SandboxManager {
         // 调用判题安全沙箱
         JSONArray result = get().run(param);
 
-        JSONObject testcaseRes = (JSONObject) result.get(0);
-        testcaseRes.set("originalStatus", testcaseRes.getStr("status"));
-        testcaseRes.set("status", RESULT_MAP_STATUS.get(testcaseRes.getStr("status")));
+        postProcessResult(result);
         return result;
     }
 

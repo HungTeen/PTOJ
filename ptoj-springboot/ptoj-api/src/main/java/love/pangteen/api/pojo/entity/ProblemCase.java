@@ -10,6 +10,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -21,7 +22,7 @@ import java.util.Date;
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
 @ApiModel(value="Case对象", description="题目测试样例")
-public class ProblemCase {
+public class ProblemCase implements Serializable {
 
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
