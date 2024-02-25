@@ -6,12 +6,12 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import love.pangteen.api.constant.OJConstant;
-import love.pangteen.api.enums.JudgeMode;
-import love.pangteen.api.enums.ProblemAuth;
-import love.pangteen.api.enums.ProblemType;
-import love.pangteen.api.enums.RemoteOJ;
+import love.pangteen.api.enums.*;
+import love.pangteen.api.pojo.entity.Judge;
 import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.api.pojo.entity.ProblemCase;
+import love.pangteen.api.service.IDubboJudgeService;
+import love.pangteen.api.utils.JudgeUtils;
 import love.pangteen.api.utils.RandomUtils;
 import love.pangteen.exception.StatusFailException;
 import love.pangteen.exception.StatusForbiddenException;
@@ -27,6 +27,7 @@ import love.pangteen.problem.service.*;
 import love.pangteen.problem.utils.ProblemUtils;
 import love.pangteen.problem.utils.ValidateUtils;
 import love.pangteen.utils.AccountUtils;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,6 +58,9 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 
     @Resource
     private ProblemMapper problemMapper;
+
+    @DubboReference(check = false)
+    private IDubboJudgeService judgeService;
 
     @Transactional
     @Override
@@ -208,34 +212,17 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
      */
     @Override
     public HashMap<Long, Object> getUserProblemStatus(PidListDTO pidListDto) {
-        // 需要获取一下该token对应用户的数据
-        AccountProfile userRolesVo = AccountUtils.getProfile();
+        AccountProfile profile = AccountUtils.getProfile();
         HashMap<Long, Object> result = new HashMap<>();
+
         // 先查询判断该用户对于这些题是否已经通过，若已通过，则无论后续再提交结果如何，该题都标记为通过
-//        QueryWrapper<Judge> queryWrapper = new QueryWrapper<>();
-//        queryWrapper.select("distinct pid,status,submit_time,score")
-//                .in("pid", pidListDto.getPidList())
-//                .eq("uid", userRolesVo.getUuid())
-//                .orderByDesc("submit_time");
-//
-//        if (pidListDto.getIsContestProblemList()) {
-//            // 如果是比赛的提交记录需要判断cid
-//            queryWrapper.eq("cid", pidListDto.getCid());
-//        } else {
-//            queryWrapper.eq("cid", 0);
-//            if (pidListDto.getGid() != null) {
-//                queryWrapper.eq("gid", pidListDto.getGid());
-//            } else {
-//                queryWrapper.isNull("gid");
-//            }
-//        }
-//        List<Judge> judges = judgeEntityService.list(queryWrapper);
-//
-//        boolean isACMContest = true;
-//        boolean isContainsContestEndJudge = false;
-//        long contestEndTime = 0L;
-//        Contest contest = null;
-//        if (pidListDto.getIsContestProblemList()) {
+        List<Judge> judges = judgeService.getSubmitJudges(pidListDto.getPidList(), profile.getUuid(), pidListDto.getIsContestProblemList() ? pidListDto.getCid() : 0, pidListDto.getGid());
+
+        boolean isACMContest = true;
+        boolean isContainsContestEndJudge = false;
+        long contestEndTime = 0L;
+//        Contest contest = null; TODO 对于Contest的判断
+        if (pidListDto.getIsContestProblemList()) {
 //            contest = contestEntityService.getById(pidListDto.getCid());
 //            if (contest == null) {
 //                throw new StatusNotFoundException("错误：该比赛不存在！");
@@ -244,18 +231,18 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 //            isContainsContestEndJudge = Objects.equals(contest.getAllowEndSubmit(), true)
 //                    && Objects.equals(pidListDto.getContainsEnd(), true);
 //            contestEndTime = contest.getEndTime().getTime();
-//        }
+        }
 //        boolean isSealRank = false;
 //        if (!isACMContest && CollectionUtil.isNotEmpty(judges)) {
-//            isSealRank = contestValidator.isSealRank(userRolesVo.getUid(), contest, false,
+//            isSealRank = contestValidator.isSealRank(profile.getUid(), contest, false,
 //                    SecurityUtils.getSubject().hasRole("root"));
 //        }
-//        for (Judge judge : judges) {
-//
-//            HashMap<String, Object> temp = new HashMap<>();
-//            if (pidListDto.getIsContestProblemList()) { // 如果是比赛的题目列表状态
-//
-//                // 如果是隐藏比赛后的提交，需要判断提交时间进行过滤
+        for (Judge judge : judges) {
+
+            HashMap<String, Object> temp = new HashMap<>();
+            if (pidListDto.getIsContestProblemList()) { // 如果是比赛的题目列表状态
+
+                // 如果是隐藏比赛后的提交，需要判断提交时间进行过滤
 //                if (!isContainsContestEndJudge && judge.getSubmitTime().getTime() >= contestEndTime) {
 //                    continue;
 //                }
@@ -287,38 +274,38 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 //                        result.put(judge.getPid(), temp);
 //                    }
 //                }
-//
-//            } else { // 不是比赛题目
-//                if (judge.getStatus().intValue() == Constants.Judge.STATUS_ACCEPTED.getStatus()) {
-//                    // 如果该题目已通过，则强制写为通过（0）
-//                    temp.put("status", Constants.Judge.STATUS_ACCEPTED.getStatus());
-//                    result.put(judge.getPid(), temp);
-//                } else if (!result.containsKey(judge.getPid())) {
-//                    // 还未写入，则使用最新一次提交的结果
-//                    temp.put("status", judge.getStatus());
-//                    result.put(judge.getPid(), temp);
-//                }
-//            }
-//        }
-//
-//        // 再次检查，应该可能从未提交过该题，则状态写为-10
-//        for (Long pid : pidListDto.getPidList()) {
-//            // 如果是比赛的题目列表状态
-//            if (pidListDto.getIsContestProblemList()) {
+
+            } else { // 不是比赛题目
+                if (JudgeUtils.isAccepted(judge.getStatus())) {
+                    // 如果该题目已通过，则强制写为通过（0）
+                    temp.put(OJConstant.JUDGE_STATUS, JudgeStatus.STATUS_ACCEPTED.getStatus());
+                    result.put(judge.getPid(), temp);
+                } else if (!result.containsKey(judge.getPid())) {
+                    // 还未写入，则使用最新一次提交的结果
+                    temp.put("status", judge.getStatus());
+                    result.put(judge.getPid(), temp);
+                }
+            }
+        }
+
+        // 再次检查，应该可能从未提交过该题，则状态写为-10
+        for (Long pid : pidListDto.getPidList()) {
+            // 如果是比赛的题目列表状态
+            if (pidListDto.getIsContestProblemList()) {
 //                if (!result.containsKey(pid)) {
 //                    HashMap<String, Object> temp = new HashMap<>();
 //                    temp.put("score", null);
 //                    temp.put("status", Constants.Judge.STATUS_NOT_SUBMITTED.getStatus());
 //                    result.put(pid, temp);
 //                }
-//            } else {
-//                if (!result.containsKey(pid)) {
-//                    HashMap<String, Object> temp = new HashMap<>();
-//                    temp.put("status", Constants.Judge.STATUS_NOT_SUBMITTED.getStatus());
-//                    result.put(pid, temp);
-//                }
-//            }
-//        }
+            } else {
+                if (!result.containsKey(pid)) {
+                    HashMap<String, Object> temp = new HashMap<>();
+                    temp.put(OJConstant.JUDGE_STATUS, JudgeStatus.STATUS_NOT_SUBMITTED.getStatus());
+                    result.put(pid, temp);
+                }
+            }
+        }
         return result;
     }
 

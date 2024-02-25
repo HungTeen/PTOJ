@@ -24,4 +24,6 @@ public interface OJConstant {
 
     String DEFAULT_OJ = "ME";
     String DEFAULT_TAG_SOURCE = DEFAULT_OJ;
+
+    String JUDGE_STATUS = "status";
 }

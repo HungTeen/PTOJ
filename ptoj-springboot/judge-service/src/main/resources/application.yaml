@@ -41,6 +41,8 @@ dubbo:
     port: -1
   registry:
     address: nacos://${ptoj.nacos.host}:${ptoj.nacos.port}?username=${ptoj.nacos.username}&password=${ptoj.nacos.password}
+  consumer:
+    check: false
 logging:
   level:
     love.pangteen: debug

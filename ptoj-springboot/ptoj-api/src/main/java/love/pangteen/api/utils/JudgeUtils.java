@@ -32,6 +32,10 @@ public class JudgeUtils {
         return trainingId != null && trainingId != 0;
     }
 
+    public static boolean isAccepted(Integer status){
+        return JudgeStatus.STATUS_ACCEPTED.getStatus().equals(status);
+    }
+
     public static HashMap<String, String> getProblemExtraFileMap(Problem problem, String type) {
         if ("user".equals(type)) {
             if (!StrUtil.isEmpty(problem.getUserExtraFile())) {
