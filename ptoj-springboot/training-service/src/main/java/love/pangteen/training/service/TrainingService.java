@@ -4,7 +4,6 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.github.yulichang.base.MPJBaseService;
 import love.pangteen.training.pojo.dto.TrainingDTO;
 import love.pangteen.training.pojo.entity.Training;
-import love.pangteen.training.pojo.vo.TrainingVO;
 
 /**
  * @program: PTOJ
@@ -25,7 +24,5 @@ public interface TrainingService extends MPJBaseService<Training> {
     void changeTrainingStatus(Long tid, String author, Boolean status);
 
     void modified(Long tid);
-
-    IPage<TrainingVO> getTrainingDetailList(Integer limit, Integer currentPage, String keyword, Long categoryId, String auth);
 
 }
