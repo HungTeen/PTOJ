@@ -35,6 +35,10 @@ spring:
           uri: lb://judge-service
           predicates:
             - Path=/judge/**
+        - id: training
+          uri: lb://training-service
+          predicates:
+            - Path=/admin/training/**,/training/**
 security:
   ignore:
     whitelist:
@@ -51,6 +55,7 @@ security:
       - /problem/get-problem-code-template
       - /tag/**
       - /language/**
+      - /training/get-training-list
 dubbo:
   application:
     name: dubbo-${spring.application.name}

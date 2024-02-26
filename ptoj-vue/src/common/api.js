@@ -446,7 +446,7 @@ const ojApi = {
 
   // 获取训练分类列表
   getTrainingCategoryList() {
-    return ajax('/api/get-training-category', 'get')
+    return ajax('/api/training/get-training-category', 'get')
   },
 
 
@@ -463,20 +463,20 @@ const ojApi = {
         }
       })
     }
-    return ajax('/api/get-training-list', 'get', {
+    return ajax('/api/training/get-training-list', 'get', {
       params: params
     })
   },
 
   // 获取训练详情
   getTraining(tid) {
-    return ajax('/api/get-training-detail', 'get', {
+    return ajax('/api/training/get-training-detail', 'get', {
       params: { tid }
     })
   },
   // 注册私有训练
   registerTraining(tid, password) {
-    return ajax('/api/register-training', 'post', {
+    return ajax('/api/training/register-training', 'post', {
       data: {
         tid,
         password
@@ -485,13 +485,13 @@ const ojApi = {
   },
   // 获取注册训练权限
   getTrainingAccess(tid) {
-    return ajax('/api/get-training-access', 'get', {
+    return ajax('/api/training/get-training-access', 'get', {
       params: { tid }
     })
   },
   // 获取训练题目列表
   getTrainingProblemList(tid) {
-    return ajax('/api/get-training-problem-list', 'get', {
+    return ajax('/api/training/get-training-problem-list', 'get', {
       params: { tid }
     })
   },
@@ -503,7 +503,7 @@ const ojApi = {
   },
   // 获取训练记录榜单
   getTrainingRank(params) {
-    return ajax('/api/get-training-rank', 'get', {
+    return ajax('/api/training/get-training-rank', 'get', {
       params
     })
   },

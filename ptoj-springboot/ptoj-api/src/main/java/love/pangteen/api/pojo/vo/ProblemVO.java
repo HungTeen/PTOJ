@@ -1,9 +1,9 @@
-package love.pangteen.problem.pojo.vo;
+package love.pangteen.api.pojo.vo;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
-import love.pangteen.problem.pojo.entity.Tag;
+import love.pangteen.api.pojo.entity.Tag;
 
 import java.io.Serializable;
 import java.util.List;

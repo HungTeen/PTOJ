@@ -1,0 +1,24 @@
+server:
+  port: 8004 # 内嵌的 Tomcat 端口号。默认值为 8080。
+spring:
+  application:
+    name: training-service # 微服务名称。
+ptoj:
+  mysql:
+    name: ptoj-training
+    host: localhost
+    port: 3306
+    password: 123456
+  redis:
+    host: localhost
+    port: 6379
+    password: 123456
+  nacos:
+    host: localhost
+    port: 8848
+    username: nacos
+    password: nacos
+
+  swagger:
+    title: "题单管理接口文档"
+    package: love.pangteen.training.controller

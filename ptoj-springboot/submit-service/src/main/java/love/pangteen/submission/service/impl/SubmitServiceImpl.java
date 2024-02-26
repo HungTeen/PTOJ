@@ -20,7 +20,7 @@ import love.pangteen.submission.publisher.SubmissionPublisher;
 import love.pangteen.submission.service.JudgeService;
 import love.pangteen.submission.service.SubmitService;
 import love.pangteen.submission.utils.SubmitUtils;
-import love.pangteen.submission.utils.ValidateUtils;
+import love.pangteen.submission.utils.JudgeValidateUtils;
 import love.pangteen.utils.AccountUtils;
 import love.pangteen.utils.IpUtils;
 import love.pangteen.utils.RedisUtils;
@@ -48,7 +48,7 @@ public class SubmitServiceImpl implements SubmitService {
     private JudgeService judgeService;
 
     @Resource
-    private ValidateUtils validateUtils;
+    private JudgeValidateUtils validateUtils;
 
     @Resource
     private SubmitUtils submitUtils;

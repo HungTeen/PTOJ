@@ -5,7 +5,7 @@ import love.pangteen.api.annotations.IgnoreLogin;
 import love.pangteen.problem.pojo.dto.PidListDTO;
 import love.pangteen.problem.pojo.entity.CodeTemplate;
 import love.pangteen.problem.pojo.vo.ProblemInfoVO;
-import love.pangteen.problem.pojo.vo.ProblemVO;
+import love.pangteen.api.pojo.vo.ProblemVO;
 import love.pangteen.problem.pojo.vo.RandomProblemVO;
 import love.pangteen.problem.service.CodeTemplateService;
 import love.pangteen.problem.service.ProblemService;

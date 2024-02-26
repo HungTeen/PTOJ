@@ -1,7 +1,7 @@
 package love.pangteen.problem.controller;
 
 import love.pangteen.api.constant.OJConstant;
-import love.pangteen.problem.pojo.entity.Tag;
+import love.pangteen.api.pojo.entity.Tag;
 import love.pangteen.problem.pojo.entity.TagClassification;
 import love.pangteen.problem.service.ClassificationService;
 import love.pangteen.problem.service.TagService;

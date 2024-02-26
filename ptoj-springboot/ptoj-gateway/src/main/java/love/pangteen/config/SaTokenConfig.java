@@ -40,6 +40,7 @@ public class SaTokenConfig {
 
                     this.checkUserService();
                     this.checkProblemService();
+                    this.checkTrainingService();
 
                 }).setError(e -> {
                     if (e instanceof NotLoginException) {
@@ -65,7 +66,7 @@ public class SaTokenConfig {
     }
 
     /**
-     * 问题服务鉴权。
+     * 题目服务鉴权。
      */
     private void checkProblemService(){
         SaRouter.match("/admin/problem/**")
@@ -80,6 +81,28 @@ public class SaTokenConfig {
                 });
 
         SaRouter.match("/admin/tag/**")
+                .check(r -> {
+                    StpUtil.checkRoleOr(RoleUtils.getProblemAdmins());
+                });
+    }
+
+    /**
+     * 题单服务鉴权。
+     */
+    private void checkTrainingService(){
+        SaRouter.match("/admin/training/**")
+                .check(r -> {
+                    StpUtil.checkRoleOr(RoleUtils.getAdmins());
+                });
+
+        // Root权限才能删除题单。
+        SaRouter.match("/admin/training")
+                .match(SaHttpMethod.DELETE)
+                .check(r -> {
+                    StpUtil.checkRoleOr(RoleUtils.getRoot());
+                });
+
+        SaRouter.match("/admin/training/problem", "/admin/training/category/**")
                 .check(r -> {
                     StpUtil.checkRoleOr(RoleUtils.getProblemAdmins());
                 });

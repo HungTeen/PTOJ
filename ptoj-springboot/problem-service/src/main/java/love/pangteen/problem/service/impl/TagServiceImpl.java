@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import love.pangteen.exception.StatusFailException;
 import love.pangteen.api.constant.OJConstant;
 import love.pangteen.problem.mapper.TagMapper;
-import love.pangteen.problem.pojo.entity.Tag;
+import love.pangteen.api.pojo.entity.Tag;
 import love.pangteen.problem.service.TagService;
 import love.pangteen.problem.utils.ProblemUtils;
 import org.springframework.stereotype.Service;

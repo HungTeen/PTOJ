@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.api.pojo.entity.ProblemCase;
+import love.pangteen.api.pojo.entity.Tag;
 import love.pangteen.problem.pojo.entity.*;
 
 import javax.validation.Valid;

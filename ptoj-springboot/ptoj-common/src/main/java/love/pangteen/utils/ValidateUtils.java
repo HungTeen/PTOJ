@@ -1,4 +1,4 @@
-package love.pangteen.problem.utils;
+package love.pangteen.utils;
 
 import cn.dev33.satoken.stp.StpUtil;
 import love.pangteen.api.enums.JudgeCaseMode;
@@ -22,9 +22,7 @@ public class ValidateUtils {
      */
     public static void validateProblemAndRole(Problem problem, AccountProfile profile){
         validateProblem(problem);
-        if(! StpUtil.hasRoleOr(RoleUtils.getProblemAdmins()) && !profile.getUsername().equals(problem.getAuthor())){
-            throw new StatusForbiddenException("对不起，你无权限修改题目！");
-        }
+        validateAuthorOrRoles(profile, problem.getAuthor(), "对不起，你无权限修改题目！", RoleUtils.getProblemAdmins());
     }
 
     public static void validateProblem(Problem problem){
@@ -44,6 +42,12 @@ public class ValidateUtils {
     public static void validateProblemAuth(Problem problem){
         if(problem.getAuth() == 1 && ! StpUtil.hasRoleOr(RoleUtils.getProblemAdmins())){
             throw new StatusForbiddenException("修改失败！你无权限公开题目！");
+        }
+    }
+
+    public static void validateAuthorOrRoles(AccountProfile profile, String author, String msg, String... roles){
+        if(! StpUtil.hasRoleOr(roles) && ! profile.getUsername().equals(author)){
+            throw new StatusForbiddenException(msg);
         }
     }
 

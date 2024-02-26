@@ -3,6 +3,7 @@ package love.pangteen.problem.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import love.pangteen.api.pojo.vo.ProblemVO;
 import love.pangteen.problem.pojo.dto.PidListDTO;
 import love.pangteen.problem.pojo.dto.ProblemDTO;
 import love.pangteen.api.pojo.entity.Problem;

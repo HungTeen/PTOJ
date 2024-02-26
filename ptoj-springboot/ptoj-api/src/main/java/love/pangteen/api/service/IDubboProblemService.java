@@ -1,5 +1,6 @@
 package love.pangteen.api.service;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.api.pojo.entity.ProblemCase;
 
@@ -21,4 +22,7 @@ public interface IDubboProblemService {
 
     List<ProblemCase> getProblemCases(Long pid);
 
+    boolean removeById(Long pid);
+
+    IPage<Problem> getTrainingProblemPage(Integer limit, Integer currentPage, String keyword, Boolean queryExisted, List<Long> pidList);
 }

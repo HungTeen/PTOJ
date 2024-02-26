@@ -1,7 +1,7 @@
 package love.pangteen.problem.pojo.vo;
 
 import lombok.Data;
-import love.pangteen.problem.pojo.entity.Tag;
+import love.pangteen.api.pojo.entity.Tag;
 import love.pangteen.problem.pojo.entity.TagClassification;
 
 import java.io.Serializable;

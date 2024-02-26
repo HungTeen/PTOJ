@@ -4,7 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import love.pangteen.exception.StatusFailException;
 import love.pangteen.problem.mapper.ClassificationMapper;
-import love.pangteen.problem.pojo.entity.Tag;
+import love.pangteen.api.pojo.entity.Tag;
 import love.pangteen.problem.pojo.entity.TagClassification;
 import love.pangteen.problem.pojo.vo.ProblemTagVO;
 import love.pangteen.problem.service.ClassificationService;

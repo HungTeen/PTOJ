@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import love.pangteen.problem.mapper.ProblemTagMapper;
 import love.pangteen.problem.pojo.entity.ProblemTag;
-import love.pangteen.problem.pojo.entity.Tag;
+import love.pangteen.api.pojo.entity.Tag;
 import love.pangteen.problem.service.ProblemTagService;
 import love.pangteen.problem.service.TagService;
 import org.springframework.stereotype.Service;

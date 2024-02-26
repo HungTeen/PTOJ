@@ -21,7 +21,7 @@ import java.util.List;
  * @create: 2024/1/26 15:03
  **/
 @Component
-public class ValidateUtils {
+public class JudgeValidateUtils {
 
     @Resource
     private AccessUtils accessUtils;

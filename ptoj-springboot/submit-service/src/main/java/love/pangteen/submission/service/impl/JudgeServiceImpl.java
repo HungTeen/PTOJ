@@ -17,7 +17,7 @@ import love.pangteen.submission.pojo.vo.JudgeCaseVO;
 import love.pangteen.submission.pojo.vo.JudgeVO;
 import love.pangteen.submission.pojo.vo.TestJudgeVO;
 import love.pangteen.submission.service.JudgeService;
-import love.pangteen.submission.utils.ValidateUtils;
+import love.pangteen.submission.utils.JudgeValidateUtils;
 import love.pangteen.utils.RedisUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.BeanUtils;
@@ -44,7 +44,7 @@ public class JudgeServiceImpl extends MPJBaseServiceImpl<JudgeMapper, Judge> imp
     private RedisUtils redisUtils;
 
     @Resource
-    private ValidateUtils validateUtils;
+    private JudgeValidateUtils validateUtils;
 
     /**
      * 通用查询判题记录列表。

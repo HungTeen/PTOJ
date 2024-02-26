@@ -1,4 +1,4 @@
-package love.pangteen.problem.pojo.entity;
+package love.pangteen.api.pojo.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.annotations.ApiModel;

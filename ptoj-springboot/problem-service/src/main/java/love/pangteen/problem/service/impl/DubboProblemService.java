@@ -1,9 +1,12 @@
 package love.pangteen.problem.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
+import cn.hutool.core.util.StrUtil;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.api.pojo.entity.ProblemCase;
 import love.pangteen.api.service.IDubboProblemService;
-import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.problem.service.ProblemCaseService;
 import love.pangteen.problem.service.ProblemService;
 import org.apache.dubbo.config.annotation.DubboService;
@@ -48,6 +51,30 @@ public class DubboProblemService implements IDubboProblemService {
     @Override
     public List<ProblemCase> getProblemCases(Long pid) {
         return problemCaseService.getProblemCases(pid, false);
+    }
+
+    @Override
+    public boolean removeById(Long pid) {
+        problemService.deleteProblem(pid);
+        return true;
+    }
+
+    @Override
+    public IPage<Problem> getTrainingProblemPage(Integer limit, Integer currentPage, String keyword, Boolean queryExisted, List<Long> pidList) {
+        return problemService.lambdaQuery()
+                .and(wrapper -> {
+                    // 逻辑判断，如果是查询已有的就应该是in，如果是查询不要重复的，使用not in。
+                    if (queryExisted) {
+                        wrapper.in(!pidList.isEmpty(), Problem::getId, pidList)
+                                .isNull(pidList.isEmpty(), Problem::getId);
+                    } else {
+                        // 权限需要是公开的（隐藏的，比赛中不可加入！）
+                        wrapper.notIn(!pidList.isEmpty(), Problem::getId, pidList)
+                                .eq(Problem::getAuth, 1).eq(Problem::getIsGroup, false);
+                    }
+                }).and(StrUtil.isNotEmpty(keyword), wrapper -> {
+                    wrapper.like(Problem::getTitle, keyword).or().like(Problem::getProblemId, keyword).or().like(Problem::getAuthor, keyword);
+                }).page(new Page<>(currentPage, limit));
     }
 
 }

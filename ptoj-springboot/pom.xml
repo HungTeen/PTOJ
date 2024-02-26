@@ -16,6 +16,7 @@
         <module>problem-service</module>
         <module>judge-service</module>
         <module>submit-service</module>
+        <module>training-service</module>
     </modules>
 
     <parent>
