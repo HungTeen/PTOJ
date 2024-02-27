@@ -4,6 +4,7 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.api.pojo.entity.ProblemCase;
 import love.pangteen.api.pojo.vo.ProblemVO;
@@ -63,7 +64,7 @@ public class DubboProblemService implements IDubboProblemService {
     }
 
     @Override
-    public IPage<Problem> getTrainingProblemPage(Integer limit, Integer currentPage, String keyword, Boolean queryExisted, List<Long> pidList) {
+    public PageDTO<Problem> getTrainingProblemPage(Integer limit, Integer currentPage, String keyword, Boolean queryExisted, List<Long> pidList) {
         return problemService.lambdaQuery()
                 .and(wrapper -> {
                     // 逻辑判断，如果是查询已有的就应该是in，如果是查询不要重复的，使用not in。
@@ -77,7 +78,7 @@ public class DubboProblemService implements IDubboProblemService {
                     }
                 }).and(StrUtil.isNotEmpty(keyword), wrapper -> {
                     wrapper.like(Problem::getTitle, keyword).or().like(Problem::getProblemId, keyword).or().like(Problem::getAuthor, keyword);
-                }).page(new Page<>(currentPage, limit));
+                }).page(new PageDTO<>(currentPage, limit));
     }
 
     @Override

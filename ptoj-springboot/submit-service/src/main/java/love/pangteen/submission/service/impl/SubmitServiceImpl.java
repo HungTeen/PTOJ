@@ -48,7 +48,7 @@ public class SubmitServiceImpl implements SubmitService {
     private JudgeService judgeService;
 
     @Resource
-    private JudgeValidateUtils validateUtils;
+    private JudgeValidateUtils judgeValidateUtils;
 
     @Resource
     private SubmitUtils submitUtils;
@@ -151,7 +151,7 @@ public class SubmitServiceImpl implements SubmitService {
      */
     @Override
     public Judge submitProblemJudge(SubmitJudgeDTO judgeDto) {
-        validateUtils.validateSubmission(judgeDto);
+        judgeValidateUtils.validateSubmission(judgeDto);
 
         //TODO 提交频率限制。
 //        SwitchConfig switchConfig = nacosSwitchConfig.getSwitchConfig();
@@ -215,7 +215,7 @@ public class SubmitServiceImpl implements SubmitService {
 
     @Override
     public String submitProblemTestJudge(TestJudgeDTO testJudgeDto) {
-        validateUtils.validateTestJudge(testJudgeDto);
+        judgeValidateUtils.validateTestJudge(testJudgeDto);
 
         HttpServletRequest request = ((ServletRequestAttributes) (RequestContextHolder.currentRequestAttributes())).getRequest();
         AccountProfile profile = AccountUtils.getProfile();

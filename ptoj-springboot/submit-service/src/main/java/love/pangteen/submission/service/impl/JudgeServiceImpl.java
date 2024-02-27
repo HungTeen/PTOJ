@@ -43,8 +43,8 @@ public class JudgeServiceImpl extends MPJBaseServiceImpl<JudgeMapper, Judge> imp
     @Resource
     private RedisUtils redisUtils;
 
-    @Resource
-    private JudgeValidateUtils validateUtils;
+//    @Resource
+//    private JudgeValidateUtils validateUtils;
 
     /**
      * 通用查询判题记录列表。

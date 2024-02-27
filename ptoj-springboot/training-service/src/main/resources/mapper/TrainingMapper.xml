@@ -17,8 +17,8 @@
     </resultMap>
 
     <select id="getTrainingList" resultMap="map_TrainingList">
-        SELECT t.* #,COALESCE(tp.problem_count,0)
-            as problem_count FROM (
+        SELECT t.* #,COALESCE(tp.problem_count,0) as problem_count
+        FROM (
         select t.*,tc.name as category_name,tc.color as category_color
         from training t
         left join mapping_training_category mtc

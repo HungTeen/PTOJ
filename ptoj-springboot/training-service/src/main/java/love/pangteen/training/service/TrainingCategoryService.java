@@ -3,6 +3,8 @@ package love.pangteen.training.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import love.pangteen.training.pojo.entity.TrainingCategory;
 
+import java.util.List;
+
 /**
  * @program: PTOJ
  * @author: PangTeen
@@ -16,4 +18,6 @@ public interface TrainingCategoryService extends IService<TrainingCategory> {
     void deleteTrainingCategory(Long cid);
 
     TrainingCategory getByName(String name);
+
+    List<TrainingCategory> getTrainingCategory();
 }

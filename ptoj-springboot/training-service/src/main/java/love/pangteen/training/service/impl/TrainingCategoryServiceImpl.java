@@ -7,6 +7,8 @@ import love.pangteen.training.pojo.entity.TrainingCategory;
 import love.pangteen.training.service.TrainingCategoryService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
  * @program: PTOJ
  * @author: PangTeen
@@ -49,6 +51,11 @@ public class TrainingCategoryServiceImpl extends ServiceImpl<TrainingCategoryMap
     @Override
     public TrainingCategory getByName(String name) {
         return lambdaQuery().eq(TrainingCategory::getName, name).oneOpt().orElse(null);
+    }
+
+    @Override
+    public List<TrainingCategory> getTrainingCategory() {
+        return lambdaQuery().list();
     }
 
 }

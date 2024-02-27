@@ -6,7 +6,9 @@ import love.pangteen.api.pojo.vo.AccessVO;
 import love.pangteen.api.pojo.vo.ProblemVO;
 import love.pangteen.result.CommonResult;
 import love.pangteen.training.pojo.dto.RegisterTrainingDTO;
+import love.pangteen.training.pojo.entity.TrainingCategory;
 import love.pangteen.training.pojo.vo.TrainingVO;
+import love.pangteen.training.service.TrainingCategoryService;
 import love.pangteen.training.service.TrainingProblemService;
 import love.pangteen.training.service.TrainingRegisterService;
 import love.pangteen.training.service.TrainingService;
@@ -26,7 +28,7 @@ import java.util.List;
 public class TrainingController {
 
     @Resource
-    private TrainingService trainingService;
+    private TrainingCategoryService trainingCategoryService;
 
     @Resource
     private TrainingRegisterService trainingRegisterService;
@@ -83,6 +85,11 @@ public class TrainingController {
         return CommonResult.success(trainingRegisterService.getTrainingAccess(tid));
     }
 
+    @GetMapping("/get-training-category")
+    @IgnoreLogin
+    public CommonResult<List<TrainingCategory>> getTrainingCategory() {
+        return CommonResult.success(trainingCategoryService.getTrainingCategory());
+    }
 
 //    /**
 //     * 获取训练的排行榜分页。

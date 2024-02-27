@@ -5,6 +5,7 @@ import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.core.lang.Pair;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.api.pojo.vo.ProblemVO;
@@ -128,7 +129,7 @@ public class TrainingProblemServiceImpl extends ServiceImpl<TrainingProblemMappe
             pidList.add(trainingProblem.getPid());
         });
 
-        IPage<Problem> problemPage = problemService.getTrainingProblemPage(limit, currentPage, keyword, queryExisted, pidList);
+        PageDTO<Problem> problemPage = problemService.getTrainingProblemPage(limit, currentPage, keyword, queryExisted, pidList);
         if(queryExisted && ! pidList.isEmpty()) {
             List<Problem> sortProblemList = problemPage.getRecords()
                     .stream()
@@ -218,9 +219,7 @@ public class TrainingProblemServiceImpl extends ServiceImpl<TrainingProblemMappe
         validateUtils.validateTrainingAuth(training);
 
         List<Long> pidList = getPidList(tid, true);
-        List<ProblemVO> trainingProblemList = problemService.getTrainingProblemList(pidList).stream()
-                .filter(distinctByKey(ProblemVO::getPid))
-                .collect(Collectors.toList());
+        List<ProblemVO> trainingProblemList = problemService.getTrainingProblemList(pidList);
 
         trainingProblemList.forEach(problemVO -> {
             Pair<Integer, Integer> stats = judgeService.getAcStats(problemVO.getPid());
@@ -244,8 +243,4 @@ public class TrainingProblemServiceImpl extends ServiceImpl<TrainingProblemMappe
         return problemService.getValidPidList(getPidList(tid, false));
     }
 
-    static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
-        Map<Object, Boolean> seen = new ConcurrentHashMap<>();
-        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
-    }
 }
