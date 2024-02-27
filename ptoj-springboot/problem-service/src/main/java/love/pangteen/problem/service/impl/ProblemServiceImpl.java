@@ -63,7 +63,6 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
     @DubboReference(check = false)
     private IDubboJudgeService judgeService;
 
-    @Transactional
     @Override
     public Page<ProblemVO> getProblemList(Integer limit, Integer currentPage, String keyword, List<Long> tagIds, Integer difficulty, String oj) {
         Page<ProblemVO> page = new Page<>(currentPage, limit);

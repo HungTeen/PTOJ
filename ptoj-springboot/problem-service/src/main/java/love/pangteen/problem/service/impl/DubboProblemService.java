@@ -6,15 +6,18 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.api.pojo.entity.ProblemCase;
+import love.pangteen.api.pojo.vo.ProblemVO;
 import love.pangteen.api.service.IDubboProblemService;
 import love.pangteen.problem.service.ProblemCaseService;
 import love.pangteen.problem.service.ProblemService;
 import org.apache.dubbo.config.annotation.DubboService;
+import org.springframework.beans.BeanUtils;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @program: PTOJ
@@ -75,6 +78,24 @@ public class DubboProblemService implements IDubboProblemService {
                 }).and(StrUtil.isNotEmpty(keyword), wrapper -> {
                     wrapper.like(Problem::getTitle, keyword).or().like(Problem::getProblemId, keyword).or().like(Problem::getAuthor, keyword);
                 }).page(new Page<>(currentPage, limit));
+    }
+
+    @Override
+    public List<Long> getValidPidList(List<Long> pidList) {
+        return problemService.lambdaQuery()
+                .eq(Problem::getAuth, 1)
+                .in(Problem::getId, pidList).list()
+                .stream().map(Problem::getId).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<ProblemVO> getTrainingProblemList(List<Long> pidList) {
+        return pidList.stream().map(pid -> {
+            Problem problem = problemService.getById(pid);
+            ProblemVO problemVO = new ProblemVO();
+            BeanUtils.copyProperties(problem, problemVO);
+            return problemVO;
+        }).collect(Collectors.toList());
     }
 
 }

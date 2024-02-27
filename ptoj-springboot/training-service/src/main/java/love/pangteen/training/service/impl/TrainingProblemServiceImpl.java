@@ -2,14 +2,17 @@ package love.pangteen.training.service.impl;
 
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.lang.Pair;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.api.pojo.vo.ProblemVO;
+import love.pangteen.api.service.IDubboJudgeService;
 import love.pangteen.api.service.IDubboProblemService;
 import love.pangteen.exception.StatusFailException;
 import love.pangteen.pojo.AccountProfile;
+import love.pangteen.training.TrainingValidateUtils;
 import love.pangteen.training.mapper.TrainingMapper;
 import love.pangteen.training.mapper.TrainingProblemMapper;
 import love.pangteen.training.pojo.dto.TrainingProblemDTO;
@@ -27,10 +30,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 /**
@@ -52,6 +55,12 @@ public class TrainingProblemServiceImpl extends ServiceImpl<TrainingProblemMappe
 
     @DubboReference
     private IDubboProblemService problemService;
+
+    @DubboReference
+    private IDubboJudgeService judgeService;
+
+    @Resource
+    private TrainingValidateUtils validateUtils;
 
     @Transactional
     @Override
@@ -139,32 +148,27 @@ public class TrainingProblemServiceImpl extends ServiceImpl<TrainingProblemMappe
     public IPage<TrainingVO> getTrainingDetailList(Integer limit, Integer currentPage, String keyword, Long categoryId, String auth) {
         Page<TrainingVO> page = new Page<>(currentPage, limit);
         List<TrainingVO> trainingList = trainingMapper.getTrainingList(page, categoryId, auth, keyword);
+        Map<Long, List<Long>> tidPidMap = new HashMap<>();
+        Set<Long> pidSet = new HashSet<>(); // 记录所有查询到的训练包含的题目id。
 
         // 查询每个训练包含多少题目。
         trainingList.forEach(trainingVO -> {
-            List<TrainingProblem> pidList = lambdaQuery().select(TrainingProblem::getPid)
-                    .eq(TrainingProblem::getTid, trainingVO.getId()).list();
-            trainingVO.setProblemCount(pidList.size());
+            List<Long> validPidList = getValidPidList(trainingVO.getId());
+            pidSet.addAll(validPidList);
+            tidPidMap.put(trainingVO.getId(), validPidList);
+            trainingVO.setProblemCount(validPidList.size());
         });
 
         // 当前用户有登录，且训练列表不为空，则查询用户对于每个训练的做题进度。
         if (StpUtil.isLogin() && !trainingList.isEmpty()) {
             AccountProfile profile = AccountUtils.getProfile();
-            List<Long> tidList = trainingList.stream().map(TrainingVO::getId).collect(Collectors.toList());
-            List<TrainingProblem> trainingProblemList = getTrainingListAcceptedCountByUid(tidList, profile.getUuid());
-
+            HashMap<Long, Boolean> statusMap = judgeService.getUserAcceptCount(profile.getUuid(), pidSet);
             //记录用户每个训练题单通过的题目数。
-            HashMap<Long, Integer> tidMapCount = new HashMap<>(trainingList.size());
-            for (TrainingProblem trainingProblem : trainingProblemList) {
-                int count = tidMapCount.getOrDefault(trainingProblem.getTid(), 0);
-                count++;
-                tidMapCount.put(trainingProblem.getTid(), count);
-            }
-
-            for (TrainingVO trainingVo : trainingList) {
-                Integer count = tidMapCount.getOrDefault(trainingVo.getId(), 0);
-                trainingVo.setAcCount(count);
-            }
+            trainingList.forEach(trainingVO -> {
+                List<Long> pidList = tidPidMap.get(trainingVO.getId());
+                long count = pidList.stream().filter(id -> statusMap.containsKey(id) && statusMap.get(id)).count();
+                trainingVO.setAcCount((int) count);
+            });
         }
 
         page.setRecords(trainingList);
@@ -191,15 +195,16 @@ public class TrainingProblemServiceImpl extends ServiceImpl<TrainingProblemMappe
         TrainingCategory trainingCategory = mappingTrainingCategoryService.getTrainingCategory(tid);
         trainingVo.setCategoryName(trainingCategory.getName());
         trainingVo.setCategoryColor(trainingCategory.getColor());
-//        List<Long> trainingProblemIdList = getTrainingProblemIdList(training.getId());
-//        trainingVo.setProblemCount(trainingProblemIdList.size());
-//        if (StpUtil.isLogin() && trainingValidator.isInTrainingOrAdmin(training, userRolesVo)) {
-//            AccountProfile profile = AccountUtils.getProfile();
-//            Integer count = getUserTrainingACProblemCount(profile.getUuid(), gid, trainingProblemIdList);
-//            trainingVo.setAcCount(count);
-//        } else {
-//            trainingVo.setAcCount(0);
-//        }
+
+        List<Long> pidList = getValidPidList(tid);
+        trainingVo.setProblemCount(pidList.size());
+
+        if(StpUtil.isLogin() && !pidList.isEmpty()){
+            AccountProfile profile = AccountUtils.getProfile();
+            HashMap<Long, Boolean> statusMap = judgeService.getUserAcceptCount(profile.getUuid(), pidList);
+            long count = pidList.stream().filter(id -> statusMap.containsKey(id) && statusMap.get(id)).count();
+            trainingVo.setAcCount((int) count);
+        }
 
         return trainingVo;
     }
@@ -210,14 +215,37 @@ public class TrainingProblemServiceImpl extends ServiceImpl<TrainingProblemMappe
         if (training == null || !training.getStatus()) {
             throw new StatusFailException("该训练不存在或不允许显示！");
         }
-//        trainingValidator.validateTrainingAuth(training); TODO 写不出来。
-//        List<ProblemVO> trainingProblemList = trainingProblemMapper.getTrainingProblemList(tid);
-//        return trainingProblemList.stream().filter(distinctByKey(ProblemVO::getPid)).collect(Collectors.toList());
-        return List.of();
+        validateUtils.validateTrainingAuth(training);
+
+        List<Long> pidList = getPidList(tid, true);
+        List<ProblemVO> trainingProblemList = problemService.getTrainingProblemList(pidList).stream()
+                .filter(distinctByKey(ProblemVO::getPid))
+                .collect(Collectors.toList());
+
+        trainingProblemList.forEach(problemVO -> {
+            Pair<Integer, Integer> stats = judgeService.getAcStats(problemVO.getPid());
+            problemVO.setTotal(stats.getKey());
+            problemVO.setAc(stats.getValue());
+        });
+
+        return trainingProblemList;
     }
 
-    private List<TrainingProblem> getTrainingListAcceptedCountByUid(List<Long> tidList, String uuid) {
-        //TODO RPC调用Judge。
-        return List.of();
+    public List<Long> getPidList(Long tid, boolean sort) {
+        return lambdaQuery().select(TrainingProblem::getPid)
+                .eq(TrainingProblem::getTid, tid)
+                .orderByAsc(sort, TrainingProblem::getRank).list()
+                .stream()
+                .map(TrainingProblem::getPid)
+                .collect(Collectors.toList());
+    }
+
+    public List<Long> getValidPidList(Long tid) {
+        return problemService.getValidPidList(getPidList(tid, false));
+    }
+
+    static <T> Predicate<T> distinctByKey(Function<? super T, ?> keyExtractor) {
+        Map<Object, Boolean> seen = new ConcurrentHashMap<>();
+        return t -> seen.putIfAbsent(keyExtractor.apply(t), Boolean.TRUE) == null;
     }
 }

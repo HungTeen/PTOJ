@@ -1,8 +1,11 @@
 package love.pangteen.api.service;
 
+import cn.hutool.core.lang.Pair;
 import love.pangteen.api.pojo.entity.Judge;
 import org.springframework.lang.Nullable;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -15,4 +18,18 @@ public interface IDubboJudgeService {
     List<Judge> getSubmitJudges(List<Long> pidList, String uid,  @Nullable Long cid, @Nullable Long gid);
 
 
+    /**
+     * 获取用户对题目的提交通过map。
+     * @param uuid 用户uuid。
+     * @param pidSet 题目id集合。
+     * @return 每个题目是否通过。
+     */
+    HashMap<Long, Boolean> getUserAcceptCount(String uuid, Collection<Long> pidSet);
+
+    /**
+     * 获取题目的ac和提交数。
+     * @param pid 题目id。
+     * @return Pair<总提交数, 通过提交数>。
+     */
+    Pair<Integer, Integer> getAcStats(Long pid);
 }

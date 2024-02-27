@@ -1,6 +1,7 @@
 package love.pangteen.api.pojo.vo;
 
 import io.swagger.annotations.ApiModelProperty;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
@@ -9,6 +10,7 @@ import lombok.Data;
  * @create: 2024/2/26 15:14
  **/
 @Data
+@AllArgsConstructor
 public class AccessVO {
 
     @ApiModelProperty(value = "是否有进入比赛或训练的权限")

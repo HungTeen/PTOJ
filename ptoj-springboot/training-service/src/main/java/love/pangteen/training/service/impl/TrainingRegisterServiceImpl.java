@@ -1,6 +1,7 @@
 package love.pangteen.training.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import love.pangteen.api.pojo.vo.AccessVO;
 import love.pangteen.exception.StatusFailException;
 import love.pangteen.pojo.AccountProfile;
 import love.pangteen.training.mapper.TrainingMapper;
@@ -53,5 +54,24 @@ public class TrainingRegisterServiceImpl extends ServiceImpl<TrainingRegisterMap
         lambdaUpdate()
                 .eq(TrainingRegister::getTid, id)
                 .remove();
+    }
+
+    @Override
+    public AccessVO getTrainingAccess(Long tid) {
+        AccountProfile profile = AccountUtils.getProfile();
+        AccessVO accessVO = new AccessVO(false);
+        if(lambdaQuery()
+                .eq(TrainingRegister::getTid, tid)
+                .eq(TrainingRegister::getUid, profile.getUuid())
+                .eq(TrainingRegister::getStatus, true)
+                .oneOpt().isPresent()){
+            Training training = trainingMapper.selectById(tid);
+            if(training != null && training.getStatus()){
+                accessVO.setAccess(true);
+            } else {
+                throw new StatusFailException("对不起，该训练不存在!");
+            }
+        }
+        return accessVO;
     }
 }

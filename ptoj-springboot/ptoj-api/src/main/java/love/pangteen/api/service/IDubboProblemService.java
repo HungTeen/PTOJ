@@ -3,6 +3,7 @@ package love.pangteen.api.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.api.pojo.entity.ProblemCase;
+import love.pangteen.api.pojo.vo.ProblemVO;
 
 import java.util.List;
 import java.util.Map;
@@ -25,4 +26,11 @@ public interface IDubboProblemService {
     boolean removeById(Long pid);
 
     IPage<Problem> getTrainingProblemPage(Integer limit, Integer currentPage, String keyword, Boolean queryExisted, List<Long> pidList);
+
+    /**
+     * 获取有效的题目ID列表。
+     */
+    List<Long> getValidPidList(List<Long> pidList);
+
+    List<ProblemVO> getTrainingProblemList(List<Long> pidList);
 }

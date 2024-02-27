@@ -15,4 +15,5 @@ import java.util.List;
 public interface ProblemMapper extends BaseMapper<Problem> {
 
     List<ProblemVO> getProblemList(Page<ProblemVO> page, Long pid, String keyword, Integer difficulty, List<Long> tagIds, Integer tagListSize, String oj);
+
 }
