@@ -9,4 +9,5 @@ import love.pangteen.api.pojo.entity.Judge;
  * @create: 2024/1/25 16:10
  **/
 public interface JudgeMapper extends MPJBaseMapper<Judge> {
+
 }

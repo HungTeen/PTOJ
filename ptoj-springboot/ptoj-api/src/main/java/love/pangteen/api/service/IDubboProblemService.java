@@ -1,6 +1,5 @@
 package love.pangteen.api.service;
 
-import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.api.pojo.entity.ProblemCase;
@@ -34,4 +33,6 @@ public interface IDubboProblemService {
     List<Long> getValidPidList(List<Long> pidList);
 
     List<ProblemVO> getTrainingProblemList(List<Long> pidList);
+
+    List<Problem> getProblems(List<Long> acPidList);
 }

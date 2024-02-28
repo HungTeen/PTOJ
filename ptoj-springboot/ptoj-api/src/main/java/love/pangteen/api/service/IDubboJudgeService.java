@@ -32,4 +32,8 @@ public interface IDubboJudgeService {
      * @return Pair<总提交数, 通过提交数>。
      */
     Pair<Integer, Integer> getAcStats(Long pid);
+
+    int getUserTotalSubmitCount(String uuid);
+
+    List<Judge> getLastYearUserJudgeList(String uid);
 }

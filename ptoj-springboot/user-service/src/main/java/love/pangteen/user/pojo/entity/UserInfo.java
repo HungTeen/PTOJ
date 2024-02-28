@@ -58,6 +58,10 @@ public class UserInfo implements Serializable {
     @ApiModelProperty(value = "cf的username")
     private String cfUsername;
 
+    @ApiModelProperty(value = "cf得分")
+    @TableField(value = "rating", updateStrategy = FieldStrategy.IGNORED)
+    private Integer rating;
+
     @TableField(updateStrategy = FieldStrategy.IGNORED)
     @ApiModelProperty(value = "github地址")
     private String github;

@@ -3,9 +3,7 @@ package love.pangteen.user.service;
 import com.baomidou.mybatisplus.extension.service.IService;
 import love.pangteen.user.pojo.dto.*;
 import love.pangteen.user.pojo.entity.UserInfo;
-import love.pangteen.user.pojo.vo.CheckUsernameOrEmailVO;
-import love.pangteen.user.pojo.vo.GenerateKeyVO;
-import love.pangteen.user.pojo.vo.UserInfoVO;
+import love.pangteen.user.pojo.vo.*;
 
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -30,4 +28,8 @@ public interface UserInfoService extends IService<UserInfo> {
     CheckUsernameOrEmailVO checkUsernameOrEmail(CheckUsernameOrEmailDTO checkUsernameOrEmailDto);
 
     UserInfoVO changeUserInfo(EditUserInfoDTO editUserInfoDTO);
+
+    UserHomeVO getUserHomeInfo(String uid, String username);
+
+    UserCalendarHeatmapVO getUserCalendarHeatmap(String uid, String username);
 }

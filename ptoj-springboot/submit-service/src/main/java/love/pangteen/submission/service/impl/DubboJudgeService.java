@@ -5,6 +5,8 @@ import io.micrometer.core.lang.Nullable;
 import love.pangteen.api.enums.JudgeStatus;
 import love.pangteen.api.pojo.entity.Judge;
 import love.pangteen.api.service.IDubboJudgeService;
+import love.pangteen.api.utils.Utils;
+import love.pangteen.submission.mapper.JudgeMapper;
 import love.pangteen.submission.service.JudgeService;
 import org.apache.dubbo.config.annotation.DubboService;
 
@@ -23,6 +25,9 @@ public class DubboJudgeService implements IDubboJudgeService {
 
     @Resource
     private JudgeService judgeService;
+
+    @Resource
+    private JudgeMapper judgeMapper;
 
     @Override
     public List<Judge> getSubmitJudges(List<Long> pidList, String uid, @Nullable Long cid, @Nullable Long gid) {
@@ -62,6 +67,25 @@ public class DubboJudgeService implements IDubboJudgeService {
                 .eq(Judge::getStatus, JudgeStatus.STATUS_ACCEPTED.getStatus())
                 .count();
         return Pair.of(total.intValue(), ac.intValue());
+    }
+
+    @Override
+    public int getUserTotalSubmitCount(String uuid) {
+        return judgeService.lambdaQuery()
+                .eq(Judge::getUid, uuid)
+                .eq(Judge::getCid, 0)
+                .isNull(Judge::getGid)
+                .count().intValue();
+    }
+
+    @Override
+    public List<Judge> getLastYearUserJudgeList(String uuid) {
+        return judgeService.lambdaQuery()
+                .select(Judge::getSubmitTime)
+                .eq(Judge::getUid, uuid)
+                .eq(Judge::getCid, 0)
+                .ge(Judge::getSubmitTime, Utils.getYearAgo(1))
+                .list();
     }
 
 }

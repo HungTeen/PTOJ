@@ -16,15 +16,13 @@ import java.util.Date;
 /**
  * @program: PTOJ
  * @author: PangTeen
- * @create: 2024/1/22 8:42
+ * @create: 2024/1/22 8:39
  **/
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
-@ApiModel(value="UserRecord对象", description="")
-public class UserRecord implements Serializable {
-
-    private static final long serialVersionUID = 1L;
+@ApiModel(value="UserAcproblem对象", description="")
+public class UserAcProblem implements Serializable {
 
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;
@@ -32,9 +30,11 @@ public class UserRecord implements Serializable {
     @ApiModelProperty(value = "用户id")
     private String uid;
 
-    @ApiModelProperty(value = "cf得分")
-    @TableField("rating")
-    private Integer rating;
+    @ApiModelProperty(value = "ac的题目id")
+    private Long pid;
+
+    @ApiModelProperty(value = "提交的id")
+    private Long submitId;
 
     @TableField(fill = FieldFill.INSERT)
     private Date gmtCreate;

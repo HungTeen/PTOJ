@@ -2,8 +2,6 @@ package love.pangteen.problem.service.impl;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
-import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.api.pojo.entity.ProblemCase;
@@ -97,6 +95,11 @@ public class DubboProblemService implements IDubboProblemService {
             BeanUtils.copyProperties(problem, problemVO);
             return problemVO;
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Problem> getProblems(List<Long> acPidList) {
+        return problemService.lambdaQuery().in(Problem::getId, acPidList).list();
     }
 
 }

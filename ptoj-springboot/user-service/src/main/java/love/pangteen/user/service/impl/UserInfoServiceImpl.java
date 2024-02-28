@@ -2,25 +2,30 @@ package love.pangteen.user.service.impl;
 
 import cn.dev33.satoken.secure.SaSecureUtil;
 import cn.dev33.satoken.stp.StpUtil;
+import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import love.pangteen.api.enums.OJRole;
+import love.pangteen.api.pojo.entity.Judge;
+import love.pangteen.api.pojo.entity.Problem;
+import love.pangteen.api.service.IDubboJudgeService;
+import love.pangteen.api.service.IDubboProblemService;
 import love.pangteen.exception.StatusFailException;
 import love.pangteen.user.mapper.UserInfoMapper;
 import love.pangteen.user.pojo.dto.*;
 import love.pangteen.user.pojo.entity.Role;
+import love.pangteen.user.pojo.entity.UserAcProblem;
 import love.pangteen.user.pojo.entity.UserInfo;
-import love.pangteen.user.pojo.vo.CheckUsernameOrEmailVO;
-import love.pangteen.user.pojo.vo.GenerateKeyVO;
-import love.pangteen.user.pojo.vo.UserInfoVO;
-import love.pangteen.user.pojo.vo.UserRolesVO;
+import love.pangteen.user.pojo.vo.*;
+import love.pangteen.user.service.UserAcProblemService;
 import love.pangteen.user.service.UserInfoService;
 import love.pangteen.user.service.UserRoleService;
 import love.pangteen.user.utils.ExcelUtils;
 import love.pangteen.utils.RedisUtils;
+import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,9 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -49,6 +52,15 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
 
     @Resource
     private UserRoleService userRoleService;
+
+    @Resource
+    private UserAcProblemService userAcProblemService;
+
+    @DubboReference
+    private IDubboJudgeService judgeService;
+
+    @DubboReference
+    private IDubboProblemService problemService;
 
     @Override
     public UserInfo getUserInfoByName(String username) {
@@ -163,6 +175,72 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         } else {
             throw new StatusFailException("个人信息修改失败！");
         }
+    }
+
+    @Override
+    public UserHomeVO getUserHomeInfo(String uid, String username) {
+        UserInfo userInfo = getUserInfo(uid, username);
+
+        UserHomeVO userHomeVO = new UserHomeVO();
+        BeanUtils.copyProperties(userInfo, userHomeVO);
+        List<UserAcProblem> acProblemList = userAcProblemService.getAcProblemList(userInfo.getUuid());
+        List<Long> acPidList = acProblemList.stream().map(UserAcProblem::getPid).distinct().collect(Collectors.toList());
+        List<Problem> problems = problemService.getProblems(acPidList);
+        Map<Integer, List<UserHomeProblemVO>> acMap = problems.stream().map(problem -> {
+            UserHomeProblemVO problemVO = new UserHomeProblemVO();
+            BeanUtils.copyProperties(problem, problemVO);
+            return problemVO;
+        }).collect(Collectors.groupingBy(UserHomeProblemVO::getDifficulty));
+        userHomeVO.setSolvedList(problems.stream().map(Problem::getProblemId).collect(Collectors.toList()));
+        userHomeVO.setSolvedGroupByDifficulty(acMap);
+
+        userHomeVO.setTotal(judgeService.getUserTotalSubmitCount(userInfo.getUuid()));
+        return userHomeVO;
+    }
+
+    @Override
+    public UserCalendarHeatmapVO getUserCalendarHeatmap(String uid, String username) {
+        UserInfo userInfo = getUserInfo(uid, username);
+
+        UserCalendarHeatmapVO userCalendarHeatmapVo = new UserCalendarHeatmapVO();
+        userCalendarHeatmapVo.setEndDate(DateUtil.format(new Date(), "yyyy-MM-dd"));
+
+        List<Judge> lastYearUserJudgeList = judgeService.getLastYearUserJudgeList(userInfo.getUuid());
+        HashMap<String, Integer> tmpRecordMap = new HashMap<>();
+        for (Judge judge : lastYearUserJudgeList) {
+            Date submitTime = judge.getSubmitTime();
+            String dateStr = DateUtil.format(submitTime, "yyyy-MM-dd");
+            tmpRecordMap.merge(dateStr, 1, Integer::sum);
+        }
+        List<HashMap<String, Object>> dataList = new ArrayList<>();
+        for (Map.Entry<String, Integer> record : tmpRecordMap.entrySet()) {
+            HashMap<String, Object> tmp = new HashMap<>(2);
+            tmp.put("date", record.getKey());
+            tmp.put("count", record.getValue());
+            dataList.add(tmp);
+        }
+        userCalendarHeatmapVo.setDataList(dataList);
+        return userCalendarHeatmapVo;
+    }
+
+    private UserInfo getUserInfo(String uid, String username) {
+        // 如果没有uid和username，默认查询当前登录用户的。
+        if (StrUtil.isEmpty(uid) && StrUtil.isEmpty(username)) {
+            if (StpUtil.isLogin()) {
+                uid = StpUtil.getLoginIdAsString();
+            } else {
+                throw new StatusFailException("请求参数错误：uid和username不能都为空！");
+            }
+        }
+
+        UserInfo userInfo = lambdaQuery()
+                .eq(StrUtil.isNotEmpty(uid), UserInfo::getUuid, uid)
+                .eq(StrUtil.isNotEmpty(username), UserInfo::getUsername, username)
+                .one();
+        if (userInfo == null) {
+            throw new StatusFailException("用户不存在！");
+        }
+        return userInfo;
     }
 
 }

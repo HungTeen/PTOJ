@@ -19,8 +19,6 @@ public interface AccountService {
 
     void logout();
 
-    UserCalendarHeatmapVO getUserCalendarHeatmap(String uid, String username);
-
     ChangeAccountVO changePassword(ChangePasswordDTO changePasswordDto);
 
     void getChangeEmailCode(String email);

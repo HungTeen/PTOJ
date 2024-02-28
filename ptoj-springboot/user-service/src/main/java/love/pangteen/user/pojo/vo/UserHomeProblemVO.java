@@ -1,7 +1,6 @@
 package love.pangteen.user.pojo.vo;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Builder;
 import lombok.Data;
 
 /**
@@ -10,7 +9,6 @@ import lombok.Data;
  * @create: 2024/1/24 16:22
  **/
 @Data
-@Builder
 public class UserHomeProblemVO {
 
     @ApiModelProperty(value = "主键id")

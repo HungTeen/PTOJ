@@ -2,10 +2,11 @@ package love.pangteen.user.controller;
 
 import love.pangteen.api.annotations.IgnoreLogin;
 import love.pangteen.result.CommonResult;
+import love.pangteen.user.pojo.dto.ChangePasswordDTO;
 import love.pangteen.user.pojo.dto.CheckUsernameOrEmailDTO;
 import love.pangteen.user.pojo.dto.EditUserInfoDTO;
-import love.pangteen.user.pojo.vo.CheckUsernameOrEmailVO;
-import love.pangteen.user.pojo.vo.UserInfoVO;
+import love.pangteen.user.pojo.vo.*;
+import love.pangteen.user.service.AccountService;
 import love.pangteen.user.service.UserInfoService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -24,29 +25,32 @@ public class UserController {
     @Resource
     private UserInfoService userInfoService;
 
+    @Resource
+    private AccountService accountService;
+
     @RequestMapping(value = "/check-username-or-email", method = RequestMethod.POST)
     @IgnoreLogin
     public CommonResult<CheckUsernameOrEmailVO> checkUsernameOrEmail(@RequestBody CheckUsernameOrEmailDTO checkUsernameOrEmailDto) {
         return CommonResult.success(userInfoService.checkUsernameOrEmail(checkUsernameOrEmailDto));
     }
 
-//    @GetMapping("/get-user-home-info")
-//    public CommonResult<UserHomeVO> getUserHomeInfo(@RequestParam(value = "uid", required = false) String uid,
-//                                                    @RequestParam(value = "username", required = false) String username) {
-//        return CommonResult.success(accountService.getUserHomeInfo(uid, username));
-//    }
-//
-//    @GetMapping("/get-user-calendar-heatmap")
-//    public CommonResult<UserCalendarHeatmapVO> getUserCalendarHeatmap(@RequestParam(value = "uid", required = false) String uid,
-//                                                                      @RequestParam(value = "username", required = false) String username) {
-//        return CommonResult.success(accountService.getUserCalendarHeatmap(uid, username));
-//    }
-//
-//    @PostMapping("/change-password")
-//    public CommonResult<ChangeAccountVO> changePassword(@RequestBody ChangePasswordDTO changePasswordDto) {
-//        return CommonResult.success(accountService.changePassword(changePasswordDto));
-//    }
-//
+    @GetMapping("/get-user-home-info")
+    public CommonResult<UserHomeVO> getUserHomeInfo(@RequestParam(value = "uid", required = false) String uid,
+                                                    @RequestParam(value = "username", required = false) String username) {
+        return CommonResult.success(userInfoService.getUserHomeInfo(uid, username));
+    }
+
+    @GetMapping("/get-user-calendar-heatmap")
+    public CommonResult<UserCalendarHeatmapVO> getUserCalendarHeatmap(@RequestParam(value = "uid", required = false) String uid,
+                                                                      @RequestParam(value = "username", required = false) String username) {
+        return CommonResult.success(userInfoService.getUserCalendarHeatmap(uid, username));
+    }
+
+    @PostMapping("/change-password")
+    public CommonResult<ChangeAccountVO> changePassword(@Validated @RequestBody ChangePasswordDTO changePasswordDto) {
+        return CommonResult.success(accountService.changePassword(changePasswordDto));
+    }
+
 //    @GetMapping("/get-change-email-code")
 //    public CommonResult<Void> getChangeEmailCode(@RequestParam("email") String email) {
 //        accountService.getChangeEmailCode(email);
