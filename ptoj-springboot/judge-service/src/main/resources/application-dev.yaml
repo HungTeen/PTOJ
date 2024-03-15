@@ -18,12 +18,16 @@ ptoj:
     port: 8848
     username: nacos
     password: nacos
-  rabbitmq:
+#  rabbitmq:
+#    host: localhost
+#    port: 5672
+#    namespace: /ptoj
+#    username: root
+#    password: 123456
+  rocketmq:
     host: localhost
-    port: 5672
-    namespace: /ptoj
-    username: root
-    password: 123456
+    port: 9876
+    group: ptoj
 
   swagger:
     title: "评测管理接口文档"

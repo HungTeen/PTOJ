@@ -24,4 +24,9 @@ public interface MQConstants {
     String CONTEST_REMOTE = "contest.remote";
     String GENERAL_REMOTE = "general.remote";
 
+    /* Topic */
+
+    String JUDGE_TOPIC = "judge";
+
+    String JUDGE_CONSUMER_GROUP = "ONLINE_JUDGE";
 }

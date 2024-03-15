@@ -1,11 +1,13 @@
-package love.pangteen.submission.publisher;
+package love.pangteen.submission.producer;
 
+import love.pangteen.api.constant.MQConstants;
 import love.pangteen.api.message.SubmissionMessage;
 import love.pangteen.api.utils.RandomUtils;
+import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.messaging.support.GenericMessage;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.annotation.Resource;
@@ -20,7 +22,7 @@ import javax.annotation.Resource;
 public class PublisherTest {
 
     @Resource
-    private RabbitTemplate rabbitTemplate;
+    private RocketMQTemplate rocketMQTemplate;
 
     @Test
     public void sendTask() {
@@ -29,11 +31,7 @@ public class PublisherTest {
             message.setJudgeId((long) i);
 
             int priority = RandomUtils.get().nextInt(5);
-            // 优先处理比赛的提交任务，其次处理普通提交的提交任务。
-            rabbitTemplate.convertAndSend("direct.test.queue", message, msg -> {
-                msg.getMessageProperties().setPriority(priority);
-                return msg;
-            });
+            rocketMQTemplate.send(MQConstants.JUDGE_TOPIC, new GenericMessage<>(message));
         }
     }
 

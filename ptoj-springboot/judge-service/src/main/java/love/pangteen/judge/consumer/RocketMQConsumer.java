@@ -1,4 +1,4 @@
-package love.pangteen.judge.listener;
+package love.pangteen.judge.consumer;
 
 import love.pangteen.api.constant.MQConstants;
 import love.pangteen.api.enums.JudgeStatus;
@@ -11,8 +11,8 @@ import love.pangteen.api.service.IDubboProblemService;
 import love.pangteen.judge.manager.JudgeManager;
 import love.pangteen.judge.service.JudgeService;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.amqp.core.ExchangeTypes;
-import org.springframework.amqp.rabbit.annotation.*;
+import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
+import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -21,10 +21,14 @@ import java.util.Objects;
 /**
  * @program: PTOJ
  * @author: PangTeen
- * @create: 2024/1/30 9:45
+ * @create: 2024/3/15 17:23
  **/
+@RocketMQMessageListener(
+        topic = MQConstants.JUDGE_TOPIC,
+        consumerGroup = MQConstants.JUDGE_CONSUMER_GROUP
+)
 @Component
-public class SubmissionListener {
+public class RocketMQConsumer implements RocketMQListener<SubmissionMessage> {
 
     @Resource
     private JudgeService judgeService;
@@ -35,14 +39,8 @@ public class SubmissionListener {
     @Resource
     private JudgeManager judgeManager;
 
-    @RabbitListener(bindings = @QueueBinding(
-            value = @Queue(value = MQConstants.JUDGE_WAITING_QUEUE, durable = "true", arguments = {
-                    @Argument(name = "x-max-priority", value = "5", type = "java.lang.Integer")
-            }),
-            exchange = @Exchange(value = MQConstants.JUDGE_EXCHANGE, type = ExchangeTypes.DIRECT, durable = "true"),
-            key = MQConstants.GENERAL
-    ))
-    public void listenGeneralJudgeMsg(SubmissionMessage msg){
+    @Override
+    public void onMessage(SubmissionMessage msg) {
         if(msg.getIsLocalTest()){
             // 自测代码。
             Problem problem = problemService.getById(msg.getPid());
@@ -85,5 +83,4 @@ public class SubmissionListener {
             }
         }
     }
-
 }

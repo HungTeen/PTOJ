@@ -16,7 +16,7 @@ import love.pangteen.pojo.AccountProfile;
 import love.pangteen.submission.pojo.dto.SubmitJudgeDTO;
 import love.pangteen.submission.pojo.dto.TestJudgeDTO;
 import love.pangteen.submission.pojo.vo.SubmissionInfoVO;
-import love.pangteen.submission.publisher.SubmissionPublisher;
+import love.pangteen.submission.producer.RocketMQProducer;
 import love.pangteen.submission.service.JudgeService;
 import love.pangteen.submission.service.SubmitService;
 import love.pangteen.submission.utils.SubmitUtils;
@@ -54,7 +54,7 @@ public class SubmitServiceImpl implements SubmitService {
     private SubmitUtils submitUtils;
 
     @Resource
-    private SubmissionPublisher submissionPublisher;
+    private RocketMQProducer rocketMQProducer;
 
     @Resource
     private RedisUtils redisUtils;
@@ -208,7 +208,7 @@ public class SubmitServiceImpl implements SubmitService {
                     .isLocalTest(false)
                     .pid(judge.getPid())
                     .judgeId(judge.getSubmitId()).build();
-            submissionPublisher.sendTask(message, isContestSubmission);
+            rocketMQProducer.sendTask(message, isContestSubmission);
         }
         return judge;
     }
@@ -247,7 +247,7 @@ public class SubmitServiceImpl implements SubmitService {
                 .expectedOutput(testJudgeDto.getExpectedOutput())
                 .userInput(testJudgeDto.getUserInput())
                 .build();
-        submissionPublisher.sendTask(message, false);
+        rocketMQProducer.sendTask(message, false);
         redisUtils.set(uniqueKey, TestJudgeResult.builder()
                 .status(JudgeStatus.STATUS_PENDING.getStatus())
                 .build(), 10 * 60);
