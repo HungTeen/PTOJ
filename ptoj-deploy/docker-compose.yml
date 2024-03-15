@@ -56,35 +56,89 @@ services:
       - ${NACOS_PORT:-8848}:8848
       - "9848:9848"
       - "9849:9849"
-#    healthcheck:
-#      test: curl -f http://${NACOS_HOST:-172.21.0.4}:8848/nacos/index.html || exit 1
-#      interval: 6s
-#      timeout: 10s
-#      retries: 10
+    #    healthcheck:
+    #      test: curl -f http://${NACOS_HOST:-172.21.0.4}:8848/nacos/index.html || exit 1
+    #      interval: 6s
+    #      timeout: 10s
+    #      retries: 10
     networks:
       ptoj-network:
         ipv4_address: ${NACOS_HOST:-172.21.0.4}
 
-  ptoj-mq:
-    image: rabbitmq:3.12.12-management
-    container_name: ptoj-mq
-    hostname: ptoj-mq
+    #  ptoj-mq:
+    #    image: rabbitmq:3.12.12-management
+    #    container_name: ptoj-mq
+    #    hostname: ptoj-mq
+    #    restart: unless-stopped
+    #    volumes:
+    ##      - ${PTOJ_DIRECTORY}/data/rabbitmq/plugins:/plugins
+    #      - ${PTOJ_DIRECTORY}/data/rabbitmq/data:/var/lib/rabbitmq
+    #    environment:
+    #      - RABBITMQ_DEFAULT_USER=root
+    #      - RABBITMQ_DEFAULT_PASS=123456
+    #    ports:
+    #      - "15672:15672"
+    #      - "5672:5672"
+    #    networks:
+    #      ptoj-network:
+    #        ipv4_address: ${MQ_HOST:-172.21.0.5}
+
+  ptoj-rocketmq-namesrv:
+    image: apache/rocketmq:5.2.0
+    container_name: ptoj-rocketmq-namesrv
+    command: sh mqnamesrv
     restart: unless-stopped
+    #    network_mode: host
     volumes:
-#      - ${PTOJ_DIRECTORY}/data/rabbitmq/plugins:/plugins
-      - ${PTOJ_DIRECTORY}/data/rabbitmq/data:/var/lib/rabbitmq
+      - ${PTOJ_DIRECTORY}/data/rocketmq/namesrv/logs:/home/rocketmq/logs/rocketmqlogs
     environment:
-      - RABBITMQ_DEFAULT_USER=root
-      - RABBITMQ_DEFAULT_PASS=123456
+      JAVA_OPT: -server -Xms512m -Xmx512m
     ports:
-      - "15672:15672"
-      - "5672:5672"
+      - "9876:9876"
     networks:
       ptoj-network:
-        ipv4_address: ${MQ_HOST:-172.21.0.5}
+        ipv4_address: ${ROCKET_MQ_SERVER_HOST:-172.21.0.10}
+
+  ptoj-rocketmq-broker:
+    image: apache/rocketmq:5.2.0
+    container_name: ptoj-rocketmq-broker
+    command: sh mqbroker -c /home/rocketmq/rocketmq-5.2.0/conf/broker.conf
+    restart: unless-stopped
+    #    network_mode: host
+    depends_on:
+      - ptoj-rocketmq-namesrv
+    volumes:
+      - ${PTOJ_DIRECTORY}/data/rocketmq/broker/conf/broker.conf:/home/rocketmq/rocketmq-5.2.0/conf/broker.conf
+      - ${PTOJ_DIRECTORY}/data/rocketmq/broker/logs:/home/rocketmq/logs/rocketmqlogs
+      - ${PTOJ_DIRECTORY}/data/rocketmq/broker/store:/home/rocketmq/store
+    environment:
+      NAMESRV_ADDR: ptoj-rocketmq-namesrv:9876
+      JAVA_OPT_EXT: -server -Xms512M -Xmx512M -Xmn256m
+    ports:
+      - "10911:10911"
+      - "10909:10909"
+      - "10912:10912"
+    networks:
+      ptoj-network:
+        ipv4_address: ${ROCKET_MQ_BROKER_HOST:-172.21.0.11}
+
+  ptoj-mqconsole:
+    image: apacherocketmq/rocketmq-dashboard:latest
+    container_name: ptoj-mqconsole
+    restart: unless-stopped
+    #    network_mode: host
+    depends_on:
+      - ptoj-rocketmq-namesrv
+    environment:
+      JAVA_OPTS: -Dserver.port=19876 -Drocketmq.namesrv.addr=ptoj-rocketmq-namesrv:9876 -Dcom.rocketmq.sendMessageWithVIPChannel=false
+    ports:
+      - "19876:19876"
+    networks:
+      ptoj-network:
+        ipv4_address: ${ROCKET_MQ_CONSOLE:-172.21.0.12}
 
   ptoj-judge:
-#    image: criyle/go-judge
+    #    image: criyle/go-judge
     build: src/judge
     privileged: true
     volumes:
@@ -117,30 +171,6 @@ services:
 #    networks:
 #      ptoj-network:
 #        ipv4_address: ${ES:-172.21.0.6}
-
-#  hoj-frontend:
-##    image: registry.cn-shenzhen.aliyuncs.com/hcode/hoj_frontend
-#    build: src/frontend
-#    container_name: ptoj-frontend
-#    restart: always
-#    # 开启https，请提供证书
-#    #volumes:
-#    #  - ./server.crt:/etc/nginx/etc/crt/server.crt
-#    #  - ./server.key:/etc/nginx/etc/crt/server.key
-#    # 修改前端logo
-#    #  - ./logo.a0924d7d.png:/usr/share/nginx/html/assets/img/logo.a0924d7d.png
-#    #  - ./backstage.8bce8c6e.png:/usr/share/nginx/html/assets/img/backstage.8bce8c6e.png
-#    environment:
-#      - SERVER_NAME=localhost # 域名(例如baidu.com)或localhost(本地)
-#      - BACKEND_SERVER_HOST=${BACKEND_HOST:-172.20.0.5} # backend后端服务地址
-#      - BACKEND_SERVER_PORT=${BACKEND_PORT:-6688} # backend后端服务端口号
-#      - USE_HTTPS=false # 使用https请设置为true
-#    ports:
-#      - "80:80"
-#      - "443:443"
-#    networks:
-#      ptoj-network:
-#        ipv4_address: 172.21.0.6
 
 networks:
   ptoj-network:

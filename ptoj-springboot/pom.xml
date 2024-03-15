@@ -35,6 +35,7 @@
         <spring-cloud.version>2021.0.3</spring-cloud.version>
         <spring-cloud-alibaba.version>2021.0.4.0</spring-cloud-alibaba.version>
         <dubbo.version>3.2.4</dubbo.version>
+        <rocketmq.version>2.3.0</rocketmq.version>
         <mybatis-plus.version>3.5.5</mybatis-plus.version>
         <mybatis-plus-join.version>1.4.9</mybatis-plus-join.version>
         <hutool.version>5.8.24</hutool.version>
@@ -72,11 +73,12 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-<!--            <dependency>-->
-<!--                <groupId>org.apache.shiro</groupId>-->
-<!--                <artifactId>shiro-spring-boot-web-starter</artifactId>-->
-<!--                <version>${shiro.version}</version>-->
-<!--            </dependency>-->
+            <!-- RocketMQ -->
+            <dependency>
+                <groupId>org.apache.rocketmq</groupId>
+                <artifactId>rocketmq-spring-boot-starter</artifactId>
+                <version>${rocketmq.version}</version>
+            </dependency>
             <!-- 数据库驱动包管理 -->
             <dependency>
                 <groupId>mysql</groupId>
