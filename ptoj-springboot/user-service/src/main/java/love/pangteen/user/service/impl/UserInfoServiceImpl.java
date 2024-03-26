@@ -223,6 +223,11 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         return userCalendarHeatmapVo;
     }
 
+    @Override
+    public int getTotalUserCount() {
+        return Math.toIntExact(lambdaQuery().count());
+    }
+
     private UserInfo getUserInfo(String uid, String username) {
         // 如果没有uid和username，默认查询当前登录用户的。
         if (StrUtil.isEmpty(uid) && StrUtil.isEmpty(username)) {

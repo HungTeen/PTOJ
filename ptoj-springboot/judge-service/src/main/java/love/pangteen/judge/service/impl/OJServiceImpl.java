@@ -59,6 +59,7 @@ public class OJServiceImpl implements OJService {
     @Override
     public SystemConfigVO getSystemConfig() {
         SystemConfigVO systemConfigVO = new SystemConfigVO();
+        systemConfigVO.setName(ojProperties.getName());
         systemConfigVO.setCpuCores(Runtime.getRuntime().availableProcessors()); // cpu核数
 
         double cpuLoad = 100 - OshiUtil.getCpuInfo().getFree();

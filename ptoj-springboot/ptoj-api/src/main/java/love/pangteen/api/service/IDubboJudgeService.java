@@ -36,4 +36,6 @@ public interface IDubboJudgeService {
     int getUserTotalSubmitCount(String uuid);
 
     List<Judge> getLastYearUserJudgeList(String uid);
+
+    int getTodayJudgeCount();
 }

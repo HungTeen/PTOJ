@@ -10,6 +10,8 @@ import lombok.Data;
 @Data
 public class SystemConfigVO {
 
+    private String name;
+
     private Integer cpuCores;
 
     private String percentCpuLoad;

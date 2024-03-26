@@ -32,4 +32,6 @@ public interface UserInfoService extends IService<UserInfo> {
     UserHomeVO getUserHomeInfo(String uid, String username);
 
     UserCalendarHeatmapVO getUserCalendarHeatmap(String uid, String username);
+
+    int getTotalUserCount();
 }

@@ -22,6 +22,13 @@ public class Utils {
         return sb.toString();
     }
 
+    public static Date getDayAgo(int day) {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(new Date());
+        calendar.add(Calendar.DAY_OF_MONTH, -day);
+        return calendar.getTime();
+    }
+
     public static Date getYearAgo(int year) {
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());

@@ -3,6 +3,7 @@ package love.pangteen.judge.config.properties;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.stereotype.Component;
 
 /**
  * @program: PTOJ
@@ -10,7 +11,7 @@ import org.springframework.context.annotation.Configuration;
  * @create: 2024/1/30 15:36
  **/
 @Data
-@Configuration
+@Component
 @ConfigurationProperties(prefix = "ptoj-judge-server")
 public class OJProperties {
 

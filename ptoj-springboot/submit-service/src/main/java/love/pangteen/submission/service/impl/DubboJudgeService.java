@@ -88,4 +88,11 @@ public class DubboJudgeService implements IDubboJudgeService {
                 .list();
     }
 
+    @Override
+    public int getTodayJudgeCount() {
+        return Math.toIntExact(judgeService.lambdaQuery()
+                .ge(Judge::getSubmitTime, Utils.getDayAgo(1))
+                .count());
+    }
+
 }

@@ -27,9 +27,11 @@ public class JudgeController {
         return CommonResult.success(ojService.getJudgeServerInfo(), "运行正常");
     }
 
+    /**
+     * 由AdminDashboardController后端请求调用。
+     */
     @RequestMapping("/get-sys-config")
     public SystemConfigVO getSystemConfig(){
-        //TODO /get-sys-config 改成了 /judge/get-sys-config，但是前端没找到发请求的地方。
         return ojService.getSystemConfig();
     }
 
