@@ -27,7 +27,7 @@ public class AcceptMessageConsumer implements RocketMQListener<AcceptMessage> {
 
     @Override
     public void onMessage(AcceptMessage acceptMessage) {
-        userAcceptManager.updateUserCount(acceptMessage.getUid(), acceptMessage.getAcCount());
+        userAcceptManager.updateUserCount(acceptMessage.getUid(), acceptMessage.getAcCount(), true);
     }
 
 }

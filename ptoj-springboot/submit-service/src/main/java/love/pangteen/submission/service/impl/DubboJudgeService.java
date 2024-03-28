@@ -96,8 +96,13 @@ public class DubboJudgeService implements IDubboJudgeService {
     }
 
     @Override
-    public List<Pair<String, Long>> getUserAcceptList() {
-        return judgeMapper.getUserList(JudgeStatus.STATUS_ACCEPTED.getStatus());
+    public List<Long> getUserAcceptList(String uid) {
+        return judgeMapper.getUserAcceptList(uid, JudgeStatus.STATUS_ACCEPTED.getStatus());
+    }
+
+    @Override
+    public List<Pair<String, Long>> getAcceptList() {
+        return judgeMapper.getAcceptList(JudgeStatus.STATUS_ACCEPTED.getStatus());
     }
 
 }

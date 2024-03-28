@@ -99,6 +99,7 @@ public class DubboProblemService implements IDubboProblemService {
 
     @Override
     public List<Problem> getProblems(List<Long> acPidList) {
+        if(acPidList.isEmpty()) return List.of();
         return problemService.lambdaQuery().in(Problem::getId, acPidList).list();
     }
 

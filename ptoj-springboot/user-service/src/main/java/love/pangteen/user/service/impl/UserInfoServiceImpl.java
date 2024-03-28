@@ -14,6 +14,7 @@ import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.api.service.IDubboJudgeService;
 import love.pangteen.api.service.IDubboProblemService;
 import love.pangteen.exception.StatusFailException;
+import love.pangteen.pojo.AccountProfile;
 import love.pangteen.user.mapper.UserInfoMapper;
 import love.pangteen.user.pojo.dto.*;
 import love.pangteen.user.pojo.entity.Role;
@@ -24,9 +25,11 @@ import love.pangteen.user.service.UserAcProblemService;
 import love.pangteen.user.service.UserInfoService;
 import love.pangteen.user.service.UserRoleService;
 import love.pangteen.user.utils.ExcelUtils;
+import love.pangteen.utils.AccountUtils;
 import love.pangteen.utils.RedisUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.BeanUtils;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -165,9 +168,10 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
     public UserInfoVO changeUserInfo(EditUserInfoDTO editDTO) {
         UserInfo userInfo = new UserInfo();
         BeanUtils.copyProperties(editDTO, userInfo);
-        userInfo.setUuid(editDTO.getUid());
+        AccountProfile profile = AccountUtils.getProfile();
+        userInfo.setUuid(profile.getUuid());
         if(updateById(userInfo)){
-            UserRolesVO userRolesVO = userRoleService.getUserRoles(editDTO.getUid(), null);
+            UserRolesVO userRolesVO = userRoleService.getUserRoles(profile.getUuid(), null);
             UserInfoVO userInfoVO = new UserInfoVO();
             BeanUtils.copyProperties(userRolesVO, userInfoVO);
             userInfoVO.setRoleList(userRolesVO.getRoles().stream().map(Role::getRole).collect(Collectors.toList()));
@@ -183,8 +187,9 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
 
         UserHomeVO userHomeVO = new UserHomeVO();
         BeanUtils.copyProperties(userInfo, userHomeVO);
-        List<UserAcProblem> acProblemList = userAcProblemService.getAcProblemList(userInfo.getUuid());
-        List<Long> acPidList = acProblemList.stream().map(UserAcProblem::getPid).distinct().collect(Collectors.toList());
+//        List<UserAcProblem> acProblemList = userAcProblemService.getAcProblemList(userInfo.getUuid());
+//        List<Long> acPidList = acProblemList.stream().map(UserAcProblem::getPid).distinct().collect(Collectors.toList());
+        List<Long> acPidList = judgeService.getUserAcceptList(uid);
         List<Problem> problems = problemService.getProblems(acPidList);
         Map<Integer, List<UserHomeProblemVO>> acMap = problems.stream().map(problem -> {
             UserHomeProblemVO problemVO = new UserHomeProblemVO();

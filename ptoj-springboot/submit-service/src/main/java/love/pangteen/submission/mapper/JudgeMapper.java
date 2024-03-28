@@ -14,7 +14,10 @@ import java.util.List;
  **/
 public interface JudgeMapper extends MPJBaseMapper<Judge> {
 
+    @Select("select DISTINCT pid from judge where uid = #{uid} and status = #{status}")
+    List<Long> getUserAcceptList(String uid, int status);
+
     @Select("select uid, count(DISTINCT pid) from judge where status = #{status} group by uid")
-    List<Pair<String, Long>> getUserList(int status);
+    List<Pair<String, Long>> getAcceptList(int status);
 
 }

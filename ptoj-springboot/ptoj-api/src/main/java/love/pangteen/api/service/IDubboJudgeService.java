@@ -39,5 +39,7 @@ public interface IDubboJudgeService {
 
     int getTodayJudgeCount();
 
-    List<Pair<String, Long>> getUserAcceptList();
+    List<Long> getUserAcceptList(String uid);
+
+    List<Pair<String, Long>> getAcceptList();
 }

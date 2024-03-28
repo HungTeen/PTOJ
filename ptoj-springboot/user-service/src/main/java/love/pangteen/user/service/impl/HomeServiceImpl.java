@@ -15,6 +15,10 @@ import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -54,10 +58,14 @@ public class HomeServiceImpl implements HomeService {
     @Override
     public IPage<AnnouncementVO> getAnnouncements(Integer limit, Integer currentPage) {
         Page<AnnouncementVO> page = new Page<>(limit, currentPage);
+        LocalDate localDate = LocalDate.of(2024, 3, 9);
+        Date date = Date.from(localDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
         page.setRecords(List.of(
                 AnnouncementVO.builder()
                         .title("Welcome to PTOJ")
                         .content("Guys, welcome to PTOJ, this is a test announcement.")
+                        .gmtCreate(date)
+                        .gmtModified(date)
                         .build()
         ));
         return page;

@@ -15,10 +15,6 @@ import java.util.List;
 @Data
 public class EditUserInfoDTO {
 
-    @NotNull(message = "用户id不能为空")
-    @ApiModelProperty(value = "用户id")
-    private String uid;
-
     @ApiModelProperty(value = "用户名")
     private String username;
 

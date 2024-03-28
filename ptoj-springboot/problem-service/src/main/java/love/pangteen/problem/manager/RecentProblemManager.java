@@ -69,7 +69,7 @@ public class RecentProblemManager {
         return redisUtils.lRange(KEY, 0, PROBLEM_COUNT).stream()
                 .map(pid -> {
                     RecentUpdatedProblemVO vo = new RecentUpdatedProblemVO();
-                    BeanUtils.copyProperties(problemService.getProblem((Long) pid), vo);
+                    BeanUtils.copyProperties(problemService.getProblem(Long.valueOf(pid.toString())), vo);
                     return vo;
                 })
                 .collect(Collectors.toList());

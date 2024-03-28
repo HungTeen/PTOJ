@@ -31,15 +31,14 @@ public class UserAcceptManager {
     @Resource
     private IDubboJudgeService dubboJudgeService;
 
-    @PostConstruct
-    void init(){
+    void assertInit(){
         if(! initialized()){
             redisUtils.lock(RANK_LOCK);
             try{
                 if(! initialized()){
-                    List<Pair<String, Long>> userList = dubboJudgeService.getUserAcceptList();
+                    List<Pair<String, Long>> userList = dubboJudgeService.getAcceptList();
                     userList.forEach(pair -> {
-                        updateUserCount(pair.getKey(), pair.getValue());
+                        updateUserCount(pair.getKey(), pair.getValue(), false);
                     });
                 }
             } catch (Exception ignored){
@@ -50,7 +49,8 @@ public class UserAcceptManager {
         }
     }
 
-    public void updateUserCount(String uid, Long count){
+    public void updateUserCount(String uid, Long count, boolean check){
+        if(check) assertInit();
         if(redisUtils.zContains(KEY, uid)){
             redisUtils.zRemove(KEY, uid);
         }
@@ -58,6 +58,7 @@ public class UserAcceptManager {
     }
 
     public List<ZSetOperations.TypedTuple<String>> getTopUsers(){
+        assertInit();
         return redisUtils.zRange(KEY, 0, USER_COUNT).stream().map(tuple -> {
             return ZSetOperations.TypedTuple.of((String) tuple.getValue(), - tuple.getScore());
         }).collect(Collectors.toList());
