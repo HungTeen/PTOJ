@@ -4,12 +4,17 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.ArrayUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ZSetOperations;
+import org.springframework.integration.redis.util.RedisLockRegistry;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
 
 /**
  * @program: PTOJ
@@ -20,8 +25,13 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class RedisUtils {
 
+    private static final long DEFAULT_EXPIRE_UNUSED = 60000L;
+
     @Resource
     private RedisTemplate<String, Object> redisTemplate;
+
+    @Resource
+    private RedisLockRegistry redisLockRegistry;
 
     /* Common */
 
@@ -76,6 +86,41 @@ public class RedisUtils {
         }
     }
 
+    /* Lock */
+
+    public void lock(String lockKey) {
+        Lock lock = obtainLock(lockKey);
+        lock.lock();
+    }
+
+    public boolean tryLock(String lockKey) {
+        Lock lock = obtainLock(lockKey);
+        return lock.tryLock();
+    }
+
+    public boolean tryLock(String lockKey, long seconds) {
+        Lock lock = obtainLock(lockKey);
+        try {
+            return lock.tryLock(seconds, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            return false;
+        }
+    }
+
+    public void unlock(String lockKey) {
+        try {
+            Lock lock = obtainLock(lockKey);
+            lock.unlock();
+            redisLockRegistry.expireUnusedOlderThan(DEFAULT_EXPIRE_UNUSED);
+        } catch (Exception e) {
+            log.error("分布式锁 [{}] 释放异常", lockKey, e);
+        }
+    }
+
+    private Lock obtainLock(String lockKey) {
+        return redisLockRegistry.obtain(lockKey);
+    }
+
     /* String */
 
     public Object get(String key) {
@@ -106,6 +151,20 @@ public class RedisUtils {
         }
     }
 
+    /* List */
+
+    public void lPushRight(String key, Object value) {
+        redisTemplate.opsForList().rightPush(key, value);
+    }
+
+    public List<Object> lRange(String key, long start, long end) {
+        return redisTemplate.opsForList().range(key, start, end);
+    }
+
+    public boolean lContains(String key, Object value){
+        return redisTemplate.opsForList().indexOf(key, value) != null;
+    }
+
     /* Hash Map */
 
     public Map<Object, Object> hmget(String key) {
@@ -134,6 +193,31 @@ public class RedisUtils {
             return false;
         }
     }
+
+    /* ZSet */
+
+    public boolean zAdd(String key, Object value, double score) {
+        try {
+            redisTemplate.opsForZSet().add(key, value, score);
+            return true;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+    public Long zRemove(String key, Object... values) {
+        return redisTemplate.opsForZSet().remove(key, values);
+    }
+
+    public boolean zContains(String key, Object value) {
+        return redisTemplate.opsForZSet().rank(key, value) != null;
+    }
+
+    public Set<ZSetOperations.TypedTuple<Object>> zRange(String key, long start, long end){
+        return redisTemplate.opsForZSet().rangeWithScores(key, start, end);
+    }
+
 
 
 }

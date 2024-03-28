@@ -2,7 +2,7 @@ package love.pangteen.judge.consumer;
 
 import love.pangteen.api.constant.MQConstants;
 import love.pangteen.api.enums.JudgeStatus;
-import love.pangteen.api.message.SubmissionMessage;
+import love.pangteen.api.message.JudgeMessage;
 import love.pangteen.api.pojo.dto.TestJudgeDTO;
 import love.pangteen.api.pojo.dto.ToJudgeDTO;
 import love.pangteen.api.pojo.entity.Judge;
@@ -28,7 +28,7 @@ import java.util.Objects;
         consumerGroup = MQConstants.JUDGE_CONSUMER_GROUP
 )
 @Component
-public class RocketMQConsumer implements RocketMQListener<SubmissionMessage> {
+public class JudgeMessageConsumer implements RocketMQListener<JudgeMessage> {
 
     @Resource
     private JudgeService judgeService;
@@ -40,7 +40,7 @@ public class RocketMQConsumer implements RocketMQListener<SubmissionMessage> {
     private JudgeManager judgeManager;
 
     @Override
-    public void onMessage(SubmissionMessage msg) {
+    public void onMessage(JudgeMessage msg) {
         if(msg.getIsLocalTest()){
             // 自测代码。
             Problem problem = problemService.getById(msg.getPid());

@@ -34,6 +34,10 @@ dubbo:
     address: nacos://${ptoj.nacos.host}:${ptoj.nacos.port}?username=${ptoj.nacos.username}&password=${ptoj.nacos.password}
   consumer:
     check: false
+rocketmq:
+  name-server: ${ptoj.rocketmq.host}:${ptoj.rocketmq.port} #rocketmq服务地址
+  producer:
+    group: ${ptoj.rocketmq.group} #自定义的组名称
 logging:
   level:
     love.pangteen: debug

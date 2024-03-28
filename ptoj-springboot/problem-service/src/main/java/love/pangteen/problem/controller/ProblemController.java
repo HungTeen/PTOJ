@@ -2,11 +2,13 @@ package love.pangteen.problem.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import love.pangteen.api.annotations.IgnoreLogin;
+import love.pangteen.problem.manager.RecentProblemManager;
 import love.pangteen.problem.pojo.dto.PidListDTO;
 import love.pangteen.problem.pojo.entity.CodeTemplate;
 import love.pangteen.problem.pojo.vo.ProblemInfoVO;
 import love.pangteen.api.pojo.vo.ProblemVO;
 import love.pangteen.problem.pojo.vo.RandomProblemVO;
+import love.pangteen.problem.pojo.vo.RecentUpdatedProblemVO;
 import love.pangteen.problem.service.CodeTemplateService;
 import love.pangteen.problem.service.ProblemService;
 import love.pangteen.result.CommonResult;
@@ -33,6 +35,9 @@ public class ProblemController {
 
     @Resource
     private CodeTemplateService codeTemplateService;
+
+    @Resource
+    private RecentProblemManager recentProblemManager;
 
     @RequestMapping(value = "/get-problem-list", method = RequestMethod.GET)
     @IgnoreLogin
@@ -81,4 +86,10 @@ public class ProblemController {
     public CommonResult<List<CodeTemplate>> getProblemCodeTemplate(@RequestParam("pid") Long pid) {
         return CommonResult.success(codeTemplateService.getProblemCodeTemplate(pid));
     }
+
+    @GetMapping("/get-recent-updated-problem")
+    public CommonResult<List<RecentUpdatedProblemVO>> getRecentUpdatedProblemList() {
+        return CommonResult.success(recentProblemManager.getRecentUpdatedProblemList());
+    }
+
 }

@@ -38,4 +38,6 @@ public interface IDubboJudgeService {
     List<Judge> getLastYearUserJudgeList(String uid);
 
     int getTodayJudgeCount();
+
+    List<Pair<String, Long>> getUserAcceptList();
 }

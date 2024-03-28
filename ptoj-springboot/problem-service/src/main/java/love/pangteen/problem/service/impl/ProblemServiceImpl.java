@@ -115,17 +115,19 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 
     @Transactional
     @Override
-    public void deleteProblem(Long pid) {
+    public boolean deleteProblem(Long pid) {
         removeById(pid);
         problemLanguageService.deleteProblemLanguages(pid);
         codeTemplateService.deleteCodeTemplates(pid);
         problemCaseService.deleteProblemCases(pid);
         problemTagService.deleteProblemTags(pid);
+
+        return true;
     }
 
     @Transactional
     @Override
-    public void addProblem(ProblemDTO problemDto) {
+    public boolean addProblem(ProblemDTO problemDto) {
         Problem problem = problemDto.getProblem();
 
         ValidateUtils.validateProblem(problem);
@@ -148,6 +150,8 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 
         // 为新的题目添加对应的tag，可能tag是原表已有，也可能是新的，所以需要判断。
         problemTagService.saveOrUpdateProblemTags(problem.getId(), problemDto.getTags());
+
+        return true;
     }
 
     @Transactional
@@ -354,6 +358,12 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
         }
         return oj;
     }
+
+    @Override
+    public List<Long> getProblemsByCreateDate() {
+        return getBaseMapper().getProblemsByCreateDate();
+    }
+
 
     /**
      * 设置Problem其他属性，然后保存或更新。

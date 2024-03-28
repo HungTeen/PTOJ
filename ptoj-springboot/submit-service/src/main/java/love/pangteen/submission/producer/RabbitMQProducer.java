@@ -15,7 +15,7 @@ public class RabbitMQProducer {
 //    @Resource
 //    private JudgeService judgeService;
 //
-//    public void sendTask(SubmissionMessage message, boolean isContest) {
+//    public void sendJudgeTask(SubmissionMessage message, boolean isContest) {
 //        // 优先处理比赛的提交任务，其次处理普通提交的提交任务。
 //        rabbitTemplate.convertAndSend(MQConstants.JUDGE_WAITING_QUEUE, message, msg -> {
 //            msg.getMessageProperties().setPriority(isContest ? 2 : 1);

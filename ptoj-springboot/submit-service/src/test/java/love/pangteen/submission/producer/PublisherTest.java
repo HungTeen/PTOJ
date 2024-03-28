@@ -1,7 +1,7 @@
 package love.pangteen.submission.producer;
 
 import love.pangteen.api.constant.MQConstants;
-import love.pangteen.api.message.SubmissionMessage;
+import love.pangteen.api.message.JudgeMessage;
 import love.pangteen.api.utils.RandomUtils;
 import org.apache.rocketmq.spring.core.RocketMQTemplate;
 import org.junit.Test;
@@ -27,7 +27,7 @@ public class PublisherTest {
     @Test
     public void sendTask() {
         for(int i = 0; i < 5; ++ i){
-            SubmissionMessage message = new SubmissionMessage();
+            JudgeMessage message = new JudgeMessage();
             message.setJudgeId((long) i);
 
             int priority = RandomUtils.get().nextInt(5);

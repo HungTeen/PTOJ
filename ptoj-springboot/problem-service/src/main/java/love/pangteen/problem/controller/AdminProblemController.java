@@ -2,6 +2,7 @@ package love.pangteen.problem.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import love.pangteen.api.interfaces.ValidateGroups;
+import love.pangteen.problem.manager.RecentProblemManager;
 import love.pangteen.problem.pojo.dto.ProblemDTO;
 import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.api.pojo.entity.ProblemCase;
@@ -32,6 +33,9 @@ public class AdminProblemController {
     @Resource
     private ProblemCaseService problemCaseService;
 
+    @Resource
+    private RecentProblemManager recentProblemManager;
+
     @GetMapping("/get-problem-list")
     public CommonResult<IPage<Problem>> getProblemList(@Range(min = 1) @RequestParam(value = "limit", defaultValue = "10") Integer limit,
                                                        @Range(min = 1) @RequestParam(value = "currentPage", defaultValue = "1") Integer currentPage,
@@ -48,13 +52,17 @@ public class AdminProblemController {
 
     @DeleteMapping("")
     public CommonResult<Void> deleteProblem(@RequestParam("pid") Long pid) {
-        problemService.deleteProblem(pid);
+        if(problemService.deleteProblem(pid)){
+            recentProblemManager.removeProblem(pid);
+        }
         return CommonResult.success();
     }
 
     @PostMapping("")
     public CommonResult<Void> addProblem(@Validated @RequestBody ProblemDTO problemDto) {
-        problemService.addProblem(problemDto);
+        if(problemService.addProblem(problemDto)){
+            recentProblemManager.createProblem(problemDto.getProblem().getId());
+        }
         return CommonResult.success();
     }
 

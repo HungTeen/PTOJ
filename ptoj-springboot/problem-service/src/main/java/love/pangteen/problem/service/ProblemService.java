@@ -25,9 +25,9 @@ public interface ProblemService extends IService<Problem> {
 
     Problem getProblem(Long pid);
 
-    void deleteProblem(Long pid);
+    boolean deleteProblem(Long pid);
 
-    void addProblem(ProblemDTO problemDto);
+    boolean addProblem(ProblemDTO problemDto);
 
     void updateProblem(ProblemDTO problemDto);
 
@@ -44,4 +44,6 @@ public interface ProblemService extends IService<Problem> {
     List<ProblemFullScreenListVO> getFullScreenProblemList(Long tid, Long cid);
 
     String getProblemOJ(Long pid);
+
+    List<Long> getProblemsByCreateDate();
 }

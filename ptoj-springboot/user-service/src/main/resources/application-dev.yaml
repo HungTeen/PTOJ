@@ -18,7 +18,10 @@ ptoj:
     port: 8848
     username: nacos
     password: nacos
-
+  rocketmq:
+    host: localhost
+    port: 9876
+    group: ptoj
   swagger:
     title: "用户管理接口文档"
     package: love.pangteen.user.controller

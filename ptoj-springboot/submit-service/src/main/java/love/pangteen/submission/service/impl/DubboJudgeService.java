@@ -95,4 +95,9 @@ public class DubboJudgeService implements IDubboJudgeService {
                 .count());
     }
 
+    @Override
+    public List<Pair<String, Long>> getUserAcceptList() {
+        return judgeMapper.getUserList(JudgeStatus.STATUS_ACCEPTED.getStatus());
+    }
+
 }

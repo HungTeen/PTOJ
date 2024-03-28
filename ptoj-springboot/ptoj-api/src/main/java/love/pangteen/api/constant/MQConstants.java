@@ -26,7 +26,11 @@ public interface MQConstants {
 
     /* Topic */
 
+    String SUBMIT_TOPIC = "submit";
     String JUDGE_TOPIC = "judge";
+    String ACCEPT_TOPIC = "accept";
 
     String JUDGE_CONSUMER_GROUP = "ONLINE_JUDGE";
+    String ACCEPT_GROUP = "ACCEPT_GROUP";
+
 }

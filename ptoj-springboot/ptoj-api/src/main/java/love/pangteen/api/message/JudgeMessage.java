@@ -14,7 +14,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class SubmissionMessage {
+public class JudgeMessage {
 
     /**
      * 正式提交代码必须。

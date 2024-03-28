@@ -2,10 +2,12 @@ package love.pangteen.judge.manager;
 
 import cn.hutool.core.util.StrUtil;
 import love.pangteen.api.enums.JudgeStatus;
+import love.pangteen.api.message.AcceptMessage;
 import love.pangteen.api.pojo.dto.TestJudgeDTO;
 import love.pangteen.api.pojo.dto.ToJudgeDTO;
 import love.pangteen.api.pojo.entity.Judge;
 import love.pangteen.api.pojo.entity.TestJudgeResult;
+import love.pangteen.judge.producer.RocketMQProducer;
 import love.pangteen.judge.service.JudgeService;
 import love.pangteen.result.CommonResult;
 import love.pangteen.utils.RedisUtils;
@@ -27,6 +29,9 @@ public class JudgeManager {
     @Resource
     private RedisUtils redisUtils;
 
+    @Resource
+    private RocketMQProducer rocketMQProducer;
+
     public CommonResult<Void> submitProblemJudge(ToJudgeDTO toJudgeDTO) {
 //        if (!Objects.equals(toJudgeDTO.getToken(), judgeToken)) {
 //            return CommonResult.errorResponse("对不起！您使用的判题服务调用凭证不正确！访问受限！", ResultStatus.ACCESS_DENIED);
@@ -38,7 +43,11 @@ public class JudgeManager {
             return CommonResult.clientError("调用参数错误！请检查您的调用参数！");
         }
 
-        judgeService.judge(judge);
+        JudgeStatus status = judgeService.judge(judge);
+        if(status == JudgeStatus.STATUS_ACCEPTED){
+            long acCount = judgeService.getUserAcceptCount(judge.getUid());
+            rocketMQProducer.postAcceptMessage(new AcceptMessage(judge.getUid(), judge.getPid(), acCount));
+        }
 
         return CommonResult.successMsg("判题机评测完成！");
     }

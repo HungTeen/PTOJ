@@ -3,7 +3,8 @@ package love.pangteen.submission.service.impl;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.IdUtil;
 import love.pangteen.api.enums.JudgeStatus;
-import love.pangteen.api.message.SubmissionMessage;
+import love.pangteen.api.message.JudgeMessage;
+import love.pangteen.api.message.SubmitMessage;
 import love.pangteen.api.pojo.entity.Judge;
 import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.api.pojo.entity.TestJudgeResult;
@@ -198,17 +199,17 @@ public class SubmitServiceImpl implements SubmitService {
 
         // TODO 将提交加入消息队列。
         if (judgeDto.getIsRemote()) { // 如果是远程oj判题。
-//            remoteJudgeDispatcher.sendTask(judge.getSubmitId(),
+//            remoteJudgeDispatcher.sendJudgeTask(judge.getSubmitId(),
 //                    judge.getPid(),
 //                    judge.getDisplayPid(),
 //                    isContestSubmission,
 //                    false);
         } else {
-            SubmissionMessage message = SubmissionMessage.builder()
+            rocketMQProducer.sendJudgeTask(JudgeMessage.builder()
                     .isLocalTest(false)
                     .pid(judge.getPid())
-                    .judgeId(judge.getSubmitId()).build();
-            rocketMQProducer.sendTask(message, isContestSubmission);
+                    .judgeId(judge.getSubmitId()).build());
+            rocketMQProducer.sendSubmitTask(new SubmitMessage(judge.getPid(), profile.getUuid(), judge.getSubmitTime()));
         }
         return judge;
     }
@@ -238,7 +239,7 @@ public class SubmitServiceImpl implements SubmitService {
         }
 
         String uniqueKey = "TEST_JUDGE_" + IdUtil.simpleUUID();
-        SubmissionMessage message = SubmissionMessage.builder()
+        rocketMQProducer.sendJudgeTask(JudgeMessage.builder()
                 .isLocalTest(true)
                 .pid(testJudgeDto.getPid())
                 .code(testJudgeDto.getCode())
@@ -246,8 +247,7 @@ public class SubmitServiceImpl implements SubmitService {
                 .uniqueKey(uniqueKey)
                 .expectedOutput(testJudgeDto.getExpectedOutput())
                 .userInput(testJudgeDto.getUserInput())
-                .build();
-        rocketMQProducer.sendTask(message, false);
+                .build());
         redisUtils.set(uniqueKey, TestJudgeResult.builder()
                 .status(JudgeStatus.STATUS_PENDING.getStatus())
                 .build(), 10 * 60);

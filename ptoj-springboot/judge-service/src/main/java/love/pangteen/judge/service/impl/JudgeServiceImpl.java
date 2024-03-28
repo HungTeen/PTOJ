@@ -10,6 +10,7 @@ import love.pangteen.api.constant.OJFiles;
 import love.pangteen.api.enums.JudgeCaseMode;
 import love.pangteen.api.enums.JudgeStatus;
 import love.pangteen.api.enums.ProblemType;
+import love.pangteen.api.message.AcceptMessage;
 import love.pangteen.api.pojo.dto.TestJudgeDTO;
 import love.pangteen.api.pojo.dto.ToJudgeDTO;
 import love.pangteen.api.pojo.entity.Judge;
@@ -27,6 +28,7 @@ import love.pangteen.judge.mapper.JudgeMapper;
 import love.pangteen.judge.pojo.entity.JudgeResult;
 import love.pangteen.judge.pojo.entity.LanguageConfig;
 import love.pangteen.api.pojo.entity.TestJudgeResult;
+import love.pangteen.judge.producer.RocketMQProducer;
 import love.pangteen.judge.sandbox.Compiler;
 import love.pangteen.judge.sandbox.JudgeRunner;
 import love.pangteen.judge.sandbox.JudgeStrategy;
@@ -35,6 +37,7 @@ import love.pangteen.judge.service.JudgeCaseService;
 import love.pangteen.judge.service.JudgeService;
 import love.pangteen.judge.utils.ProblemCaseUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
+import org.checkerframework.checker.units.qual.A;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -70,7 +73,7 @@ public class JudgeServiceImpl extends ServiceImpl<JudgeMapper, Judge> implements
      */
     @Transactional
     @Override
-    public void judge(Judge judge) {
+    public JudgeStatus judge(Judge judge) {
         // 标志该判题过程进入编译阶段，写入当前判题服务的名字。
         boolean result = lambdaUpdate()
                 .eq(Judge::getSubmitId, judge.getSubmitId())
@@ -81,7 +84,7 @@ public class JudgeServiceImpl extends ServiceImpl<JudgeMapper, Judge> implements
         // 没更新成功，则可能表示该评测被取消 或者 judge记录被删除了，则结束评测。
         if(! result){
             // TODO Do something。
-            return;
+            return JudgeStatus.STATUS_CANCELLED;
         }
         Problem problem = problemService.getById(judge.getPid());
         Judge finalJudge = postProblemJudge(problem, judge);
@@ -98,6 +101,7 @@ public class JudgeServiceImpl extends ServiceImpl<JudgeMapper, Judge> implements
                     finalJudge.getScore(),
                     finalJudge.getTime());
         }
+        return JudgeStatus.getTypeByStatus(finalJudge.getStatus());
     }
 
     @Override
@@ -155,6 +159,11 @@ public class JudgeServiceImpl extends ServiceImpl<JudgeMapper, Judge> implements
                 SandboxManager.delFile(userFileId);
             }
         }
+    }
+
+    @Override
+    public int getUserAcceptCount(String uid) {
+        return getBaseMapper().getJudgeCount(uid, JudgeStatus.STATUS_ACCEPTED.getStatus());
     }
 
     @Transactional
