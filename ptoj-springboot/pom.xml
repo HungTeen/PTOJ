@@ -44,6 +44,7 @@
         <jjwt.version>0.9.1</jjwt.version>
         <sa-token.version>1.37.0</sa-token.version>
         <oshi.version>6.4.11</oshi.version>
+        <docker-plugin.version>1.2.2</docker-plugin.version>
     </properties>
 
     <!-- 对依赖包进行管理 -->

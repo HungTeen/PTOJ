@@ -1,0 +1,19 @@
+server:
+  port: 6688
+spring:
+  application:
+    name: gateway
+  servlet:
+    multipart:
+      max-file-size: 512MB
+      max-request-size: 512MB
+ptoj:
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:123456}
+  nacos:
+    host: ${NACOS_HOST:localhost}
+    port: ${NACOS_PORT:8848}
+    username: ${NACOS_USERNAME:nacos}
+    password: ${NACOS_PASSWORD:nacos}

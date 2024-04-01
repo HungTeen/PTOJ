@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev
+    active: prod
   datasource:
     url: jdbc:mysql://${ptoj.mysql.host}:${ptoj.mysql.port}/${ptoj.mysql.name}?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true&serverTimezone=Asia/Shanghai
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -34,6 +34,8 @@ dubbo:
     address: nacos://${ptoj.nacos.host}:${ptoj.nacos.port}?username=${ptoj.nacos.username}&password=${ptoj.nacos.password}
   consumer:
     check: false
+  metadata-report:
+    retry-times: 3
 rocketmq:
   name-server: ${ptoj.rocketmq.host}:${ptoj.rocketmq.port} #rocketmq服务地址
   producer:

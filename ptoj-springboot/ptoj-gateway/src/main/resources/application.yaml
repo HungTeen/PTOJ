@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: dev
+    active: prod
   redis:
     host: ${ptoj.redis.host}
     port: ${ptoj.redis.port}
