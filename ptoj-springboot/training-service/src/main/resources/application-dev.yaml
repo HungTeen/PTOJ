@@ -1,5 +1,5 @@
 server:
-  port: 8004 # 内嵌的 Tomcat 端口号。默认值为 8080。
+  port: 8003 # 内嵌的 Tomcat 端口号。默认值为 8080。
 spring:
   application:
     name: training-service # 微服务名称。

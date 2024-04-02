@@ -137,22 +137,44 @@ services:
 #      ptoj-network:
 #        ipv4_address: ${ROCKETMQ_CONSOLE_HOST:-172.21.0.12}
 
-  ptoj-judge:
-    #    image: criyle/go-judge
-    build: src/judge
-    privileged: true
-    volumes:
-      - ${PTOJ_DIRECTORY}/data/judge/testcase:/judge/test_case
-      - ${PTOJ_DIRECTORY}/data/judge/log:/judge/log
-      - ${PTOJ_DIRECTORY}/data/judge/run:/judge/run
-      - ${PTOJ_DIRECTORY}/data/judge/spj:/judge/spj
+#  ptoj-judge:
+#    #    image: criyle/go-judge
+#    build: src/judge
+#    privileged: true
+#    volumes:
+#      - ${PTOJ_DIRECTORY}/data/judge/testcase:/judge/test_case
+#      - ${PTOJ_DIRECTORY}/data/judge/log:/judge/log
+#      - ${PTOJ_DIRECTORY}/data/judge/run:/judge/run
+#      - ${PTOJ_DIRECTORY}/data/judge/spj:/judge/spj
+#    environment:
+#      - shm-size=256m
+#    ports:
+#      - "5050:5050"
+#    networks:
+#      ptoj-network:
+#        ipv4_address: ${JUDGE_HOST:-172.21.0.6}
+
+  ptoj-gateway-test:
+    image: ptoj-gateway:1.0-SNAPSHOT
+    container_name: ptoj-gateway-test
+    restart: unless-stopped
+    depends_on:
+      - ptoj-mysql
+      - ptoj-nacos
+      - ptoj-redis
     environment:
-      - shm-size=256m
+      - REDIS_HOST=${REDIS_HOST:-172.21.0.2}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-123456}
+      - NACOS_HOST=${NACOS_HOST:-172.21.0.4}
+      - NACOS_PORT=${NACOS_PORT:-8848}
+      - NACOS_USERNAME=${NACOS_USERNAME:-nacos}
+      - NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
     ports:
-      - "5050:5050"
+      - "6688:6688"
     networks:
       ptoj-network:
-        ipv4_address: ${JUDGE_HOST:-172.21.0.6}
+        ipv4_address: ${GATEWAY_HOST:-172.21.0.20}
 
   ptoj-gateway:
     image: ptoj-gateway:latest
@@ -184,7 +206,9 @@ services:
       - ptoj-mysql
       - ptoj-nacos
       - ptoj-redis
-      - ptoj-gateway
+#      - ptoj-gateway
+      - ptoj-rocketmq-namesrv
+      - ptoj-rocketmq-broker
     environment:
       - REDIS_HOST=${REDIS_HOST:-172.21.0.2}
       - REDIS_PORT=${REDIS_PORT:-6379}
@@ -207,6 +231,128 @@ services:
       ptoj-network:
         ipv4_address: ${USER_SERVICE_HOST:-172.21.0.21}
 
+  ptoj-problem-service:
+    image: problem-service:latest
+    container_name: problem-service
+    restart: unless-stopped
+    depends_on:
+      - ptoj-mysql
+      - ptoj-nacos
+      - ptoj-redis
+      - ptoj-gateway
+    environment:
+      - REDIS_HOST=${REDIS_HOST:-172.21.0.2}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-123456}
+      - MYSQL_HOST=${MYSQL_HOST:-172.21.0.3}
+      - MYSQL_PORT=${MYSQL_PORT:-3306}
+      - MYSQL_DATABASE_NAME=${MYSQL_DATABASE_PROBLEM:-ptoj-problem}
+      - MYSQL_USERNAME=root
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-123456}
+      - NACOS_HOST=${NACOS_HOST:-172.21.0.4}
+      - NACOS_PORT=${NACOS_PORT:-8848}
+      - NACOS_USERNAME=${NACOS_USERNAME:-nacos}
+      - NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
+    ports:
+      - "8001:8001"
+    networks:
+      ptoj-network:
+        ipv4_address: ${PROBLEM_SERVICE_HOST:-172.21.0.22}
+
+  ptoj-submit-service:
+    image: submit-service:latest
+    container_name: submit-service
+    restart: unless-stopped
+    depends_on:
+      - ptoj-mysql
+      - ptoj-nacos
+      - ptoj-redis
+      - ptoj-gateway
+      - ptoj-problem-service
+    environment:
+      - REDIS_HOST=${REDIS_HOST:-172.21.0.2}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-123456}
+      - MYSQL_HOST=${MYSQL_HOST:-172.21.0.3}
+      - MYSQL_PORT=${MYSQL_PORT:-3306}
+      - MYSQL_DATABASE_NAME=${MYSQL_DATABASE_JUDGE:-ptoj-judge}
+      - MYSQL_USERNAME=root
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-123456}
+      - NACOS_HOST=${NACOS_HOST:-172.21.0.4}
+      - NACOS_PORT=${NACOS_PORT:-8848}
+      - NACOS_USERNAME=${NACOS_USERNAME:-nacos}
+      - NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
+      - ROCKETMQ_HOST=${ROCKETMQ_SERVER_HOST:-172.21.0.4}
+      - ROCKETMQ_PORT=${ROCKETMQ_SERVER_PORT:-9876}
+      - ROCKETMQ_GROUP=${ROCKETMQ_GROUP:-ptoj}
+    ports:
+      - "8002:8002"
+    networks:
+      ptoj-network:
+        ipv4_address: ${SUBMIT_SERVICE_HOST:-172.21.0.23}
+
+  ptoj-training-service:
+    image: training-service:latest
+    container_name: training-service
+    restart: unless-stopped
+    depends_on:
+      - ptoj-mysql
+      - ptoj-nacos
+      - ptoj-redis
+      - ptoj-gateway
+      - ptoj-problem-service
+    environment:
+      - REDIS_HOST=${REDIS_HOST:-172.21.0.2}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-123456}
+      - MYSQL_HOST=${MYSQL_HOST:-172.21.0.3}
+      - MYSQL_PORT=${MYSQL_PORT:-3306}
+      - MYSQL_DATABASE_NAME=${MYSQL_DATABASE_TRAINING:-ptoj-training}
+      - MYSQL_USERNAME=root
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-123456}
+      - NACOS_HOST=${NACOS_HOST:-172.21.0.4}
+      - NACOS_PORT=${NACOS_PORT:-8848}
+      - NACOS_USERNAME=${NACOS_USERNAME:-nacos}
+      - NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
+    ports:
+      - "8003:8003"
+    networks:
+      ptoj-network:
+        ipv4_address: ${TRAINING_SERVICE_HOST:-172.21.0.24}
+
+  ptoj-judge-server:
+    image: judge-service:latest
+    container_name: judge-server-1
+    restart: unless-stopped
+    depends_on:
+      - ptoj-mysql
+      - ptoj-nacos
+      - ptoj-redis
+      - ptoj-gateway
+      - ptoj-problem-service
+    environment:
+      - REDIS_HOST=${REDIS_HOST:-172.21.0.2}
+      - REDIS_PORT=${REDIS_PORT:-6379}
+      - REDIS_PASSWORD=${REDIS_PASSWORD:-123456}
+      - MYSQL_HOST=${MYSQL_HOST:-172.21.0.3}
+      - MYSQL_PORT=${MYSQL_PORT:-3306}
+      - MYSQL_DATABASE_NAME=${MYSQL_DATABASE_JUDGE:-ptoj-judge}
+      - MYSQL_USERNAME=root
+      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-123456}
+      - NACOS_HOST=${NACOS_HOST:-172.21.0.4}
+      - NACOS_PORT=${NACOS_PORT:-8848}
+      - NACOS_USERNAME=${NACOS_USERNAME:-nacos}
+      - NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
+      - ROCKETMQ_HOST=${ROCKETMQ_SERVER_HOST:-172.21.0.4}
+      - ROCKETMQ_PORT=${ROCKETMQ_SERVER_PORT:-9876}
+      - ROCKETMQ_GROUP=${ROCKETMQ_GROUP:-ptoj}
+      - JUDGE_SERVER_NAME=${JUDGE_SERVER_1_NAME:-ptoj-judger-1}
+      - MAX_TASK_NUM=${MAX_TASK_NUM:-1}
+    ports:
+      - "8010:8010"
+    networks:
+      ptoj-network:
+        ipv4_address: ${JUDGE_SERVER_1_HOST:-172.21.0.30}
 
 #  ptoj-es:
 #    image: elasticsearch:7.14.0

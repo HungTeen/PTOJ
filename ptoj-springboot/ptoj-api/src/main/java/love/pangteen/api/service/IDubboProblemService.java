@@ -6,7 +6,6 @@ import love.pangteen.api.pojo.entity.ProblemCase;
 import love.pangteen.api.pojo.vo.ProblemVO;
 
 import java.util.List;
-import java.util.Map;
 
 /**
  * @program: PTOJ
@@ -14,8 +13,6 @@ import java.util.Map;
  * @create: 2024/1/26 10:15
  **/
 public interface IDubboProblemService {
-
-    Map<Long, String> getProblemTitleMap(List<Long> pidList);
 
     Problem getById(Long pid);
 

@@ -8,10 +8,10 @@
 /*!40111 SET @OLD_SQL_NOTES = @@SQL_NOTES, SQL_NOTES = 0 */;
 
 CREATE
-DATABASE IF NOT EXISTS `ptoj-problem` DEFAULT CHARACTER SET utf8;
+    DATABASE IF NOT EXISTS `ptoj-problem` DEFAULT CHARACTER SET utf8;
 
 USE
-`ptoj-problem`;
+    `ptoj-problem`;
 
 /**
   `problem`：题目表
@@ -22,6 +22,8 @@ USE
   `language`：语言表
   `problem_language`：题目语言表
   `code_template`：代码模板表
+  `judge`：判题记录表
+  `judge_case`：判题样例表
  */
 
 /*Table structure for table `problem` */
@@ -31,47 +33,47 @@ DROP TABLE IF EXISTS `problem`;
 CREATE TABLE `problem`
 (
     `id`                    bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-    `problem_id`            varchar(255) NOT NULL COMMENT '问题的自定义ID 例如（HOJ-1000）',
-    `title`                 varchar(255) NOT NULL COMMENT '题目',
-    `author`                varchar(255) DEFAULT '未知' COMMENT '作者',
-    `type`                  int(11) NOT NULL DEFAULT '0' COMMENT '0为ACM,1为OI',
-    `time_limit`            int(11) DEFAULT '1000' COMMENT '单位ms',
-    `memory_limit`          int(11) DEFAULT '65535' COMMENT '单位kb',
-    `stack_limit`           int(11) DEFAULT '128' COMMENT '单位mb',
+    `problem_id`            varchar(255)        NOT NULL COMMENT '问题的自定义ID 例如（HOJ-1000）',
+    `title`                 varchar(255)        NOT NULL COMMENT '题目',
+    `author`                varchar(255)                 DEFAULT '未知' COMMENT '作者',
+    `type`                  int(11)             NOT NULL DEFAULT '0' COMMENT '0为ACM,1为OI',
+    `time_limit`            int(11)                      DEFAULT '1000' COMMENT '单位ms',
+    `memory_limit`          int(11)                      DEFAULT '65535' COMMENT '单位kb',
+    `stack_limit`           int(11)                      DEFAULT '128' COMMENT '单位mb',
     `description`           longtext COMMENT '描述',
     `input`                 longtext COMMENT '输入描述',
     `output`                longtext COMMENT '输出描述',
     `examples`              longtext COMMENT '题面样例',
-    `is_remote`             tinyint(1) DEFAULT '0' COMMENT '是否为vj判题',
+    `is_remote`             tinyint(1)                   DEFAULT '0' COMMENT '是否为vj判题',
     `source`                text COMMENT '题目来源',
-    `difficulty`            int(11) DEFAULT '0' COMMENT '题目难度,0简单，1中等，2困难',
+    `difficulty`            int(11)                      DEFAULT '0' COMMENT '题目难度,0简单，1中等，2困难',
     `hint`                  longtext COMMENT '备注,提醒',
-    `auth`                  int(11) DEFAULT '1' COMMENT '默认为1公开，2为私有，3为比赛题目',
-    `io_score`              int(11) DEFAULT '100' COMMENT '当该题目为io题目时的分数',
-    `code_share`            tinyint(1) DEFAULT '1' COMMENT '该题目对应的相关提交代码，用户是否可用分享',
-    `judge_mode`            varchar(255) DEFAULT 'default' COMMENT '题目评测模式,default、spj、interactive',
-    `judge_case_mode`       varchar(255) DEFAULT 'default' COMMENT '题目样例评测模式,default,subtask_lowest,subtask_average',
-    `user_extra_file`       mediumtext   DEFAULT NULL COMMENT '题目评测时用户程序的额外文件 json key:name value:content',
-    `judge_extra_file`      mediumtext   DEFAULT NULL COMMENT '题目评测时交互或特殊程序的额外文件 json key:name value:content',
+    `auth`                  int(11)                      DEFAULT '1' COMMENT '默认为1公开，2为私有，3为比赛题目',
+    `io_score`              int(11)                      DEFAULT '100' COMMENT '当该题目为io题目时的分数',
+    `code_share`            tinyint(1)                   DEFAULT '1' COMMENT '该题目对应的相关提交代码，用户是否可用分享',
+    `judge_mode`            varchar(255)                 DEFAULT 'default' COMMENT '题目评测模式,default、spj、interactive',
+    `judge_case_mode`       varchar(255)                 DEFAULT 'default' COMMENT '题目样例评测模式,default,subtask_lowest,subtask_average',
+    `user_extra_file`       mediumtext                   DEFAULT NULL COMMENT '题目评测时用户程序的额外文件 json key:name value:content',
+    `judge_extra_file`      mediumtext                   DEFAULT NULL COMMENT '题目评测时交互或特殊程序的额外文件 json key:name value:content',
     `spj_code`              longtext COMMENT '特判程序或交互程序代码',
-    `spj_language`          varchar(255) DEFAULT NULL COMMENT '特判程序或交互程序代码的语言',
-    `is_remove_end_blank`   tinyint(1) DEFAULT '1' COMMENT '是否默认去除用户代码的文末空格',
-    `open_case_result`      tinyint(1) DEFAULT '1' COMMENT '是否默认开启该题目的测试样例结果查看',
-    `is_upload_case`        tinyint(1) DEFAULT '1' COMMENT '题目测试数据是否是上传文件的',
-    `case_version`          varchar(40)  DEFAULT '0' COMMENT '题目测试数据的版本号',
-    `modified_user`         varchar(255) DEFAULT NULL COMMENT '修改题目的管理员用户名',
-    `is_group`              tinyint(1) DEFAULT '0',
-    `gid`                   bigint(20) unsigned DEFAULT NULL,
-    `apply_public_progress` int(11) DEFAULT NULL COMMENT '申请公开的进度：null为未申请，1为申请中，2为申请通过，3为申请拒绝',
-    `is_file_io`            tinyint(1) DEFAULT '0' COMMENT '是否是file io自定义输入输出文件模式',
-    `io_read_file_name`     varchar(255) DEFAULT NULL COMMENT '题目指定的file io输入文件的名称',
-    `io_write_file_name`    varchar(255) DEFAULT NULL COMMENT '题目指定的file io输出文件的名称',
-    `gmt_create`            datetime     DEFAULT CURRENT_TIMESTAMP,
-    `gmt_modified`          datetime     DEFAULT CURRENT_TIMESTAMP,
+    `spj_language`          varchar(255)                 DEFAULT NULL COMMENT '特判程序或交互程序代码的语言',
+    `is_remove_end_blank`   tinyint(1)                   DEFAULT '1' COMMENT '是否默认去除用户代码的文末空格',
+    `open_case_result`      tinyint(1)                   DEFAULT '1' COMMENT '是否默认开启该题目的测试样例结果查看',
+    `is_upload_case`        tinyint(1)                   DEFAULT '1' COMMENT '题目测试数据是否是上传文件的',
+    `case_version`          varchar(40)                  DEFAULT '0' COMMENT '题目测试数据的版本号',
+    `modified_user`         varchar(255)                 DEFAULT NULL COMMENT '修改题目的管理员用户名',
+    `is_group`              tinyint(1)                   DEFAULT '0',
+    `gid`                   bigint(20) unsigned          DEFAULT NULL,
+    `apply_public_progress` int(11)                      DEFAULT NULL COMMENT '申请公开的进度：null为未申请，1为申请中，2为申请通过，3为申请拒绝',
+    `is_file_io`            tinyint(1)                   DEFAULT '0' COMMENT '是否是file io自定义输入输出文件模式',
+    `io_read_file_name`     varchar(255)                 DEFAULT NULL COMMENT '题目指定的file io输入文件的名称',
+    `io_write_file_name`    varchar(255)                 DEFAULT NULL COMMENT '题目指定的file io输出文件的名称',
+    `gmt_create`            datetime                     DEFAULT CURRENT_TIMESTAMP,
+    `gmt_modified`          datetime                     DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
-    KEY                     `author` (`author`),
-    KEY                     `problem_id` (`problem_id`)
-        # CONSTRAINT `problem_ibfk_1` FOREIGN KEY (`author`) REFERENCES `user_info` (`username`) ON DELETE NO ACTION ON UPDATE CASCADE,
+    KEY `author` (`author`),
+    KEY `problem_id` (`problem_id`)
+    # CONSTRAINT `problem_ibfk_1` FOREIGN KEY (`author`) REFERENCES `user_info` (`username`) ON DELETE NO ACTION ON UPDATE CASCADE,
     # CONSTRAINT `problem_ibfk_2` FOREIGN KEY (`gid`) REFERENCES `group` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1000
@@ -87,14 +89,14 @@ CREATE TABLE `problem_case`
     `pid`          bigint(20) unsigned NOT NULL COMMENT '题目id',
     `input`        longtext COMMENT '测试样例的输入',
     `output`       longtext COMMENT '测试样例的输出',
-    `score`        int(11) DEFAULT NULL COMMENT '该测试样例的IO得分',
-    `status`       int(11) DEFAULT '0' COMMENT '0可用，1不可用',
-    `group_num`    int(11) DEFAULT '1' COMMENT 'subtask分组的编号',
+    `score`        int(11)  DEFAULT NULL COMMENT '该测试样例的IO得分',
+    `status`       int(11)  DEFAULT '0' COMMENT '0可用，1不可用',
+    `group_num`    int(11)  DEFAULT '1' COMMENT 'subtask分组的编号',
     `gmt_create`   datetime DEFAULT CURRENT_TIMESTAMP,
     `gmt_modified` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
-    KEY            `pid` (`pid`)
-        # CONSTRAINT `problem_case_ibfk_1` FOREIGN KEY (`pid`) REFERENCES `problem` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+    KEY `pid` (`pid`)
+    # CONSTRAINT `problem_case_ibfk_1` FOREIGN KEY (`pid`) REFERENCES `problem` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
   DEFAULT CHARSET = utf8;
@@ -106,16 +108,16 @@ DROP TABLE IF EXISTS `tag`;
 CREATE TABLE `tag`
 (
     `id`           bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-    `name`         varchar(255) NOT NULL COMMENT '标签名字',
-    `color`        varchar(10)  DEFAULT NULL COMMENT '标签颜色',
-    `oj`           varchar(255) DEFAULT 'ME' COMMENT '标签所属oj',
+    `name`         varchar(255)        NOT NULL COMMENT '标签名字',
+    `color`        varchar(10)         DEFAULT NULL COMMENT '标签颜色',
+    `oj`           varchar(255)        DEFAULT 'ME' COMMENT '标签所属oj',
     `gid`          bigint(20) unsigned DEFAULT NULL,
     `tcid`         bigint(20) unsigned DEFAULT NULL,
-    `gmt_create`   datetime     DEFAULT CURRENT_TIMESTAMP,
-    `gmt_modified` datetime     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `gmt_create`   datetime            DEFAULT CURRENT_TIMESTAMP,
+    `gmt_modified` datetime            DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     UNIQUE KEY `name` (`name`, `oj`, `gid`)
-        # CONSTRAINT `tag_ibfk_1` FOREIGN KEY (`gid`) REFERENCES `group` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    # CONSTRAINT `tag_ibfk_1` FOREIGN KEY (`gid`) REFERENCES `group` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
     # CONSTRAINT `tag_ibfk_2` FOREIGN KEY (`tcid`) REFERENCES `tag_classification` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
@@ -127,14 +129,16 @@ DROP TABLE IF EXISTS `tag_classification`;
 
 CREATE TABLE `tag_classification`
 (
-    `id`           bigint UNSIGNED NOT NULL AUTO_INCREMENT,
+    `id`           bigint UNSIGNED                                               NOT NULL AUTO_INCREMENT,
     `name`         varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '标签分类名称',
     `oj`           varchar(255) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '标签分类所属oj',
-    `gmt_create`   datetime NULL DEFAULT NULL,
-    `gmt_modified` datetime NULL DEFAULT NULL,
-    `rank`         int(10) UNSIGNED ZEROFILL NULL DEFAULT NULL COMMENT '标签分类优先级 越小越高',
+    `gmt_create`   datetime                                                      NULL DEFAULT NULL,
+    `gmt_modified` datetime                                                      NULL DEFAULT NULL,
+    `rank`         int(10) UNSIGNED ZEROFILL                                     NULL DEFAULT NULL COMMENT '标签分类优先级 越小越高',
     PRIMARY KEY (`id`) USING BTREE
-) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 1
+  DEFAULT CHARSET = utf8;
 
 /*Table structure for table `problem_tag` */
 
@@ -148,9 +152,9 @@ CREATE TABLE `problem_tag`
     `gmt_create`   datetime DEFAULT CURRENT_TIMESTAMP,
     `gmt_modified` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
-    KEY            `pid` (`pid`),
-    KEY            `tid` (`tid`)
-        # CONSTRAINT `problem_tag_ibfk_1` FOREIGN KEY (`pid`) REFERENCES `problem` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    KEY `pid` (`pid`),
+    KEY `tid` (`tid`)
+    # CONSTRAINT `problem_tag_ibfk_1` FOREIGN KEY (`pid`) REFERENCES `problem` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
     # CONSTRAINT `problem_tag_ibfk_2` FOREIGN KEY (`tid`) REFERENCES `tag` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
@@ -169,9 +173,9 @@ CREATE TABLE `language`
     `compile_command` mediumtext COMMENT '编译指令',
     `template`        longtext COMMENT '模板',
     `code_template`   longtext COMMENT '语言默认代码模板',
-    `is_spj`          tinyint(1) DEFAULT '0' COMMENT '是否可作为特殊判题的一种语言',
+    `is_spj`          tinyint(1)   DEFAULT '0' COMMENT '是否可作为特殊判题的一种语言',
     `oj`              varchar(255) DEFAULT NULL COMMENT '该语言属于哪个oj，自身oj用ME',
-    `seq`             int(11) DEFAULT '0' COMMENT '语言排序',
+    `seq`             int(11)      DEFAULT '0' COMMENT '语言排序',
     `gmt_create`      datetime     DEFAULT CURRENT_TIMESTAMP,
     `gmt_modified`    datetime     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`)
@@ -191,9 +195,9 @@ CREATE TABLE `problem_language`
     `gmt_create`   datetime DEFAULT CURRENT_TIMESTAMP,
     `gmt_modified` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
-    KEY            `pid` (`pid`),
-    KEY            `lid` (`lid`)
-        # CONSTRAINT `problem_language_ibfk_1` FOREIGN KEY (`pid`) REFERENCES `problem` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    KEY `pid` (`pid`),
+    KEY `lid` (`lid`)
+    # CONSTRAINT `problem_language_ibfk_1` FOREIGN KEY (`pid`) REFERENCES `problem` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
     # CONSTRAINT `problem_language_ibfk_2` FOREIGN KEY (`lid`) REFERENCES `language` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
@@ -205,18 +209,99 @@ DROP TABLE IF EXISTS `code_template`;
 
 CREATE TABLE `code_template`
 (
-    `id`           int(11) NOT NULL AUTO_INCREMENT,
+    `id`           int(11)             NOT NULL AUTO_INCREMENT,
     `pid`          bigint(20) unsigned NOT NULL,
     `lid`          bigint(20) unsigned NOT NULL,
-    `code`         longtext NOT NULL,
+    `code`         longtext            NOT NULL,
     `status`       tinyint(1) DEFAULT '0',
-    `gmt_create`   datetime DEFAULT CURRENT_TIMESTAMP,
-    `gmt_modified` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `gmt_create`   datetime   DEFAULT CURRENT_TIMESTAMP,
+    `gmt_modified` datetime   DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
-    KEY            `pid` (`pid`),
-    KEY            `lid` (`lid`)
-        # CONSTRAINT `code_template_ibfk_1` FOREIGN KEY (`pid`) REFERENCES `problem` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+    KEY `pid` (`pid`),
+    KEY `lid` (`lid`)
+    # CONSTRAINT `code_template_ibfk_1` FOREIGN KEY (`pid`) REFERENCES `problem` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
     # CONSTRAINT `code_template_ibfk_2` FOREIGN KEY (`lid`) REFERENCES `language` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 1
+  DEFAULT CHARSET = utf8;
+
+/*Table structure for table `judge` */
+
+DROP TABLE IF EXISTS `judge`;
+
+CREATE TABLE `judge`
+(
+    `submit_id`        bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+    `pid`              bigint(20) unsigned NOT NULL COMMENT '题目id',
+    `display_pid`      varchar(255)        NOT NULL COMMENT '题目展示id',
+    `uid`              varchar(32)         NOT NULL COMMENT '用户id',
+    `username`         varchar(255)                 DEFAULT NULL COMMENT '用户名',
+    `submit_time`      datetime            NOT NULL COMMENT '提交的时间',
+    `status`           int(11)                      DEFAULT NULL COMMENT '结果码具体参考文档',
+    `share`            tinyint(1)                   DEFAULT '0' COMMENT '0为仅自己可见，1为全部人可见。',
+    `error_message`    mediumtext COMMENT '错误提醒（编译错误，或者vj提醒）',
+    `time`             int(11)                      DEFAULT NULL COMMENT '运行时间(ms)',
+    `memory`           int(11)                      DEFAULT NULL COMMENT '运行内存（kb）',
+    `score`            int(11)                      DEFAULT NULL COMMENT 'IO判题则不为空',
+    `length`           int(11)                      DEFAULT NULL COMMENT '代码长度',
+    `code`             longtext            NOT NULL COMMENT '代码',
+    `language`         varchar(255)                 DEFAULT NULL COMMENT '代码语言',
+    `gid`              bigint(20) unsigned          DEFAULT NULL COMMENT '团队id，不为团队内提交则为null',
+    `cid`              bigint(20) unsigned NOT NULL DEFAULT '0' COMMENT '比赛id，非比赛题目默认为0',
+    `cpid`             bigint(20) unsigned          DEFAULT '0' COMMENT '比赛中题目排序id，非比赛题目默认为0',
+    `judger`           varchar(20)                  DEFAULT NULL COMMENT '判题机ip',
+    `ip`               varchar(20)                  DEFAULT NULL COMMENT '提交者所在ip',
+    `version`          int(11)             NOT NULL DEFAULT '0' COMMENT '乐观锁',
+    `oi_rank_score`    int(11)             NULL     DEFAULT '0' COMMENT 'oi排行榜得分',
+    `vjudge_submit_id` bigint(20) unsigned NULL COMMENT 'vjudge判题在其它oj的提交id',
+    `vjudge_username`  varchar(255)        NULL COMMENT 'vjudge判题在其它oj的提交用户名',
+    `vjudge_password`  varchar(255)        NULL COMMENT 'vjudge判题在其它oj的提交账号密码',
+    `is_manual`        tinyint(1)                   DEFAULT '0' COMMENT '是否为人工评测',
+    `gmt_create`       datetime                     DEFAULT CURRENT_TIMESTAMP,
+    `gmt_modified`     datetime                     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`submit_id`, `pid`, `display_pid`, `uid`, `cid`),
+    KEY `pid` (`pid`),
+    KEY `uid` (`uid`),
+    KEY `username` (`username`)
+#     CONSTRAINT `judge_ibfk_1` FOREIGN KEY (`pid`) REFERENCES `problem` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+#     CONSTRAINT `judge_ibfk_2` FOREIGN KEY (`uid`) REFERENCES `user_info` (`uuid`) ON DELETE CASCADE ON UPDATE CASCADE,
+#     CONSTRAINT `judge_ibfk_3` FOREIGN KEY (`username`) REFERENCES `user_info` (`username`) ON DELETE CASCADE ON UPDATE CASCADE,
+#     CONSTRAINT `judge_ibfk_4` FOREIGN KEY (`gid`) REFERENCES `group` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE = InnoDB
+  AUTO_INCREMENT = 1
+  DEFAULT CHARSET = utf8;
+
+/*Table structure for table `judge_case` */
+
+DROP TABLE IF EXISTS `judge_case`;
+
+CREATE TABLE `judge_case`
+(
+    `id`           bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+    `submit_id`    bigint(20) unsigned NOT NULL COMMENT '提交判题id',
+    `uid`          varchar(32)         NOT NULL COMMENT '用户id',
+    `pid`          bigint(20) unsigned NOT NULL COMMENT '题目id',
+    `case_id`      bigint(20)   DEFAULT NULL COMMENT '测试样例id',
+    `status`       int(11)      DEFAULT NULL COMMENT '具体看结果码',
+    `time`         int(11)      DEFAULT NULL COMMENT '测试该样例所用时间ms',
+    `memory`       int(11)      DEFAULT NULL COMMENT '测试该样例所用空间KB',
+    `score`        int(11)      DEFAULT NULL COMMENT 'IO得分',
+    `group_num`    int(11)      DEFAULT NULL COMMENT 'subtask分组的组号',
+    `seq`          int(11)      DEFAULT NULL COMMENT '排序',
+    `mode`         varchar(255) DEFAULT 'default' COMMENT 'default,subtask_lowest,subtask_average',
+    `input_data`   longtext COMMENT '样例输入，比赛不可看',
+    `output_data`  longtext COMMENT '样例输出，比赛不可看',
+    `user_output`  longtext COMMENT '用户样例输出，比赛不可看',
+    `gmt_create`   datetime     DEFAULT CURRENT_TIMESTAMP,
+    `gmt_modified` datetime     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`, `submit_id`, `uid`, `pid`),
+    KEY `case_id` (`case_id`),
+    KEY `judge_case_ibfk_1` (`uid`),
+    KEY `judge_case_ibfk_2` (`pid`),
+    KEY `judge_case_ibfk_3` (`submit_id`)
+--     CONSTRAINT `judge_case_ibfk_1` FOREIGN KEY (`uid`) REFERENCES `user_info` (`uuid`) ON DELETE CASCADE ON UPDATE CASCADE,
+--     CONSTRAINT `judge_case_ibfk_2` FOREIGN KEY (`pid`) REFERENCES `problem` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+--     CONSTRAINT `judge_case_ibfk_3` FOREIGN KEY (`submit_id`) REFERENCES `judge` (`submit_id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE = InnoDB
   AUTO_INCREMENT = 1
   DEFAULT CHARSET = utf8;
@@ -243,6 +328,12 @@ from `problem_language`;
 
 delete
 from `code_template`;
+
+delete
+from judge;
+
+delete
+from judge_case;
 
 /*Data for the table `language` */
 INSERT INTO `language`(`content_type`, `description`, `name`, `compile_command`, `template`, `code_template`, `is_spj`,

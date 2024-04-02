@@ -23,7 +23,6 @@ import java.util.List;
  * @create: 2024/1/21 22:25
  **/
 @RestController
-
 @RequestMapping("/admin/problem")
 public class AdminProblemController {
 

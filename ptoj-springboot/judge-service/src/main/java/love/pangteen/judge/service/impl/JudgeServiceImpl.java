@@ -10,7 +10,6 @@ import love.pangteen.api.constant.OJFiles;
 import love.pangteen.api.enums.JudgeCaseMode;
 import love.pangteen.api.enums.JudgeStatus;
 import love.pangteen.api.enums.ProblemType;
-import love.pangteen.api.message.AcceptMessage;
 import love.pangteen.api.pojo.dto.TestJudgeDTO;
 import love.pangteen.api.pojo.dto.ToJudgeDTO;
 import love.pangteen.api.pojo.entity.Judge;
@@ -28,7 +27,6 @@ import love.pangteen.judge.mapper.JudgeMapper;
 import love.pangteen.judge.pojo.entity.JudgeResult;
 import love.pangteen.judge.pojo.entity.LanguageConfig;
 import love.pangteen.api.pojo.entity.TestJudgeResult;
-import love.pangteen.judge.producer.RocketMQProducer;
 import love.pangteen.judge.sandbox.Compiler;
 import love.pangteen.judge.sandbox.JudgeRunner;
 import love.pangteen.judge.sandbox.JudgeStrategy;
@@ -37,7 +35,6 @@ import love.pangteen.judge.service.JudgeCaseService;
 import love.pangteen.judge.service.JudgeService;
 import love.pangteen.judge.utils.ProblemCaseUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
-import org.checkerframework.checker.units.qual.A;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -185,9 +182,9 @@ public class JudgeServiceImpl extends ServiceImpl<JudgeMapper, Judge> implements
         finalJudgeRes.setStatus(judgeResult.getCode());
         // 设置最大时间和最大空间不超过题目限制时间和空间
         // kb
-        finalJudgeRes.setMemory(problem.getMemoryLimit() * 1024);
+        finalJudgeRes.setMemory(judgeResult.getMemory() * 1024);
         // ms
-        finalJudgeRes.setTime(problem.getTimeLimit());
+        finalJudgeRes.setTime(judgeResult.getTime());
         // score
         finalJudgeRes.setScore(judgeResult.getScore());
         // oi_rank_score

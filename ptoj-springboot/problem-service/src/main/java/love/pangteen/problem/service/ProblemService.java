@@ -3,14 +3,16 @@ package love.pangteen.problem.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import love.pangteen.api.pojo.vo.ProblemVO;
-import love.pangteen.problem.pojo.dto.PidListDTO;
-import love.pangteen.problem.pojo.dto.ProblemDTO;
 import love.pangteen.api.pojo.entity.Problem;
-import love.pangteen.problem.pojo.vo.*;
+import love.pangteen.api.pojo.vo.ProblemVO;
+import love.pangteen.problem.pojo.dto.ProblemDTO;
+import love.pangteen.problem.pojo.vo.LastAcceptedCodeVO;
+import love.pangteen.problem.pojo.vo.ProblemFullScreenListVO;
+import love.pangteen.problem.pojo.vo.ProblemInfoVO;
+import love.pangteen.problem.pojo.vo.RandomProblemVO;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @program: PTOJ
@@ -35,8 +37,6 @@ public interface ProblemService extends IService<Problem> {
 
     RandomProblemVO getRandomProblem();
 
-    HashMap<Long, Object> getUserProblemStatus(PidListDTO pidListDto);
-
     ProblemInfoVO getProblemInfo(String problemId, Long gid);
 
     LastAcceptedCodeVO getUserLastAcceptedCode(Long pid, Long cid);
@@ -46,4 +46,8 @@ public interface ProblemService extends IService<Problem> {
     String getProblemOJ(Long pid);
 
     List<Long> getProblemsByCreateDate();
+
+    Map<Long, String> getProblemTitleMap(List<Long> pidList);
+
+    Problem getByProblemId(String problemId);
 }

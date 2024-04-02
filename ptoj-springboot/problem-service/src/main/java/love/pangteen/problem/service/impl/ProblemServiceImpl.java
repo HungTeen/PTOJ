@@ -6,35 +6,37 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import love.pangteen.api.constant.OJConstant;
-import love.pangteen.api.enums.*;
-import love.pangteen.api.pojo.entity.Judge;
+import love.pangteen.api.enums.JudgeMode;
+import love.pangteen.api.enums.ProblemAuth;
+import love.pangteen.api.enums.ProblemType;
+import love.pangteen.api.enums.RemoteOJ;
 import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.api.pojo.entity.ProblemCase;
+import love.pangteen.api.pojo.entity.Tag;
 import love.pangteen.api.pojo.vo.ProblemVO;
-import love.pangteen.api.service.IDubboJudgeService;
-import love.pangteen.api.utils.JudgeUtils;
 import love.pangteen.api.utils.RandomUtils;
 import love.pangteen.exception.StatusFailException;
 import love.pangteen.exception.StatusForbiddenException;
 import love.pangteen.exception.StatusNotFoundException;
 import love.pangteen.pojo.AccountProfile;
 import love.pangteen.problem.mapper.ProblemMapper;
-import love.pangteen.problem.pojo.dto.PidListDTO;
 import love.pangteen.problem.pojo.dto.ProblemDTO;
 import love.pangteen.problem.pojo.entity.Language;
-import love.pangteen.api.pojo.entity.Tag;
-import love.pangteen.problem.pojo.vo.*;
+import love.pangteen.problem.pojo.vo.LastAcceptedCodeVO;
+import love.pangteen.problem.pojo.vo.ProblemFullScreenListVO;
+import love.pangteen.problem.pojo.vo.ProblemInfoVO;
+import love.pangteen.problem.pojo.vo.RandomProblemVO;
 import love.pangteen.problem.service.*;
 import love.pangteen.problem.utils.ProblemUtils;
-import love.pangteen.utils.ValidateUtils;
 import love.pangteen.utils.AccountUtils;
-import org.apache.dubbo.config.annotation.DubboReference;
+import love.pangteen.utils.ValidateUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -60,8 +62,7 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
     @Resource
     private ProblemMapper problemMapper;
 
-    @DubboReference(check = false)
-    private IDubboJudgeService judgeService;
+    private JudgeService judgeService;
 
     @Override
     public Page<ProblemVO> getProblemList(Integer limit, Integer currentPage, String keyword, List<Long> tagIds, Integer difficulty, String oj) {
@@ -211,108 +212,6 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
         return randomProblemVO;
     }
 
-    /**
-     * 获取用户对应该题目列表中各个题目的做题情况。
-     */
-    @Override
-    public HashMap<Long, Object> getUserProblemStatus(PidListDTO pidListDto) {
-        AccountProfile profile = AccountUtils.getProfile();
-        HashMap<Long, Object> result = new HashMap<>();
-
-        // 先查询判断该用户对于这些题是否已经通过，若已通过，则无论后续再提交结果如何，该题都标记为通过
-        List<Judge> judges = judgeService.getSubmitJudges(pidListDto.getPidList(), profile.getUuid(), pidListDto.getIsContestProblemList() ? pidListDto.getCid() : 0, pidListDto.getGid());
-
-        boolean isACMContest = true;
-        boolean isContainsContestEndJudge = false;
-        long contestEndTime = 0L;
-//        Contest contest = null; TODO 对于Contest的判断
-        if (pidListDto.getIsContestProblemList()) {
-//            contest = contestEntityService.getById(pidListDto.getCid());
-//            if (contest == null) {
-//                throw new StatusNotFoundException("错误：该比赛不存在！");
-//            }
-//            isACMContest = contest.getType().intValue() == Constants.Contest.TYPE_ACM.getCode();
-//            isContainsContestEndJudge = Objects.equals(contest.getAllowEndSubmit(), true)
-//                    && Objects.equals(pidListDto.getContainsEnd(), true);
-//            contestEndTime = contest.getEndTime().getTime();
-        }
-//        boolean isSealRank = false;
-//        if (!isACMContest && CollectionUtil.isNotEmpty(judges)) {
-//            isSealRank = contestValidator.isSealRank(profile.getUid(), contest, false,
-//                    SecurityUtils.getSubject().hasRole("root"));
-//        }
-        for (Judge judge : judges) {
-
-            HashMap<String, Object> temp = new HashMap<>();
-            if (pidListDto.getIsContestProblemList()) { // 如果是比赛的题目列表状态
-
-                // 如果是隐藏比赛后的提交，需要判断提交时间进行过滤
-//                if (!isContainsContestEndJudge && judge.getSubmitTime().getTime() >= contestEndTime) {
-//                    continue;
-//                }
-//
-//                if (!isACMContest) {
-//                    if (!result.containsKey(judge.getPid())) {
-//                        // IO比赛的，如果还未写入，则使用最新一次提交的结果
-//                        // 判断该提交是否为封榜之后的提交,OI赛制封榜后的提交看不到提交结果，
-//                        // 只有比赛结束可以看到,比赛管理员与超级管理员的提交除外
-//                        if (isSealRank) {
-//                            temp.put("status", Constants.Judge.STATUS_SUBMITTED_UNKNOWN_RESULT.getStatus());
-//                            temp.put("score", null);
-//                        } else {
-//                            temp.put("status", judge.getStatus());
-//                            temp.put("score", judge.getScore());
-//                        }
-//                        result.put(judge.getPid(), temp);
-//                    }
-//                } else {
-//                    if (judge.getStatus().intValue() == Constants.Judge.STATUS_ACCEPTED.getStatus()) {
-//                        // 如果该题目已通过，且同时是为不封榜前提交的，则强制写为通过（0）
-//                        temp.put("status", Constants.Judge.STATUS_ACCEPTED.getStatus());
-//                        temp.put("score", null);
-//                        result.put(judge.getPid(), temp);
-//                    } else if (!result.containsKey(judge.getPid())) {
-//                        // 还未写入，则使用最新一次提交的结果
-//                        temp.put("status", judge.getStatus());
-//                        temp.put("score", null);
-//                        result.put(judge.getPid(), temp);
-//                    }
-//                }
-
-            } else { // 不是比赛题目
-                if (JudgeUtils.isAccepted(judge.getStatus())) {
-                    // 如果该题目已通过，则强制写为通过（0）
-                    temp.put(OJConstant.JUDGE_STATUS, JudgeStatus.STATUS_ACCEPTED.getStatus());
-                    result.put(judge.getPid(), temp);
-                } else if (!result.containsKey(judge.getPid())) {
-                    // 还未写入，则使用最新一次提交的结果
-                    temp.put("status", judge.getStatus());
-                    result.put(judge.getPid(), temp);
-                }
-            }
-        }
-
-        // 再次检查，应该可能从未提交过该题，则状态写为-10
-        for (Long pid : pidListDto.getPidList()) {
-            // 如果是比赛的题目列表状态
-            if (pidListDto.getIsContestProblemList()) {
-//                if (!result.containsKey(pid)) {
-//                    HashMap<String, Object> temp = new HashMap<>();
-//                    temp.put("score", null);
-//                    temp.put("status", Constants.Judge.STATUS_NOT_SUBMITTED.getStatus());
-//                    result.put(pid, temp);
-//                }
-            } else {
-                if (!result.containsKey(pid)) {
-                    HashMap<String, Object> temp = new HashMap<>();
-                    temp.put(OJConstant.JUDGE_STATUS, JudgeStatus.STATUS_NOT_SUBMITTED.getStatus());
-                    result.put(pid, temp);
-                }
-            }
-        }
-        return result;
-    }
-
     @Override
     public ProblemInfoVO getProblemInfo(String problemId, Long gid) {
         Problem problem = lambdaQuery().eq(Problem::getProblemId, problemId)
@@ -362,6 +261,19 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
     @Override
     public List<Long> getProblemsByCreateDate() {
         return getBaseMapper().getProblemsByCreateDate();
+    }
+
+    @Override
+    public Map<Long, String> getProblemTitleMap(List<Long> pidList) {
+        List<Problem> list = lambdaQuery()
+                .select(Problem::getTitle, Problem::getId)
+                .in(Problem::getId, pidList).list();
+        return CollUtil.toMap(list, new HashMap<>(), Problem::getId, Problem::getTitle);
+    }
+
+    @Override
+    public Problem getByProblemId(String problemId) {
+        return lambdaQuery().eq(Problem::getProblemId, problemId).oneOpt().orElse(null);
     }
 
 

@@ -2,7 +2,6 @@ package love.pangteen.api.service;
 
 import cn.hutool.core.lang.Pair;
 import love.pangteen.api.pojo.entity.Judge;
-import org.springframework.lang.Nullable;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -14,9 +13,6 @@ import java.util.List;
  * @create: 2024/1/30 10:50
  **/
 public interface IDubboJudgeService {
-
-    List<Judge> getSubmitJudges(List<Long> pidList, String uid,  @Nullable Long cid, @Nullable Long gid);
-
 
     /**
      * 获取用户对题目的提交通过map。

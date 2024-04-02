@@ -2,14 +2,15 @@ package love.pangteen.problem.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import love.pangteen.api.annotations.IgnoreLogin;
+import love.pangteen.api.pojo.vo.ProblemVO;
 import love.pangteen.problem.manager.RecentProblemManager;
 import love.pangteen.problem.pojo.dto.PidListDTO;
 import love.pangteen.problem.pojo.entity.CodeTemplate;
 import love.pangteen.problem.pojo.vo.ProblemInfoVO;
-import love.pangteen.api.pojo.vo.ProblemVO;
 import love.pangteen.problem.pojo.vo.RandomProblemVO;
 import love.pangteen.problem.pojo.vo.RecentUpdatedProblemVO;
 import love.pangteen.problem.service.CodeTemplateService;
+import love.pangteen.problem.service.JudgeService;
 import love.pangteen.problem.service.ProblemService;
 import love.pangteen.result.CommonResult;
 import org.hibernate.validator.constraints.Range;
@@ -37,6 +38,9 @@ public class ProblemController {
     private CodeTemplateService codeTemplateService;
 
     @Resource
+    private JudgeService judgeService;
+
+    @Resource
     private RecentProblemManager recentProblemManager;
 
     @RequestMapping(value = "/get-problem-list", method = RequestMethod.GET)
@@ -59,7 +63,7 @@ public class ProblemController {
 
     @PostMapping("/get-user-problem-status")
     public CommonResult<HashMap<Long, Object>> getUserProblemStatus(@Validated @RequestBody PidListDTO pidListDto) {
-        return CommonResult.success(problemService.getUserProblemStatus(pidListDto));
+        return CommonResult.success(judgeService.getUserProblemStatus(pidListDto));
     }
 
     @RequestMapping(value = "/get-problem-detail", method = RequestMethod.GET)

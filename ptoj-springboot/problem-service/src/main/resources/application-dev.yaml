@@ -18,7 +18,16 @@ ptoj:
     port: 8848
     username: nacos
     password: nacos
-
+    #  rabbitmq:
+    #    host: localhost
+    #    port: 5672
+    #    namespace: /ptoj
+    #    username: root
+    #    password: 123456
+  rocketmq:
+    host: localhost
+    port: 9876
+    group: ptoj
   swagger:
     title: "题目管理接口文档"
     package: love.pangteen.problem.controller

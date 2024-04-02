@@ -1,0 +1,31 @@
+server:
+  port: 8010 # 内嵌的 Tomcat 端口号。默认值为 8080。
+spring:
+  application:
+    name: judge-service # 微服务名称。
+ptoj:
+  mysql:
+    name: ${MYSQL_DATABASE_NAME:ptoj-user}
+    host: ${MYSQL_HOST:localhost}
+    port: ${MYSQL_PORT:3306}
+    password: ${MYSQL_PASSWORD:123456}
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD:123456}
+  nacos:
+    host: ${NACOS_HOST:localhost}
+    port: ${NACOS_PORT:8848}
+    username: ${NACOS_USERNAME:nacos}
+    password: ${NACOS_PASSWORD:nacos}
+  rocketmq:
+    host: ${ROCKETMQ_HOST:localhost}
+    port: ${ROCKETMQ_PORT:9876}
+    group: ${ROCKETMQ_GROUP:ptoj}
+  swagger:
+    title: "评测管理接口文档"
+    package: love.pangteen.judge.controller
+
+ptoj-judge-server:
+    max-task-num: ${MAX_TASK_NUM:-1} # -1表示最大并行任务数为cpu核心数+1
+    name: ${JUDGE_SERVER_NAME:ptoj-judger-1} # 判题机名字 唯一不可重复！！！

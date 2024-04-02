@@ -1,6 +1,5 @@
 package love.pangteen.problem.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import love.pangteen.api.pojo.entity.Problem;
@@ -13,9 +12,7 @@ import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 
 import javax.annotation.Resource;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -33,21 +30,13 @@ public class DubboProblemService implements IDubboProblemService {
     private ProblemCaseService problemCaseService;
 
     @Override
-    public Map<Long, String> getProblemTitleMap(List<Long> pidList) {
-        List<Problem> list = problemService.lambdaQuery()
-                .select(Problem::getTitle, Problem::getId)
-                .in(Problem::getId, pidList).list();
-        return CollUtil.toMap(list, new HashMap<>(), Problem::getId, Problem::getTitle);
-    }
-
-    @Override
     public Problem getById(Long pid) {
         return problemService.lambdaQuery().eq(Problem::getId, pid).oneOpt().orElse(null);
     }
 
     @Override
     public Problem getByProblemId(String problemId) {
-        return problemService.lambdaQuery().eq(Problem::getProblemId, problemId).oneOpt().orElse(null);
+        return problemService.getByProblemId(problemId);
     }
 
     @Override

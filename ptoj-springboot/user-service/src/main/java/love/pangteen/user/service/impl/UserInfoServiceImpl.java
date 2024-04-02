@@ -18,7 +18,6 @@ import love.pangteen.pojo.AccountProfile;
 import love.pangteen.user.mapper.UserInfoMapper;
 import love.pangteen.user.pojo.dto.*;
 import love.pangteen.user.pojo.entity.Role;
-import love.pangteen.user.pojo.entity.UserAcProblem;
 import love.pangteen.user.pojo.entity.UserInfo;
 import love.pangteen.user.pojo.vo.*;
 import love.pangteen.user.service.UserAcProblemService;
@@ -29,7 +28,6 @@ import love.pangteen.utils.AccountUtils;
 import love.pangteen.utils.RedisUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.BeanUtils;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
