@@ -1,4 +1,4 @@
-package love.pangteen.problem.pojo.vo;
+package love.pangteen.api.pojo.vo;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

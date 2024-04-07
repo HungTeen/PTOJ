@@ -26,11 +26,7 @@ spring:
         - id: problem
           uri: lb://problem-service
           predicates:
-            - Path=/admin/problem/**,/admin/tag/**,/problem/**,/tag/**,/language/**
-        - id: submit
-          uri: lb://submit-service
-          predicates:
-            - Path=/submit/**
+            - Path=/admin/problem/**,/admin/tag/**,/problem/**,/submit/**,/tag/**,/language/**
         - id: judge
           uri: lb://judge-service
           predicates:

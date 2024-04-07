@@ -34,7 +34,8 @@ public class ProblemTagServiceImpl extends ServiceImpl<ProblemTagMapper, Problem
             tagService.saveNewTags(tags);
             List<ProblemTag> problemTagList = tags.stream().map(tag -> {
                 Long tid = tag.getId() == null ? tagService.getTagId(tag.getName(), tag.getOj()) : tag.getId();
-                return new ProblemTag().setTid(tid).setPid(pid);
+                Long id = lambdaQuery().eq(ProblemTag::getPid, pid).eq(ProblemTag::getTid, tid).oneOpt().map(ProblemTag::getId).orElse(null);
+                return new ProblemTag().setTid(tid).setPid(pid).setId(id);
             }).collect(Collectors.toList());
 
             saveOrUpdateBatch(problemTagList);

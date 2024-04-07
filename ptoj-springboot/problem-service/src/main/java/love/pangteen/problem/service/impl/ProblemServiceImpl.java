@@ -13,7 +13,6 @@ import love.pangteen.api.enums.RemoteOJ;
 import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.api.pojo.entity.ProblemCase;
 import love.pangteen.api.pojo.entity.Tag;
-import love.pangteen.api.pojo.vo.ProblemVO;
 import love.pangteen.api.utils.RandomUtils;
 import love.pangteen.exception.StatusFailException;
 import love.pangteen.exception.StatusForbiddenException;
@@ -58,34 +57,6 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 
     @Resource
     private ProblemTagService problemTagService;
-
-    @Resource
-    private ProblemMapper problemMapper;
-
-    private JudgeService judgeService;
-
-    @Override
-    public Page<ProblemVO> getProblemList(Integer limit, Integer currentPage, String keyword, List<Long> tagIds, Integer difficulty, String oj) {
-        Page<ProblemVO> page = new Page<>(currentPage, limit);
-        Integer tagListSize = null;
-        if (CollUtil.isNotEmpty(tagIds)) {
-            tagListSize = Math.toIntExact(tagIds.stream().distinct().count());
-        }
-        List<ProblemVO> problemList = problemMapper.getProblemList(page, null, keyword, difficulty, tagIds, tagListSize, oj);
-        if(!problemList.isEmpty()){
-//            List<Long> pidList = problemList.stream().map(ProblemVO::getPid).collect(Collectors.toList());
-//            List<ProblemCountVO> problemListCount = judgeEntityService.getProblemListCount(pidList);
-//            for (ProblemVO problemVo : problemList) {
-//                for (ProblemCountVO problemCountVo : problemListCount) {
-//                    if (problemVo.getPid().equals(problemCountVo.getPid())) {
-//                        problemVo.setProblemCountVo(problemCountVo);
-//                        break;
-//                    }
-//                }
-//            }
-        }
-        return page.setRecords(problemList);
-    }
 
     @Override
     public IPage<Problem> getProblemList(Integer limit, Integer currentPage, String keyword, Integer auth, String oj) {

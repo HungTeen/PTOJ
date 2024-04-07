@@ -1,6 +1,6 @@
 package love.pangteen.training.service.impl;
 
-import com.github.yulichang.base.MPJBaseServiceImpl;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import love.pangteen.training.mapper.MappingTrainingCategoryMapper;
 import love.pangteen.training.pojo.entity.MappingTrainingCategory;
 import love.pangteen.training.pojo.entity.Training;
@@ -17,7 +17,7 @@ import javax.annotation.Resource;
  * @create: 2024/2/26 11:16
  **/
 @Service
-public class MappingTrainingCategoryServiceImpl extends MPJBaseServiceImpl<MappingTrainingCategoryMapper, MappingTrainingCategory> implements MappingTrainingCategoryService {
+public class MappingTrainingCategoryServiceImpl extends ServiceImpl<MappingTrainingCategoryMapper, MappingTrainingCategory> implements MappingTrainingCategoryService {
 
     @Resource
     private TrainingCategoryService categoryService;

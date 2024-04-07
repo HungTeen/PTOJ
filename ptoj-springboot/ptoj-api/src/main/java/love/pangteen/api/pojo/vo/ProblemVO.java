@@ -70,17 +70,17 @@ public class ProblemVO implements Serializable {
     @ApiModelProperty(value = "IO题目总分数")
     private Integer score;
 
-//    public void setProblemCountVo(ProblemCountVO problemCountVo) {
-//        this.total = problemCountVo.getTotal() == null ? 0 : problemCountVo.getTotal();
-//        this.ac = problemCountVo.getAc() == null ? 0 : problemCountVo.getAc();
-//        this.mle = problemCountVo.getMle() == null ? 0 : problemCountVo.getMle();
-//        this.tle = problemCountVo.getTle() == null ? 0 : problemCountVo.getTle();
-//        this.re = problemCountVo.getRe() == null ? 0 : problemCountVo.getRe();
-//        this.pe = problemCountVo.getPe() == null ? 0 : problemCountVo.getPe();
-//        this.ce = problemCountVo.getCe() == null ? 0 : problemCountVo.getCe();
-//        this.wa = problemCountVo.getWa() == null ? 0 : problemCountVo.getWa();
-//        this.se = problemCountVo.getSe() == null ? 0 : problemCountVo.getSe();
-//        this.pa = problemCountVo.getPa() == null ? 0 : problemCountVo.getPa();
-//    }
+    public void setProblemCountVo(ProblemCountVO problemCountVo) {
+        this.total = problemCountVo.getTotal() == null ? 0 : problemCountVo.getTotal();
+        this.ac = problemCountVo.getAc() == null ? 0 : problemCountVo.getAc();
+        this.mle = problemCountVo.getMle() == null ? 0 : problemCountVo.getMle();
+        this.tle = problemCountVo.getTle() == null ? 0 : problemCountVo.getTle();
+        this.re = problemCountVo.getRe() == null ? 0 : problemCountVo.getRe();
+        this.pe = problemCountVo.getPe() == null ? 0 : problemCountVo.getPe();
+        this.ce = problemCountVo.getCe() == null ? 0 : problemCountVo.getCe();
+        this.wa = problemCountVo.getWa() == null ? 0 : problemCountVo.getWa();
+        this.se = problemCountVo.getSe() == null ? 0 : problemCountVo.getSe();
+        this.pa = problemCountVo.getPa() == null ? 0 : problemCountVo.getPa();
+    }
 
 }

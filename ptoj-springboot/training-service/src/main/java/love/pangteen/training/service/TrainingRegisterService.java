@@ -1,6 +1,6 @@
 package love.pangteen.training.service;
 
-import com.github.yulichang.base.MPJBaseService;
+import com.baomidou.mybatisplus.extension.service.IService;
 import love.pangteen.api.pojo.vo.AccessVO;
 import love.pangteen.training.pojo.dto.RegisterTrainingDTO;
 import love.pangteen.training.pojo.entity.TrainingRegister;
@@ -10,7 +10,7 @@ import love.pangteen.training.pojo.entity.TrainingRegister;
  * @author: PangTeen
  * @create: 2024/2/26 10:36
  **/
-public interface TrainingRegisterService extends MPJBaseService<TrainingRegister> {
+public interface TrainingRegisterService extends IService<TrainingRegister> {
 
     void registerTraining(RegisterTrainingDTO registerTrainingDto);
 

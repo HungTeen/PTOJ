@@ -5,15 +5,18 @@ import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.yulichang.base.MPJBaseServiceImpl;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import love.pangteen.api.constant.OJConstant;
 import love.pangteen.api.enums.JudgeStatus;
 import love.pangteen.api.pojo.entity.Judge;
 import love.pangteen.api.pojo.entity.TestJudgeResult;
+import love.pangteen.api.pojo.vo.ProblemCountVO;
+import love.pangteen.api.pojo.vo.ProblemVO;
 import love.pangteen.api.utils.JudgeUtils;
 import love.pangteen.exception.StatusFailException;
 import love.pangteen.pojo.AccountProfile;
 import love.pangteen.problem.mapper.JudgeMapper;
+import love.pangteen.problem.mapper.ProblemMapper;
 import love.pangteen.problem.pojo.dto.PidListDTO;
 import love.pangteen.problem.pojo.dto.SubmitIdListDTO;
 import love.pangteen.problem.pojo.vo.JudgeCaseVO;
@@ -38,7 +41,7 @@ import java.util.stream.Collectors;
  * @create: 2024/1/25 16:11
  **/
 @Service
-public class JudgeServiceImpl extends MPJBaseServiceImpl<JudgeMapper, Judge> implements JudgeService {
+public class JudgeServiceImpl extends ServiceImpl<JudgeMapper, Judge> implements JudgeService {
 
     @Resource
     private RedisUtils redisUtils;
@@ -46,8 +49,34 @@ public class JudgeServiceImpl extends MPJBaseServiceImpl<JudgeMapper, Judge> imp
     @Resource
     private ProblemService problemService;
 
+    @Resource
+    private ProblemMapper problemMapper;
+
 //    @Resource
 //    private JudgeValidateUtils validateUtils;
+
+    @Override
+    public Page<ProblemVO> getProblemList(Integer limit, Integer currentPage, String keyword, List<Long> tagIds, Integer difficulty, String oj) {
+        Page<ProblemVO> page = new Page<>(currentPage, limit);
+        Integer tagListSize = null;
+        if (CollUtil.isNotEmpty(tagIds)) {
+            tagListSize = Math.toIntExact(tagIds.stream().distinct().count());
+        }
+        List<ProblemVO> problemList = problemMapper.getProblemList(page, null, keyword, difficulty, tagIds, tagListSize, oj);
+        if(!problemList.isEmpty()){
+            List<Long> pidList = problemList.stream().map(ProblemVO::getPid).collect(Collectors.toList());
+            List<ProblemCountVO> problemListCount = getProblemListCount(pidList);
+            for (ProblemVO problemVo : problemList) {
+                for (ProblemCountVO problemCountVo : problemListCount) {
+                    if (problemVo.getPid().equals(problemCountVo.getPid())) {
+                        problemVo.setProblemCountVo(problemCountVo);
+                        break;
+                    }
+                }
+            }
+        }
+        return page.setRecords(problemList);
+    }
 
     /**
      * 获取用户对应该题目列表中各个题目的做题情况。
@@ -234,5 +263,10 @@ public class JudgeServiceImpl extends MPJBaseServiceImpl<JudgeMapper, Judge> imp
                 .in(Judge::getPid, pidList)
                 .orderByDesc(Judge::getSubmitTime)
                 .list();
+    }
+
+    @Override
+    public List<ProblemCountVO> getProblemListCount(List<Long> pidList) {
+        return getBaseMapper().getProblemListCount(pidList);
     }
 }

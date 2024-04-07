@@ -36,7 +36,6 @@
         <dubbo.version>3.2.4</dubbo.version>
         <rocketmq.version>2.3.0</rocketmq.version>
         <mybatis-plus.version>3.5.5</mybatis-plus.version>
-        <mybatis-plus-join.version>1.4.9</mybatis-plus-join.version>
         <hutool.version>5.8.24</hutool.version>
         <swagger.version>4.1.0</swagger.version>
         <mysql.version>8.0.23</mysql.version>
@@ -90,12 +89,6 @@
                 <groupId>com.baomidou</groupId>
                 <artifactId>mybatis-plus-boot-starter</artifactId>
                 <version>${mybatis-plus.version}</version>
-            </dependency>
-            <!-- Mybatis plus Join 管理 -->
-            <dependency>
-                <groupId>com.github.yulichang</groupId>
-                <artifactId>mybatis-plus-join-boot-starter</artifactId>
-                <version>${mybatis-plus-join.version}</version>
             </dependency>
             <!--Hutool工具包-->
             <dependency>

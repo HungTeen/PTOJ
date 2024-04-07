@@ -38,9 +38,9 @@ services:
     depends_on:
       - ptoj-mysql
     environment:
-      - JVM_XMX=384m
-      - JVM_XMS=384m
-      - JVM_XMN=192m
+      - JVM_XMX=256m
+      - JVM_XMS=256m
+      - JVM_XMN=128m
       - MODE=standalone
       - SPRING_DATASOURCE_PLATFORM=mysql
       - MYSQL_SERVICE_HOST=${MYSQL_HOST:-172.21.0.3}
@@ -137,22 +137,22 @@ services:
 #      ptoj-network:
 #        ipv4_address: ${ROCKETMQ_CONSOLE_HOST:-172.21.0.12}
 
-#  ptoj-judge:
-#    #    image: criyle/go-judge
-#    build: src/judge
-#    privileged: true
-#    volumes:
-#      - ${PTOJ_DIRECTORY}/data/judge/testcase:/judge/test_case
-#      - ${PTOJ_DIRECTORY}/data/judge/log:/judge/log
-#      - ${PTOJ_DIRECTORY}/data/judge/run:/judge/run
-#      - ${PTOJ_DIRECTORY}/data/judge/spj:/judge/spj
-#    environment:
-#      - shm-size=256m
-#    ports:
-#      - "5050:5050"
-#    networks:
-#      ptoj-network:
-#        ipv4_address: ${JUDGE_HOST:-172.21.0.6}
+  ptoj-judge:
+    #    image: criyle/go-judge
+    build: src/judge
+    privileged: true
+    volumes:
+      - ${PTOJ_DIRECTORY}/data/judge/testcase:/judge/test_case
+      - ${PTOJ_DIRECTORY}/data/judge/log:/judge/log
+      - ${PTOJ_DIRECTORY}/data/judge/run:/judge/run
+      - ${PTOJ_DIRECTORY}/data/judge/spj:/judge/spj
+    environment:
+      - shm-size=256m
+    ports:
+      - "5050:5050"
+    networks:
+      ptoj-network:
+        ipv4_address: ${JUDGE_HOST:-172.21.0.6}
 
   ptoj-gateway-test:
     image: ptoj-gateway:1.0-SNAPSHOT

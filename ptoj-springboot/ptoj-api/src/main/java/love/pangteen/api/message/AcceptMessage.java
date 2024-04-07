@@ -1,8 +1,8 @@
 package love.pangteen.api.message;
 
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @program: PTOJ
@@ -11,6 +11,7 @@ import lombok.Data;
  **/
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class AcceptMessage {
 
     private String uid;

@@ -182,7 +182,7 @@ public class JudgeServiceImpl extends ServiceImpl<JudgeMapper, Judge> implements
         finalJudgeRes.setStatus(judgeResult.getCode());
         // 设置最大时间和最大空间不超过题目限制时间和空间
         // kb
-        finalJudgeRes.setMemory(judgeResult.getMemory() * 1024);
+        finalJudgeRes.setMemory(judgeResult.getMemory());
         // ms
         finalJudgeRes.setTime(judgeResult.getTime());
         // score

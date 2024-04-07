@@ -3,7 +3,7 @@ package love.pangteen.training.service.impl;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.github.yulichang.base.MPJBaseServiceImpl;
+import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import love.pangteen.api.enums.TrainingAuth;
 import love.pangteen.api.utils.RoleUtils;
 import love.pangteen.exception.StatusFailException;
@@ -11,7 +11,6 @@ import love.pangteen.training.mapper.TrainingMapper;
 import love.pangteen.training.pojo.dto.TrainingDTO;
 import love.pangteen.training.pojo.entity.Training;
 import love.pangteen.training.pojo.entity.TrainingCategory;
-import love.pangteen.training.pojo.vo.TrainingVO;
 import love.pangteen.training.service.MappingTrainingCategoryService;
 import love.pangteen.training.service.TrainingRegisterService;
 import love.pangteen.training.service.TrainingService;
@@ -30,7 +29,7 @@ import java.util.Objects;
  * @create: 2024/2/26 10:36
  **/
 @Service
-public class TrainingServiceImpl extends MPJBaseServiceImpl<TrainingMapper, Training> implements TrainingService {
+public class TrainingServiceImpl extends ServiceImpl<TrainingMapper, Training> implements TrainingService {
 
     @Resource
     private MappingTrainingCategoryService mappingTrainingCategoryService;

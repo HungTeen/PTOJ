@@ -1,10 +1,8 @@
 package love.pangteen.problem.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import love.pangteen.api.pojo.entity.Problem;
-import love.pangteen.api.pojo.vo.ProblemVO;
 import love.pangteen.problem.pojo.dto.ProblemDTO;
 import love.pangteen.problem.pojo.vo.LastAcceptedCodeVO;
 import love.pangteen.problem.pojo.vo.ProblemFullScreenListVO;
@@ -20,8 +18,6 @@ import java.util.Map;
  * @create: 2024/1/22 8:48
  **/
 public interface ProblemService extends IService<Problem> {
-
-    Page<ProblemVO> getProblemList(Integer limit, Integer currentPage, String keyword, List<Long> tagIds, Integer difficulty, String oj);
 
     IPage<Problem> getProblemList(Integer limit, Integer currentPage, String keyword, Integer auth, String oj);
 

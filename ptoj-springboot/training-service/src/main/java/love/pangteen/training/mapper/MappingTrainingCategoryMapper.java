@@ -1,6 +1,6 @@
 package love.pangteen.training.mapper;
 
-import com.github.yulichang.base.MPJBaseMapper;
+import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import love.pangteen.training.pojo.entity.MappingTrainingCategory;
 
 /**
@@ -8,5 +8,5 @@ import love.pangteen.training.pojo.entity.MappingTrainingCategory;
  * @author: PangTeen
  * @create: 2024/2/26 11:15
  **/
-public interface MappingTrainingCategoryMapper extends MPJBaseMapper<MappingTrainingCategory> {
+public interface MappingTrainingCategoryMapper extends BaseMapper<MappingTrainingCategory> {
 }

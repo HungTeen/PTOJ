@@ -1,7 +1,7 @@
 package love.pangteen.training.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.github.yulichang.base.MPJBaseService;
+import com.baomidou.mybatisplus.extension.service.IService;
 import love.pangteen.training.pojo.dto.TrainingDTO;
 import love.pangteen.training.pojo.entity.Training;
 
@@ -10,7 +10,7 @@ import love.pangteen.training.pojo.entity.Training;
  * @author: PangTeen
  * @create: 2024/2/26 10:36
  **/
-public interface TrainingService extends MPJBaseService<Training> {
+public interface TrainingService extends IService<Training> {
     IPage<Training> getTrainingList(Integer limit, Integer currentPage, String keyword);
 
     TrainingDTO getTraining(Long tid);

@@ -6,6 +6,8 @@ import love.pangteen.exception.StatusForbiddenException;
 import love.pangteen.problem.service.ProblemService;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
+
 /**
  * @program: PTOJ
  * @author: PangTeen
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class SubmitUtils {
 
+    @Resource
     private ProblemService problemService;
 
     public void initCommonSubmission(String problemId, Long gid, Judge judge) throws StatusForbiddenException {
