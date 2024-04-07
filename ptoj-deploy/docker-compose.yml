@@ -65,24 +65,6 @@ services:
       ptoj-network:
         ipv4_address: ${NACOS_HOST:-172.21.0.4}
 
-    #  ptoj-mq:
-    #    image: rabbitmq:3.12.12-management
-    #    container_name: ptoj-mq
-    #    hostname: ptoj-mq
-    #    restart: unless-stopped
-    #    volumes:
-    ##      - ${PTOJ_DIRECTORY}/data/rabbitmq/plugins:/plugins
-    #      - ${PTOJ_DIRECTORY}/data/rabbitmq/data:/var/lib/rabbitmq
-    #    environment:
-    #      - RABBITMQ_DEFAULT_USER=root
-    #      - RABBITMQ_DEFAULT_PASS=123456
-    #    ports:
-    #      - "15672:15672"
-    #      - "5672:5672"
-    #    networks:
-    #      ptoj-network:
-    #        ipv4_address: ${MQ_HOST:-172.21.0.5}
-
   ptoj-rocketmq-namesrv:
     image: apache/rocketmq:5.2.0
     container_name: ptoj-rocketmq-namesrv
@@ -122,62 +104,47 @@ services:
       ptoj-network:
         ipv4_address: ${ROCKETMQ_BROKER_HOST:-172.21.0.11}
 
-#  ptoj-mqconsole:
-#    image: apacherocketmq/rocketmq-dashboard:latest
-#    container_name: ptoj-mqconsole
-#    restart: unless-stopped
-#    #    network_mode: host
-#    depends_on:
-#      - ptoj-rocketmq-namesrv
-#    environment:
-#      JAVA_OPTS: -Dserver.port=19876 -Drocketmq.namesrv.addr=ptoj-rocketmq-namesrv:9876 -Dcom.rocketmq.sendMessageWithVIPChannel=false
-#    ports:
-#      - "19876:19876"
-#    networks:
-#      ptoj-network:
-#        ipv4_address: ${ROCKETMQ_CONSOLE_HOST:-172.21.0.12}
-
-  ptoj-judge:
-    #    image: criyle/go-judge
-    build: src/judge
-    privileged: true
-    volumes:
-      - ${PTOJ_DIRECTORY}/data/judge/testcase:/judge/test_case
-      - ${PTOJ_DIRECTORY}/data/judge/log:/judge/log
-      - ${PTOJ_DIRECTORY}/data/judge/run:/judge/run
-      - ${PTOJ_DIRECTORY}/data/judge/spj:/judge/spj
-    environment:
-      - shm-size=256m
-    ports:
-      - "5050:5050"
-    networks:
-      ptoj-network:
-        ipv4_address: ${JUDGE_HOST:-172.21.0.6}
-
-  ptoj-gateway-test:
-    image: ptoj-gateway:1.0-SNAPSHOT
-    container_name: ptoj-gateway-test
+  ptoj-mqconsole:
+    image: apacherocketmq/rocketmq-dashboard:latest
+    container_name: ptoj-mqconsole
     restart: unless-stopped
+    #    network_mode: host
     depends_on:
-      - ptoj-mysql
-      - ptoj-nacos
-      - ptoj-redis
+      - ptoj-rocketmq-namesrv
     environment:
-      - REDIS_HOST=${REDIS_HOST:-172.21.0.2}
-      - REDIS_PORT=${REDIS_PORT:-6379}
-      - REDIS_PASSWORD=${REDIS_PASSWORD:-123456}
-      - NACOS_HOST=${NACOS_HOST:-172.21.0.4}
-      - NACOS_PORT=${NACOS_PORT:-8848}
-      - NACOS_USERNAME=${NACOS_USERNAME:-nacos}
-      - NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
+      JAVA_OPTS: -Dserver.port=19876 -Drocketmq.namesrv.addr=ptoj-rocketmq-namesrv:9876 -Dcom.rocketmq.sendMessageWithVIPChannel=false
     ports:
-      - "6688:6688"
+      - "19876:19876"
     networks:
       ptoj-network:
-        ipv4_address: ${GATEWAY_HOST:-172.21.0.20}
+        ipv4_address: ${ROCKETMQ_CONSOLE_HOST:-172.21.0.12}
+
+
+  ptoj-frontend:
+    build: src/frontend
+    container_name: ptoj-frontend
+    restart: unless-stopped
+    # 开启https，请提供证书
+    #volumes:
+    #  - ./server.crt:/etc/nginx/etc/crt/server.crt
+    #  - ./server.key:/etc/nginx/etc/crt/server.key
+    # 修改前端logo
+    #  - ./logo.a0924d7d.png:/usr/share/nginx/html/assets/img/logo.a0924d7d.png
+    #  - ./backstage.8bce8c6e.png:/usr/share/nginx/html/assets/img/backstage.8bce8c6e.png
+    environment:
+      - SERVER_NAME=localhost # 域名(例如baidu.com)或localhost(本地)
+      - BACKEND_SERVER_HOST=${GATEWAY_HOST:-172.21.0.20} # backend后端服务地址
+      - BACKEND_SERVER_PORT=6688 # backend后端服务端口号
+      - USE_HTTPS=false # 使用https请设置为true
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      ptoj-network:
+        ipv4_address: ${FRONTEND_HOST:-172.21.0.9}
 
   ptoj-gateway:
-    image: ptoj-gateway:latest
+    image: ptoj-gateway:1.0-SNAPSHOT
     container_name: ptoj-gateway
     restart: unless-stopped
     depends_on:
@@ -198,15 +165,15 @@ services:
       ptoj-network:
         ipv4_address: ${GATEWAY_HOST:-172.21.0.20}
 
+
   ptoj-user-service:
-    image: user-service:latest
+    image: user-service:1.0-SNAPSHOT
     container_name: user-service
     restart: unless-stopped
     depends_on:
       - ptoj-mysql
       - ptoj-nacos
       - ptoj-redis
-#      - ptoj-gateway
       - ptoj-rocketmq-namesrv
       - ptoj-rocketmq-broker
     environment:
@@ -232,7 +199,7 @@ services:
         ipv4_address: ${USER_SERVICE_HOST:-172.21.0.21}
 
   ptoj-problem-service:
-    image: problem-service:latest
+    image: problem-service:1.0-SNAPSHOT
     container_name: problem-service
     restart: unless-stopped
     depends_on:
@@ -253,72 +220,44 @@ services:
       - NACOS_PORT=${NACOS_PORT:-8848}
       - NACOS_USERNAME=${NACOS_USERNAME:-nacos}
       - NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
+      - ROCKETMQ_HOST=${ROCKETMQ_SERVER_HOST:-172.21.0.4}
+      - ROCKETMQ_PORT=${ROCKETMQ_SERVER_PORT:-9876}
+      - ROCKETMQ_GROUP=${ROCKETMQ_GROUP:-ptoj}
     ports:
       - "8001:8001"
     networks:
       ptoj-network:
         ipv4_address: ${PROBLEM_SERVICE_HOST:-172.21.0.22}
 
-  ptoj-submit-service:
-    image: submit-service:latest
-    container_name: submit-service
-    restart: unless-stopped
-    depends_on:
-      - ptoj-mysql
-      - ptoj-nacos
-      - ptoj-redis
-      - ptoj-gateway
-      - ptoj-problem-service
-    environment:
-      - REDIS_HOST=${REDIS_HOST:-172.21.0.2}
-      - REDIS_PORT=${REDIS_PORT:-6379}
-      - REDIS_PASSWORD=${REDIS_PASSWORD:-123456}
-      - MYSQL_HOST=${MYSQL_HOST:-172.21.0.3}
-      - MYSQL_PORT=${MYSQL_PORT:-3306}
-      - MYSQL_DATABASE_NAME=${MYSQL_DATABASE_JUDGE:-ptoj-judge}
-      - MYSQL_USERNAME=root
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-123456}
-      - NACOS_HOST=${NACOS_HOST:-172.21.0.4}
-      - NACOS_PORT=${NACOS_PORT:-8848}
-      - NACOS_USERNAME=${NACOS_USERNAME:-nacos}
-      - NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
-      - ROCKETMQ_HOST=${ROCKETMQ_SERVER_HOST:-172.21.0.4}
-      - ROCKETMQ_PORT=${ROCKETMQ_SERVER_PORT:-9876}
-      - ROCKETMQ_GROUP=${ROCKETMQ_GROUP:-ptoj}
-    ports:
-      - "8002:8002"
-    networks:
-      ptoj-network:
-        ipv4_address: ${SUBMIT_SERVICE_HOST:-172.21.0.23}
 
-  ptoj-training-service:
-    image: training-service:latest
-    container_name: training-service
-    restart: unless-stopped
-    depends_on:
-      - ptoj-mysql
-      - ptoj-nacos
-      - ptoj-redis
-      - ptoj-gateway
-      - ptoj-problem-service
-    environment:
-      - REDIS_HOST=${REDIS_HOST:-172.21.0.2}
-      - REDIS_PORT=${REDIS_PORT:-6379}
-      - REDIS_PASSWORD=${REDIS_PASSWORD:-123456}
-      - MYSQL_HOST=${MYSQL_HOST:-172.21.0.3}
-      - MYSQL_PORT=${MYSQL_PORT:-3306}
-      - MYSQL_DATABASE_NAME=${MYSQL_DATABASE_TRAINING:-ptoj-training}
-      - MYSQL_USERNAME=root
-      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-123456}
-      - NACOS_HOST=${NACOS_HOST:-172.21.0.4}
-      - NACOS_PORT=${NACOS_PORT:-8848}
-      - NACOS_USERNAME=${NACOS_USERNAME:-nacos}
-      - NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
-    ports:
-      - "8003:8003"
-    networks:
-      ptoj-network:
-        ipv4_address: ${TRAINING_SERVICE_HOST:-172.21.0.24}
+#  ptoj-training-service:
+#    image: training-service:latest
+#    container_name: training-service
+#    restart: unless-stopped
+#    depends_on:
+#      - ptoj-mysql
+#      - ptoj-nacos
+#      - ptoj-redis
+#      - ptoj-gateway
+#      - ptoj-problem-service
+#    environment:
+#      - REDIS_HOST=${REDIS_HOST:-172.21.0.2}
+#      - REDIS_PORT=${REDIS_PORT:-6379}
+#      - REDIS_PASSWORD=${REDIS_PASSWORD:-123456}
+#      - MYSQL_HOST=${MYSQL_HOST:-172.21.0.3}
+#      - MYSQL_PORT=${MYSQL_PORT:-3306}
+#      - MYSQL_DATABASE_NAME=${MYSQL_DATABASE_TRAINING:-ptoj-training}
+#      - MYSQL_USERNAME=root
+#      - MYSQL_PASSWORD=${MYSQL_PASSWORD:-123456}
+#      - NACOS_HOST=${NACOS_HOST:-172.21.0.4}
+#      - NACOS_PORT=${NACOS_PORT:-8848}
+#      - NACOS_USERNAME=${NACOS_USERNAME:-nacos}
+#      - NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
+#    ports:
+#      - "8003:8003"
+#    networks:
+#      ptoj-network:
+#        ipv4_address: ${TRAINING_SERVICE_HOST:-172.21.0.24}
 
   ptoj-judge-server:
     image: judge-service:latest
@@ -336,7 +275,7 @@ services:
       - REDIS_PASSWORD=${REDIS_PASSWORD:-123456}
       - MYSQL_HOST=${MYSQL_HOST:-172.21.0.3}
       - MYSQL_PORT=${MYSQL_PORT:-3306}
-      - MYSQL_DATABASE_NAME=${MYSQL_DATABASE_JUDGE:-ptoj-judge}
+      - MYSQL_DATABASE_NAME=${MYSQL_DATABASE_PROBLEM:-ptoj-problem}
       - MYSQL_USERNAME=root
       - MYSQL_PASSWORD=${MYSQL_PASSWORD:-123456}
       - NACOS_HOST=${NACOS_HOST:-172.21.0.4}
@@ -353,6 +292,23 @@ services:
     networks:
       ptoj-network:
         ipv4_address: ${JUDGE_SERVER_1_HOST:-172.21.0.30}
+
+#  ptoj-judge:
+#    #    image: criyle/go-judge
+#    build: src/judge
+#    privileged: true
+#    volumes:
+#      - ${PTOJ_DIRECTORY}/data/judge/testcase:/judge/test_case
+#      - ${PTOJ_DIRECTORY}/data/judge/log:/judge/log
+#      - ${PTOJ_DIRECTORY}/data/judge/run:/judge/run
+#      - ${PTOJ_DIRECTORY}/data/judge/spj:/judge/spj
+#    environment:
+#      - shm-size=256m
+#    ports:
+#      - "5050:5050"
+#    networks:
+#      ptoj-network:
+#        ipv4_address: ${JUDGE_HOST:-172.21.0.6}
 
 #  ptoj-es:
 #    image: elasticsearch:7.14.0
@@ -371,6 +327,24 @@ services:
 #    networks:
 #      ptoj-network:
 #        ipv4_address: ${ES:-172.21.0.6}
+
+    #  ptoj-mq:
+    #    image: rabbitmq:3.12.12-management
+    #    container_name: ptoj-mq
+    #    hostname: ptoj-mq
+    #    restart: unless-stopped
+    #    volumes:
+    ##      - ${PTOJ_DIRECTORY}/data/rabbitmq/plugins:/plugins
+    #      - ${PTOJ_DIRECTORY}/data/rabbitmq/data:/var/lib/rabbitmq
+    #    environment:
+    #      - RABBITMQ_DEFAULT_USER=root
+    #      - RABBITMQ_DEFAULT_PASS=123456
+    #    ports:
+    #      - "15672:15672"
+    #      - "5672:5672"
+    #    networks:
+    #      ptoj-network:
+    #        ipv4_address: ${MQ_HOST:-172.21.0.5}
 
 networks:
   ptoj-network:

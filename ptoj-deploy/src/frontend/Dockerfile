@@ -6,8 +6,6 @@ COPY default.conf.ssl.template /etc/nginx/conf.d/default.conf.ssl.template
 
 ADD html/ /usr/share/nginx/html/
 
-ADD scrollBoard/ /usr/share/nginx/scrollBoard/
-
 COPY ./run.sh /docker-entrypoint.sh
 
 RUN chmod a+x /docker-entrypoint.sh
