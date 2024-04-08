@@ -22,12 +22,12 @@ server {
 
 	root /usr/share/nginx/html;
     location /api{
-		proxy_pass http://${BACKEND_SERVER_HOST}:${BACKEND_SERVER_PORT}; # 填写你的后端地址和端口
+		proxy_pass http://${SERVER_HOST}:${SERVER_PORT}; # 填写你的后端地址和端口
         proxy_set_header X-Real-IP $remote_addr;
         proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
 	    proxy_set_header   Host                 $http_host;
         proxy_set_header   X-Forwarded-Proto    $scheme;
-          
+        rewrite /api/(.*)  /$1 break;
         client_max_body_size 512M;
     }
     location ~ .*\.(js|json|css)$ {

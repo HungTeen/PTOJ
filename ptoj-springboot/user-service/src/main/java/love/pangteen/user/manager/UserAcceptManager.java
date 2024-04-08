@@ -7,7 +7,6 @@ import love.pangteen.utils.RedisUtils;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -46,6 +45,8 @@ public class UserAcceptManager {
             } finally {
                 redisUtils.unlock(RANK_LOCK);
             }
+        } else {
+            redisUtils.expire(KEY, 10000);
         }
     }
 

@@ -10,8 +10,7 @@
 CREATE
 DATABASE IF NOT EXISTS `ptoj-training` DEFAULT CHARACTER SET utf8;
 
-USE
-`ptoj-training`;
+USE `ptoj-training`;
 
 /**
   `training`：题单表

@@ -153,8 +153,12 @@ public class RedisUtils {
 
     /* List */
 
-    public void lPushRight(String key, Object value) {
-        redisTemplate.opsForList().rightPush(key, value);
+    public void lPushLeft(String key, Object value) {
+        redisTemplate.opsForList().leftPush(key, value);
+    }
+
+    public void lPop(String key, Object value) {
+        redisTemplate.opsForList().remove(key, 1, value);
     }
 
     public List<Object> lRange(String key, long start, long end) {

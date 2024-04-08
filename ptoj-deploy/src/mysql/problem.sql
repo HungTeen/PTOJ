@@ -10,8 +10,7 @@
 CREATE
     DATABASE IF NOT EXISTS `ptoj-problem` DEFAULT CHARACTER SET utf8;
 
-USE
-    `ptoj-problem`;
+USE `ptoj-problem`;
 
 /**
   `problem`：题目表

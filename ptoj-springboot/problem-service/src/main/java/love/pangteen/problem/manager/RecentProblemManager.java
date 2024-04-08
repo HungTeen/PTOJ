@@ -1,6 +1,5 @@
 package love.pangteen.problem.manager;
 
-import cn.hutool.core.lang.Pair;
 import lombok.extern.slf4j.Slf4j;
 import love.pangteen.problem.pojo.vo.RecentUpdatedProblemVO;
 import love.pangteen.problem.service.ProblemService;
@@ -33,31 +32,37 @@ public class RecentProblemManager {
     private ProblemService problemService;
 
     @PostConstruct
-    void init(){
+    void assertInit(){
         if(! initialized()){
             redisUtils.lock(RANK_LOCK);
             try{
                 if(! initialized()){
                     List<Long> userList = problemService.getProblemsByCreateDate();
-                    userList.forEach(this::createProblem);
+                    userList.forEach(pid -> {
+                        this.createProblem(pid, false);
+                    });
                 }
             } catch (Exception ignored){
                 log.error(ignored.getMessage());
             } finally {
                 redisUtils.unlock(RANK_LOCK);
             }
+        } else {
+            redisUtils.expire(KEY, 10000);
         }
     }
 
-    public void createProblem(Long pid){
+    public void createProblem(Long pid, boolean check){
+        if(check) assertInit();
         if(! redisUtils.lContains(KEY, pid)){
-            redisUtils.lPushRight(KEY, pid);
+            redisUtils.lPushLeft(KEY, pid);
         }
     }
 
     public void removeProblem(Long pid){
+        assertInit();
         if(! redisUtils.lContains(KEY, pid)){
-            redisUtils.lPushRight(KEY, pid);
+            redisUtils.lPop(KEY, pid);
         }
     }
 
@@ -66,6 +71,7 @@ public class RecentProblemManager {
     }
 
     public List<RecentUpdatedProblemVO> getRecentUpdatedProblemList() {
+        assertInit();
         return redisUtils.lRange(KEY, 0, PROBLEM_COUNT).stream()
                 .map(pid -> {
                     RecentUpdatedProblemVO vo = new RecentUpdatedProblemVO();

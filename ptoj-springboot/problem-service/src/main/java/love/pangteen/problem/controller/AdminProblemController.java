@@ -60,7 +60,7 @@ public class AdminProblemController {
     @PostMapping("")
     public CommonResult<Void> addProblem(@Validated @RequestBody ProblemDTO problemDto) {
         if(problemService.addProblem(problemDto)){
-            recentProblemManager.createProblem(problemDto.getProblem().getId());
+            recentProblemManager.createProblem(problemDto.getProblem().getId(), true);
         }
         return CommonResult.success();
     }
