@@ -7,9 +7,11 @@ import love.pangteen.api.pojo.dto.TestJudgeDTO;
 import love.pangteen.api.pojo.dto.ToJudgeDTO;
 import love.pangteen.api.pojo.entity.Judge;
 import love.pangteen.api.pojo.entity.Problem;
+import love.pangteen.api.pojo.entity.TestJudgeContext;
 import love.pangteen.api.service.IDubboProblemService;
 import love.pangteen.judge.manager.JudgeManager;
 import love.pangteen.judge.service.JudgeService;
+import love.pangteen.manager.TestJudgeContentManager;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.apache.rocketmq.spring.annotation.RocketMQMessageListener;
 import org.apache.rocketmq.spring.core.RocketMQListener;
@@ -39,21 +41,25 @@ public class JudgeMessageConsumer implements RocketMQListener<JudgeMessage> {
     @Resource
     private JudgeManager judgeManager;
 
+    @Resource
+    private TestJudgeContentManager testJudgeContentManager;
+
     @Override
     public void onMessage(JudgeMessage msg) {
         if(msg.getIsLocalTest()){
             // 自测代码。
             Problem problem = problemService.getById(msg.getPid());
             if(problem != null){
+                TestJudgeContext context = testJudgeContentManager.getTestJudgeContext(msg.getUniqueKey());
                 TestJudgeDTO testJudgeDTO = new TestJudgeDTO();
                 testJudgeDTO.setMemoryLimit(problem.getMemoryLimit())
                         .setTimeLimit(problem.getTimeLimit())
                         .setStackLimit(problem.getStackLimit())
-                        .setCode(msg.getCode())
-                        .setLanguage(msg.getLanguage())
+                        .setCode(context.getCode())
+                        .setLanguage(context.getLanguage())
                         .setUniqueKey(msg.getUniqueKey())
-                        .setExpectedOutput(msg.getExpectedOutput())
-                        .setTestCaseInput(msg.getUserInput())
+                        .setExpectedOutput(context.getExpectedOutput())
+                        .setTestCaseInput(context.getUserInput())
                         .setProblemJudgeMode(problem.getJudgeMode())
                         .setIsRemoveEndBlank(problem.getIsRemoveEndBlank() || problem.getIsRemote())
                         .setIsFileIO(problem.getIsFileIO())

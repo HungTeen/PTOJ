@@ -7,11 +7,13 @@ import love.pangteen.api.message.JudgeMessage;
 import love.pangteen.api.message.SubmitMessage;
 import love.pangteen.api.pojo.entity.Judge;
 import love.pangteen.api.pojo.entity.Problem;
+import love.pangteen.api.pojo.entity.TestJudgeContext;
 import love.pangteen.api.pojo.entity.TestJudgeResult;
 import love.pangteen.api.utils.JudgeUtils;
 import love.pangteen.api.utils.RoleUtils;
 import love.pangteen.exception.StatusFailException;
 import love.pangteen.exception.StatusNotFoundException;
+import love.pangteen.manager.TestJudgeContentManager;
 import love.pangteen.pojo.AccountProfile;
 import love.pangteen.problem.pojo.dto.SubmitJudgeDTO;
 import love.pangteen.problem.pojo.dto.TestJudgeDTO;
@@ -24,7 +26,6 @@ import love.pangteen.problem.utils.JudgeValidateUtils;
 import love.pangteen.problem.utils.SubmitUtils;
 import love.pangteen.utils.AccountUtils;
 import love.pangteen.utils.IpUtils;
-import love.pangteen.utils.RedisUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -57,7 +58,7 @@ public class SubmitServiceImpl implements SubmitService {
     private RocketMQProducer rocketMQProducer;
 
     @Resource
-    private RedisUtils redisUtils;
+    private TestJudgeContentManager testJudgeContentManager;
 
     /**
      * 超级管理员与题目管理员有权限查看代码。<br>
@@ -241,15 +242,17 @@ public class SubmitServiceImpl implements SubmitService {
         rocketMQProducer.sendJudgeTask(JudgeMessage.builder()
                 .isLocalTest(true)
                 .pid(testJudgeDto.getPid())
+                .uniqueKey(uniqueKey)
+                .build());
+        testJudgeContentManager.saveTestJudgeContext(uniqueKey, TestJudgeContext.builder()
                 .code(testJudgeDto.getCode())
                 .language(testJudgeDto.getLanguage())
-                .uniqueKey(uniqueKey)
-                .expectedOutput(testJudgeDto.getExpectedOutput())
                 .userInput(testJudgeDto.getUserInput())
+                .expectedOutput(testJudgeDto.getExpectedOutput())
                 .build());
-        redisUtils.set(uniqueKey, TestJudgeResult.builder()
+        testJudgeContentManager.saveTestJudgeResult(uniqueKey, TestJudgeResult.builder()
                 .status(JudgeStatus.STATUS_PENDING.getStatus())
-                .build(), 10 * 60);
+                .build());
         return uniqueKey;
     }
 

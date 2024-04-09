@@ -14,6 +14,7 @@ import love.pangteen.api.pojo.vo.ProblemCountVO;
 import love.pangteen.api.pojo.vo.ProblemVO;
 import love.pangteen.api.utils.JudgeUtils;
 import love.pangteen.exception.StatusFailException;
+import love.pangteen.manager.TestJudgeContentManager;
 import love.pangteen.pojo.AccountProfile;
 import love.pangteen.problem.mapper.JudgeMapper;
 import love.pangteen.problem.mapper.ProblemMapper;
@@ -25,7 +26,6 @@ import love.pangteen.problem.pojo.vo.TestJudgeVO;
 import love.pangteen.problem.service.JudgeService;
 import love.pangteen.problem.service.ProblemService;
 import love.pangteen.utils.AccountUtils;
-import love.pangteen.utils.RedisUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 
@@ -44,7 +44,7 @@ import java.util.stream.Collectors;
 public class JudgeServiceImpl extends ServiceImpl<JudgeMapper, Judge> implements JudgeService {
 
     @Resource
-    private RedisUtils redisUtils;
+    private TestJudgeContentManager testJudgeContentManager;
 
     @Resource
     private ProblemService problemService;
@@ -218,7 +218,7 @@ public class JudgeServiceImpl extends ServiceImpl<JudgeMapper, Judge> implements
 
     @Override
     public TestJudgeVO getTestJudgeResult(String testJudgeKey) {
-        TestJudgeResult testJudgeRes = (TestJudgeResult) redisUtils.get(testJudgeKey);
+        TestJudgeResult testJudgeRes = testJudgeContentManager.getTestJudgeResult(testJudgeKey);
         if (testJudgeRes == null) {
             throw new StatusFailException("查询错误！当前在线调试任务不存在！");
         }
@@ -234,7 +234,8 @@ public class JudgeServiceImpl extends ServiceImpl<JudgeMapper, Judge> implements
         testJudgeVo.setTime(testJudgeRes.getTime());
         testJudgeVo.setStderr(testJudgeRes.getStderr());
         testJudgeVo.setProblemJudgeMode(testJudgeRes.getProblemJudgeMode());
-        redisUtils.del(testJudgeKey);
+        testJudgeContentManager.delTestJudgeContext(testJudgeKey);
+        testJudgeContentManager.delTestJudgeResult(testJudgeKey);
         return testJudgeVo;
     }
 

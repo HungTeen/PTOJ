@@ -9,8 +9,8 @@ import love.pangteen.api.pojo.entity.Judge;
 import love.pangteen.api.pojo.entity.TestJudgeResult;
 import love.pangteen.judge.producer.RocketMQProducer;
 import love.pangteen.judge.service.JudgeService;
+import love.pangteen.manager.TestJudgeContentManager;
 import love.pangteen.result.CommonResult;
-import love.pangteen.utils.RedisUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -27,16 +27,12 @@ public class JudgeManager {
     private JudgeService judgeService;
 
     @Resource
-    private RedisUtils redisUtils;
+    private TestJudgeContentManager testJudgeContentManager;
 
     @Resource
     private RocketMQProducer rocketMQProducer;
 
     public CommonResult<Void> submitProblemJudge(ToJudgeDTO toJudgeDTO) {
-//        if (!Objects.equals(toJudgeDTO.getToken(), judgeToken)) {
-//            return CommonResult.errorResponse("对不起！您使用的判题服务调用凭证不正确！访问受限！", ResultStatus.ACCESS_DENIED);
-//        }
-
         Judge judge = toJudgeDTO.getJudge();
 
         if (judge == null || judge.getSubmitId() == null || judge.getUid() == null || judge.getPid() == null) {
@@ -67,19 +63,16 @@ public class JudgeManager {
                         .memory(0L)
                         .stderr("调用参数错误！请检查您的调用参数！")
                         .build();
-                redisUtils.set(testJudgeDTO.getUniqueKey(), result, 60);
+                testJudgeContentManager.saveTestJudgeResult(testJudgeDTO.getUniqueKey(), result);
             }
             return CommonResult.clientError("调用参数错误！请检查您的调用参数！");
         }
 
-//        if (!Objects.equals(testJudgeReq.getToken(), judgeToken)) {
-//            return CommonResult.clientError("对不起！您使用的判题服务调用凭证不正确！访问受限！", ResultStatus.ACCESS_DENIED);
-//        }
         TestJudgeResult result = judgeService.testJudge(testJudgeDTO);
         result.setInput(testJudgeDTO.getTestCaseInput());
         result.setExpectedOutput(testJudgeDTO.getExpectedOutput());
         result.setProblemJudgeMode(testJudgeDTO.getProblemJudgeMode());
-        redisUtils.set(testJudgeDTO.getUniqueKey(), result, 60);
+        testJudgeContentManager.saveTestJudgeResult(testJudgeDTO.getUniqueKey(), result);
 
         return CommonResult.successMsg("自测成功");
     }

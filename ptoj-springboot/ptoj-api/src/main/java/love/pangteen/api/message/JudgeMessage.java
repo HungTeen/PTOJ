@@ -36,24 +36,4 @@ public class JudgeMessage {
      */
     String uniqueKey;
 
-    /**
-     * 代码。
-     */
-    private String code;
-
-    /**
-     * 代码语言。
-     */
-    private String language;
-
-    /**
-     * 用户输入。
-     */
-    private String userInput;
-
-    /**
-     * 预期输出。
-     */
-    private String expectedOutput;
-
 }

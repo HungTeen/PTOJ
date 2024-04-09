@@ -56,14 +56,21 @@ services:
       - ${NACOS_PORT:-8848}:8848
       - "9848:9848"
       - "9849:9849"
-    #    healthcheck:
-    #      test: curl -f http://${NACOS_HOST:-172.21.0.4}:8848/nacos/index.html || exit 1
-    #      interval: 6s
-    #      timeout: 10s
-    #      retries: 10
     networks:
       ptoj-network:
         ipv4_address: ${NACOS_HOST:-172.21.0.4}
+
+  ptoj-sentinel:
+    build: src/sentinel
+    container_name: ptoj-sentinel
+    restart: unless-stopped
+    environment:
+      JAVA_OPTS: -Dsentinel.dashboard.auth.username=${SENTINEL_USERNAME:-sentinel} -Dsentinel.dashboard.auth.password=${SENTINEL_PASSWORD:-123456}
+    ports:
+      - ${SENTINEL_PORT:-8858}:8858
+    networks:
+      ptoj-network:
+        ipv4_address: ${SENTINEL_HOST:-172.21.0.5}
 
   ptoj-rocketmq-namesrv:
     image: apache/rocketmq:5.2.0
