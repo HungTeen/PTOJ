@@ -13,3 +13,6 @@ ptoj:
     port: 8848
     username: nacos
     password: nacos
+  sentinel:
+    host: localhost
+    port: 8858

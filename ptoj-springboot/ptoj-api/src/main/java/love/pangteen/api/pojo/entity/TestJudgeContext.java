@@ -1,7 +1,9 @@
 package love.pangteen.api.pojo.entity;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * @program: PTOJ
@@ -10,7 +12,8 @@ import lombok.Data;
  **/
 @Data
 @Builder
-
+@AllArgsConstructor
+@NoArgsConstructor
 public class TestJudgeContext {
 
     /**

@@ -161,6 +161,8 @@ services:
       - NACOS_PORT=${NACOS_PORT:-8848}
       - NACOS_USERNAME=${NACOS_USERNAME:-nacos}
       - NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
+      - SENTINEL_HOST=${SENTINEL_HOST:-localhost}
+      - SENTINEL_PORT=${SENTINEL_PORT:-8858}
     ports:
       - "6688:6688"
     networks:

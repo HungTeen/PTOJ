@@ -59,6 +59,18 @@ services:
       ptoj-network:
         ipv4_address: ${NACOS_HOST:-172.21.0.4}
 
+  ptoj-sentinel:
+    image: pangteen/sentinel-dashboard:latest
+    container_name: ptoj-sentinel
+    restart: unless-stopped
+    environment:
+      JAVA_OPTS: -Dsentinel.dashboard.auth.username=${SENTINEL_USERNAME:-sentinel} -Dsentinel.dashboard.auth.password=${SENTINEL_PASSWORD:-123456}
+    ports:
+      - ${SENTINEL_PORT:-8858}:8858
+    networks:
+      ptoj-network:
+        ipv4_address: ${SENTINEL_HOST:-172.21.0.5}
+
   ptoj-rocketmq-namesrv:
     image: apache/rocketmq:5.2.0
     container_name: ptoj-rocketmq-namesrv
@@ -132,6 +144,8 @@ services:
       - NACOS_PORT=${NACOS_PORT:-8848}
       - NACOS_USERNAME=${NACOS_USERNAME:-nacos}
       - NACOS_PASSWORD=${NACOS_PASSWORD:-nacos}
+      - SENTINEL_HOST=${SENTINEL_HOST:-localhost}
+      - SENTINEL_PORT=${SENTINEL_PORT:-8858}
     ports:
       - "6688:6688"
     networks:

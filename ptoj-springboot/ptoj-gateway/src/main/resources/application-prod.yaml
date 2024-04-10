@@ -17,3 +17,6 @@ ptoj:
     port: ${NACOS_PORT:8848}
     username: ${NACOS_USERNAME:nacos}
     password: ${NACOS_PASSWORD:nacos}
+  sentinel:
+    host: ${SENTINEL_HOST:localhost}
+    port: ${SENTINEL_PORT:8858}
