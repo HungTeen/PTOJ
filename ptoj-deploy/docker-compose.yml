@@ -133,6 +133,7 @@ services:
     restart: unless-stopped
     volumes:
       - ${PTOJ_DIRECTORY}/data/frontend/crt:/etc/nginx/etc/crt
+      - ${PTOJ_DIRECTORY}/data/frontend/html:/usr/share/nginx/html
     environment:
       - SERVER_NAME=${SERVER_NAME:-localhost} # 域名(例如baidu.com)或localhost(本地)
       - SERVER_HOST=${GATEWAY_HOST:-172.21.0.20} # backend后端服务地址

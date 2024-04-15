@@ -4,7 +4,7 @@ COPY default.conf.template /etc/nginx/conf.d/default.conf.template
 
 COPY default.conf.ssl.template /etc/nginx/conf.d/default.conf.ssl.template
 
-ADD html/ /usr/share/nginx/html/
+#ADD html/ /usr/share/nginx/html/
 
 COPY ./run.sh /docker-entrypoint.sh
 
