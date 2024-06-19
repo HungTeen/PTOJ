@@ -4,11 +4,12 @@ import cn.hutool.core.lang.Pair;
 import lombok.extern.slf4j.Slf4j;
 import love.pangteen.api.service.IDubboJudgeService;
 import love.pangteen.utils.RedisUtils;
-import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -58,11 +59,18 @@ public class UserAcceptManager {
         redisUtils.zAdd(KEY, uid, - count);
     }
 
-    public List<ZSetOperations.TypedTuple<String>> getTopUsers(){
-        assertInit();
-        return redisUtils.zRange(KEY, 0, USER_COUNT).stream().map(tuple -> {
-            return ZSetOperations.TypedTuple.of((String) tuple.getValue(), - tuple.getScore());
-        }).collect(Collectors.toList());
+    public List<Pair<String, Long>> getTopUsers(Boolean cached){
+        if(cached){
+            assertInit();
+            return redisUtils.zRange(KEY, 0, USER_COUNT).stream().map(tuple -> {
+                return Pair.of((String) tuple.getValue(), - Objects.requireNonNull(tuple.getScore()).longValue());
+            }).collect(Collectors.toList());
+        } else {
+            return dubboJudgeService.getAcceptList().stream()
+                    .sorted(Comparator.comparingLong(Pair::getValue))
+                    .limit(USER_COUNT)
+                    .collect(Collectors.toList());
+        }
     }
 
     public boolean initialized(){

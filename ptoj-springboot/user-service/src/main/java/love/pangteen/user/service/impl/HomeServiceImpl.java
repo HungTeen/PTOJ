@@ -1,5 +1,6 @@
 package love.pangteen.user.service.impl;
 
+import cn.hutool.core.lang.Pair;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import lombok.extern.slf4j.Slf4j;
@@ -9,15 +10,12 @@ import love.pangteen.user.pojo.vo.AnnouncementVO;
 import love.pangteen.user.pojo.vo.SubmissionStatisticsVO;
 import love.pangteen.user.service.HomeService;
 import love.pangteen.user.service.UserInfoService;
-import love.pangteen.utils.RedisUtils;
 import org.springframework.beans.BeanUtils;
-import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,13 +36,13 @@ public class HomeServiceImpl implements HomeService {
     private UserInfoService userInfoService;
 
     @Override
-    public List<ACMRankVO> getRecentSevenACRank() {
-        List<ZSetOperations.TypedTuple<String>> topUsers = userAcceptManager.getTopUsers();
+    public List<ACMRankVO> getRecentSevenACRank(Boolean cached) {
+        List<Pair<String, Long>> topUsers = userAcceptManager.getTopUsers(cached);
         List<ACMRankVO> acmRankVOS = topUsers.stream().map(tuple -> {
             ACMRankVO acmRankVO = new ACMRankVO();
             BeanUtils.copyProperties(userInfoService.getById(tuple.getValue()), acmRankVO);
-            acmRankVO.setUid(tuple.getValue());
-            acmRankVO.setAc(tuple.getScore().intValue());
+            acmRankVO.setUid(tuple.getKey());
+            acmRankVO.setAc(tuple.getValue().intValue());
             return acmRankVO;
         }).collect(Collectors.toList());
         return acmRankVOS;

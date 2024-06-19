@@ -68,6 +68,7 @@ services:
       JAVA_OPTS: -Dsentinel.dashboard.auth.username=${SENTINEL_USERNAME:-sentinel} -Dsentinel.dashboard.auth.password=${SENTINEL_PASSWORD:-123456}
     ports:
       - ${SENTINEL_PORT:-8858}:8858
+      - "8719:8719"
     networks:
       ptoj-network:
         ipv4_address: ${SENTINEL_HOST:-172.21.0.5}
@@ -125,7 +126,6 @@ services:
     networks:
       ptoj-network:
         ipv4_address: ${ROCKETMQ_CONSOLE_HOST:-172.21.0.12}
-
 
   ptoj-frontend:
     build: src/frontend
@@ -299,22 +299,22 @@ services:
       ptoj-network:
         ipv4_address: ${JUDGE_SERVER_1_HOST:-172.21.0.30}
 
-#  ptoj-judge:
-#    #    image: criyle/go-judge
-#    build: src/judge
-#    privileged: true
-#    volumes:
-#      - ${PTOJ_DIRECTORY}/data/judge/testcase:/judge/test_case
-#      - ${PTOJ_DIRECTORY}/data/judge/log:/judge/log
-#      - ${PTOJ_DIRECTORY}/data/judge/run:/judge/run
-#      - ${PTOJ_DIRECTORY}/data/judge/spj:/judge/spj
-#    environment:
-#      - shm-size=256m
-#    ports:
-#      - "5050:5050"
-#    networks:
-#      ptoj-network:
-#        ipv4_address: ${JUDGE_HOST:-172.21.0.6}
+  ptoj-judge:
+    #    image: criyle/go-judge
+    build: src/judge
+    privileged: true
+    volumes:
+      - ${PTOJ_DIRECTORY}/data/judge/testcase:/judge/test_case
+      - ${PTOJ_DIRECTORY}/data/judge/log:/judge/log
+      - ${PTOJ_DIRECTORY}/data/judge/run:/judge/run
+      - ${PTOJ_DIRECTORY}/data/judge/spj:/judge/spj
+    environment:
+      - shm-size=256m
+    ports:
+      - "5050:5050"
+    networks:
+      ptoj-network:
+        ipv4_address: ${JUDGE_HOST:-172.21.0.6}
 
 #  ptoj-es:
 #    image: elasticsearch:7.14.0

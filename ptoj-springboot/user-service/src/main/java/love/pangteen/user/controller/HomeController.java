@@ -1,7 +1,6 @@
 package love.pangteen.user.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import love.pangteen.result.CommonResult;
 import love.pangteen.user.pojo.vo.ACMRankVO;
 import love.pangteen.user.pojo.vo.AnnouncementVO;
@@ -35,7 +34,7 @@ public class HomeController {
 
     @GetMapping("/get-recent-seven-ac-rank")
     public CommonResult<List<ACMRankVO>> getRecentSevenACRank() {
-        return CommonResult.success(homeService.getRecentSevenACRank());
+        return CommonResult.success(homeService.getRecentSevenACRank(Boolean.TRUE));
     }
 
     @GetMapping("/get-last-week-submission-statistics")

@@ -34,7 +34,7 @@ spring:
         - id: user
           uri: lb://user-service
           predicates:
-            - Path=/admin/account/**,/admin/user/**,/admin/dashboard/**,/user/**,/account/**,/home/**
+            - Path=/admin/account/**,/admin/user/**,/admin/dashboard/**,/user/**,/account/**,/home/**,/test/**
         - id: problem
           uri: lb://problem-service
           predicates:
@@ -65,6 +65,7 @@ security:
       - /language/**
       - /training/get-training-list
       - /training/get-training-category
+      - /test/**
 dubbo:
   application:
     name: dubbo-${spring.application.name}
