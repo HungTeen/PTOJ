@@ -15,6 +15,10 @@ import java.io.IOException;
  **/
 public interface UserInfoService extends IService<UserInfo> {
 
+    UserInfo getUserInfo(String uid);
+
+    UserInfo getUserInfo(String uid, boolean cached);
+
     UserInfo getUserInfoByName(String username);
 
     void editUser(AdminEditUserDTO adminEditUserDto);
@@ -34,4 +38,5 @@ public interface UserInfoService extends IService<UserInfo> {
     UserCalendarHeatmapVO getUserCalendarHeatmap(String uid, String username);
 
     int getTotalUserCount();
+
 }

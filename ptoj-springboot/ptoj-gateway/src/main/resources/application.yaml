@@ -29,6 +29,7 @@ spring:
           response-body: '{"code": 200,"message": "请求失败，稍后重试！"}'
       transport:
         dashboard: ${ptoj.sentinel.host}:${ptoj.sentinel.port}
+      http-method-specify: true # 开启请求方式前缀
     gateway:
       routes:
         - id: user

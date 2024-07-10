@@ -15,17 +15,16 @@ import love.pangteen.api.service.IDubboJudgeService;
 import love.pangteen.api.service.IDubboProblemService;
 import love.pangteen.exception.StatusFailException;
 import love.pangteen.pojo.AccountProfile;
+import love.pangteen.user.manager.UserGenerateExcelManager;
+import love.pangteen.user.manager.UserInfoManager;
 import love.pangteen.user.mapper.UserInfoMapper;
 import love.pangteen.user.pojo.dto.*;
 import love.pangteen.user.pojo.entity.Role;
 import love.pangteen.user.pojo.entity.UserInfo;
 import love.pangteen.user.pojo.vo.*;
-import love.pangteen.user.service.UserAcProblemService;
 import love.pangteen.user.service.UserInfoService;
 import love.pangteen.user.service.UserRoleService;
-import love.pangteen.user.utils.ExcelUtils;
 import love.pangteen.utils.AccountUtils;
-import love.pangteen.utils.RedisUtils;
 import org.apache.dubbo.config.annotation.DubboReference;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
@@ -46,22 +45,34 @@ import java.util.stream.Collectors;
 public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> implements UserInfoService {
 
     @Resource
-    private RedisUtils redisUtils;
-
-    @Resource
-    private ExcelUtils excelUtils;
+    private UserGenerateExcelManager userGenerateExcelManager;
 
     @Resource
     private UserRoleService userRoleService;
-
-    @Resource
-    private UserAcProblemService userAcProblemService;
 
     @DubboReference
     private IDubboJudgeService judgeService;
 
     @DubboReference
     private IDubboProblemService problemService;
+
+    @Resource
+    private UserInfoManager userInfoManager;
+
+    @Override
+    public UserInfo getUserInfo(String uid) {
+        return getUserInfo(uid, true);
+    }
+
+    @Override
+    public UserInfo getUserInfo(String uid, boolean cached) {
+        UserInfo userInfo = cached ? userInfoManager.getUserInfoFromCache(uid) : null;
+        if(userInfo == null){
+            userInfo = getById(uid);
+            if(cached) userInfoManager.update(uid, userInfo);
+        }
+        return userInfo;
+    }
 
     @Override
     public UserInfo getUserInfoByName(String username) {
@@ -72,7 +83,6 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
     @Override
     public void editUser(AdminEditUserDTO userDTO) {
         // 更新UserInfo表。
-        UserInfo userInfo = getById(userDTO.getUid());
         userDTO.setPassword(SaSecureUtil.md5(userDTO.getPassword()));
         boolean updateUserInfo = lambdaUpdate().eq(UserInfo::getUuid, userDTO.getUid())
                 .set(StrUtil.isNotEmpty(userDTO.getUsername()), UserInfo::getUsername, userDTO.getUsername())
@@ -90,24 +100,15 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
             StpUtil.logout(userDTO.getUid());
         }
 
-        // 角色变更需要重新授权
-        if (userDTO.getType() != null && userInfo.getRoleId().intValue() != userDTO.getType()) {
-//            userRoleEntityService.deleteCache(uid, false);
+        if(updateUserInfo){
+            userInfoManager.onModified(userDTO.getUid());
         }
-//
-//        if (changeUserRole) {
-//            // 获取当前登录的用户
-//            AccountProfile userRolesVo = (AccountProfile) SecurityUtils.getSubject().getPrincipal();
-//            String title = "权限变更通知(Authority Change Notice)";
-//            String content = userRoleEntityService.getAuthChangeContent(oldType, type);
-//            adminNoticeManager.addSingleNoticeToUser(userRolesVo.getUid(), uid, title, content, "Sys");
-//        }
     }
 
     @Transactional
     @Override
     public GenerateKeyVO generateUser(GenerateUserDTO userDTO) {
-        HashMap<String, Object> userInfoMap = new HashMap<>();
+        Map<String, Object> userInfoMap = new HashMap<>();
         List<UserInfo> userInfoList = new ArrayList<>();
         for (int num = userDTO.getNumberFrom(); num <= userDTO.getNumberTo(); num++) {
             String uuid = IdUtil.simpleUUID();
@@ -125,10 +126,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         boolean result = saveBatch(userInfoList);
         if(result){
             String key = IdUtil.simpleUUID();
-            redisUtils.hmset(key, userInfoMap, 1800); // 存储半小时
-            // 异步同步系统通知
-//            List<String> uidList = userInfoList.stream().map(UserInfo::getUuid).collect(Collectors.toList());
-//            adminNoticeManager.syncNoticeToNewRegisterBatchUser(uidList);
+            userGenerateExcelManager.setGenerateMap(key, userInfoMap);
             return new GenerateKeyVO(key);
         } else {
             throw new StatusFailException("生成指定用户失败！注意查看组合生成的用户名是否已有存在的！");
@@ -137,7 +135,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
 
     @Override
     public void generateUserExcel(String key, HttpServletResponse response) throws IOException {
-        excelUtils.generateUserExcel(key, response);
+        userGenerateExcelManager.generateUserExcel(key, response);
     }
 
     @Override
@@ -145,6 +143,8 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         boolean isOk = removeByIds(deleteUserDTO.getIds());
         if (!isOk) {
             throw new StatusFailException("删除失败！");
+        } else {
+            userInfoManager.onModified(deleteUserDTO.getIds());
         }
     }
 
@@ -173,6 +173,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
             UserInfoVO userInfoVO = new UserInfoVO();
             BeanUtils.copyProperties(userRolesVO, userInfoVO);
             userInfoVO.setRoleList(userRolesVO.getRoles().stream().map(Role::getRole).collect(Collectors.toList()));
+            userInfoManager.onModified(profile.getUuid());
             return userInfoVO;
         } else {
             throw new StatusFailException("个人信息修改失败！");

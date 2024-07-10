@@ -150,6 +150,7 @@ public class SubmitServiceImpl implements SubmitService {
     /**
      * 判题通过Dubbo调用判题系统服务。
      */
+
     @Override
     public Judge submitProblemJudge(SubmitJudgeDTO judgeDto) {
         judgeValidateUtils.validateSubmission(judgeDto);

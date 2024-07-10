@@ -1,4 +1,4 @@
-package love.pangteen.user.utils;
+package love.pangteen.user.manager;
 
 import com.alibaba.excel.EasyExcel;
 import love.pangteen.user.pojo.vo.ExcelUserVO;
@@ -20,10 +20,14 @@ import java.util.Map;
  * @create: 2024/1/21 19:15
  **/
 @Component
-public class ExcelUtils {
+public class UserGenerateExcelManager {
 
     @Resource
     private RedisUtils redisUtils;
+
+    public void setGenerateMap(String key, Map<String, Object> userInfoMap){
+        redisUtils.hmPutAll(key, userInfoMap, 1800); // 存储半小时
+    }
 
     public void generateUserExcel(String key, HttpServletResponse response) throws IOException {
         response.setContentType("application/vnd.ms-excel");
@@ -39,7 +43,7 @@ public class ExcelUtils {
 
     private List<ExcelUserVO> getGenerateUsers(String key) {
         List<ExcelUserVO> result = new LinkedList<>();
-        Map<Object, Object> userInfo = redisUtils.hmget(key);
+        Map<Object, Object> userInfo = redisUtils.hmGet(key);
         for (Object hashKey : userInfo.keySet()) {
             String username = (String) hashKey;
             String password = (String) userInfo.get(hashKey);
