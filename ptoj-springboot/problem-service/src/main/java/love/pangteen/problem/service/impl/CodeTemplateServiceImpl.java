@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import love.pangteen.problem.mapper.CodeTemplateMapper;
 import love.pangteen.problem.pojo.entity.CodeTemplate;
-import love.pangteen.problem.pojo.entity.Language;
+import love.pangteen.api.pojo.entity.Language;
 import love.pangteen.problem.service.CodeTemplateService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

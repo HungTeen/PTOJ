@@ -12,7 +12,7 @@ import love.pangteen.user.pojo.dto.ChangeEmailDTO;
 import love.pangteen.user.pojo.dto.ChangePasswordDTO;
 import love.pangteen.user.pojo.dto.LoginDTO;
 import love.pangteen.user.pojo.entity.Role;
-import love.pangteen.user.pojo.entity.UserInfo;
+import love.pangteen.api.pojo.entity.UserInfo;
 import love.pangteen.user.pojo.vo.ChangeAccountVO;
 import love.pangteen.user.pojo.vo.UserAuthInfoVO;
 import love.pangteen.user.pojo.vo.UserInfoVO;

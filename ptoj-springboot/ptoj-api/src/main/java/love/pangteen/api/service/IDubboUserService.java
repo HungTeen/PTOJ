@@ -1,5 +1,7 @@
 package love.pangteen.api.service;
 
+import love.pangteen.api.pojo.entity.UserInfo;
+
 import java.util.List;
 
 /**
@@ -10,5 +12,7 @@ import java.util.List;
 public interface IDubboUserService {
 
     List<String> getUserRoles(String uid);
+
+    List<UserInfo> getAllUsers();
 
 }

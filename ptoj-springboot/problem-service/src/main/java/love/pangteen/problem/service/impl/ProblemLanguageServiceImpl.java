@@ -3,7 +3,7 @@ package love.pangteen.problem.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import love.pangteen.problem.mapper.ProblemLanguageMapper;
-import love.pangteen.problem.pojo.entity.Language;
+import love.pangteen.api.pojo.entity.Language;
 import love.pangteen.problem.pojo.entity.ProblemLanguage;
 import love.pangteen.problem.service.LanguageService;
 import love.pangteen.problem.service.ProblemLanguageService;

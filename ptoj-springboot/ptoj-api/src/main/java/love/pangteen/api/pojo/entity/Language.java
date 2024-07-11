@@ -1,4 +1,4 @@
-package love.pangteen.problem.pojo.entity;
+package love.pangteen.api.pojo.entity;
 
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
@@ -12,6 +12,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -25,7 +26,7 @@ import java.util.Date;
 @ApiModel(value="Language对象", description="")
 @AllArgsConstructor
 @NoArgsConstructor
-public class Language {
+public class Language implements Serializable {
 
     @TableId(value = "id", type = IdType.AUTO)
     private Long id;

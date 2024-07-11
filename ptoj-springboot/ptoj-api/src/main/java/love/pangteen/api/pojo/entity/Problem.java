@@ -3,8 +3,7 @@ package love.pangteen.api.pojo.entity;
 import com.baomidou.mybatisplus.annotation.*;
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.*;
 import lombok.experimental.Accessors;
 import love.pangteen.api.interfaces.ValidateGroups;
 import love.pangteen.api.constant.OJConstant;
@@ -26,6 +25,9 @@ import java.util.Date;
 @Data
 @EqualsAndHashCode(callSuper = false)
 @Accessors(chain = true)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 @ApiModel(value = "题目", description = "")
 public class Problem implements Serializable {
 

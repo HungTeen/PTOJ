@@ -1,6 +1,6 @@
 package love.pangteen.user.manager;
 
-import love.pangteen.user.pojo.entity.UserInfo;
+import love.pangteen.api.pojo.entity.UserInfo;
 import love.pangteen.utils.RedisUtils;
 import org.springframework.stereotype.Component;
 

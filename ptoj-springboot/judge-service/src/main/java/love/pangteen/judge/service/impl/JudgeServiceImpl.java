@@ -12,11 +12,11 @@ import love.pangteen.api.enums.JudgeStatus;
 import love.pangteen.api.enums.ProblemType;
 import love.pangteen.api.pojo.dto.TestJudgeDTO;
 import love.pangteen.api.pojo.dto.ToJudgeDTO;
-import love.pangteen.api.pojo.entity.Judge;
-import love.pangteen.api.pojo.entity.JudgeCase;
-import love.pangteen.api.pojo.entity.Problem;
+import love.pangteen.api.pojo.entity.*;
 import love.pangteen.api.service.IDubboProblemService;
+import love.pangteen.api.service.IDubboUserService;
 import love.pangteen.api.utils.JudgeUtils;
+import love.pangteen.api.utils.RandomUtils;
 import love.pangteen.api.utils.Utils;
 import love.pangteen.exception.JudgeSystemError;
 import love.pangteen.judge.config.properties.OJProperties;
@@ -26,7 +26,6 @@ import love.pangteen.judge.manager.LanguageManager;
 import love.pangteen.judge.mapper.JudgeMapper;
 import love.pangteen.judge.pojo.entity.JudgeResult;
 import love.pangteen.judge.pojo.entity.LanguageConfig;
-import love.pangteen.api.pojo.entity.TestJudgeResult;
 import love.pangteen.judge.sandbox.Compiler;
 import love.pangteen.judge.sandbox.JudgeRunner;
 import love.pangteen.judge.sandbox.JudgeStrategy;
@@ -40,6 +39,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @program: PTOJ
@@ -56,6 +56,9 @@ public class JudgeServiceImpl extends ServiceImpl<JudgeMapper, Judge> implements
     @DubboReference
     private IDubboProblemService problemService;
 
+    @DubboReference
+    private IDubboUserService userService;
+
     @Resource
     private ProblemCaseUtils problemCaseUtils;
 
@@ -64,6 +67,58 @@ public class JudgeServiceImpl extends ServiceImpl<JudgeMapper, Judge> implements
 
     @Resource
     private JudgeCaseService judgeCaseService;
+
+    @Override
+    public void randomInsertJudge() {
+        Random random = RandomUtils.get();
+        // Random Problem.
+        List<Problem> problems = problemService.getAllProblems();
+        Problem selectProblem = problems.get(random.nextInt(problems.size()));
+        List<Language> allLanguage = problemService.getAllLanguage();
+        Language selectLanguage = allLanguage.get(0);
+        // Random User.
+        List<UserInfo> allUsers = userService.getAllUsers();
+        UserInfo selectUser = allUsers.get(random.nextInt(allUsers.size()));
+        // Random Status.
+        List<JudgeStatus> status = Arrays.stream(JudgeStatus.values()).filter(JudgeStatus::isValidStatus).collect(Collectors.toList());
+        JudgeStatus judgeStatus = status.get(random.nextInt(status.size()));
+        int runTime = random.nextInt(1000);
+        int memory = random.nextInt(128);
+
+        Judge judge = Judge.builder()
+                .pid(selectProblem.getId())
+                .displayPid(selectProblem.getProblemId())
+                .uid(selectUser.getUuid())
+                .username(selectUser.getUsername())
+                .submitTime(Calendar.getInstance().getTime())
+                .status(judgeStatus.getStatus())
+                .errorMessage("Ignore error message")
+                .time(runTime)
+                .memory(memory)
+                .length(666)
+                .code("print 666")
+                .language(selectLanguage.getName())
+                .cid(0L)
+                .cpid(0L)
+                .judger("Dummy Judge")
+                .isManual(true)
+                .build();
+        saveOrUpdate(judge);
+    }
+
+    @Override
+    public void validateAllJudges() {
+        lambdaUpdate()
+                .isNull(Judge::getScore)
+                .isNull(Judge::getIp)
+                .and(wrapper -> wrapper.le(Judge::getStatus, -4)
+                            .or().ge(Judge::getStatus, 5)
+                )
+                .set(Judge::getScore, 0)
+                .set(Judge::getIp, "127.0.0.1")
+                .set(Judge::getStatus, JudgeStatus.STATUS_ACCEPTED.getStatus())
+                .update();
+    }
 
     /**
      * 标志该判题过程进入编译阶段。
@@ -494,4 +549,5 @@ public class JudgeServiceImpl extends ServiceImpl<JudgeMapper, Judge> implements
             return infoJudgeCaseMode;
         }
     }
+
 }

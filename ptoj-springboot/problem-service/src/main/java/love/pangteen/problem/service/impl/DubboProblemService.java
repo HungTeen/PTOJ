@@ -2,12 +2,15 @@ package love.pangteen.problem.service.impl;
 
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
+import love.pangteen.api.pojo.entity.Language;
 import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.api.pojo.entity.ProblemCase;
 import love.pangteen.api.pojo.vo.ProblemVO;
 import love.pangteen.api.service.IDubboProblemService;
+import love.pangteen.problem.service.LanguageService;
 import love.pangteen.problem.service.ProblemCaseService;
 import love.pangteen.problem.service.ProblemService;
+import love.pangteen.problem.utils.LanguageUtils;
 import org.apache.dubbo.config.annotation.DubboService;
 import org.springframework.beans.BeanUtils;
 
@@ -28,6 +31,9 @@ public class DubboProblemService implements IDubboProblemService {
 
     @Resource
     private ProblemCaseService problemCaseService;
+
+    @Resource
+    private LanguageService languageService;
 
     @Override
     public Problem getById(Long pid) {
@@ -90,6 +96,16 @@ public class DubboProblemService implements IDubboProblemService {
     public List<Problem> getProblems(List<Long> acPidList) {
         if(acPidList.isEmpty()) return List.of();
         return problemService.lambdaQuery().in(Problem::getId, acPidList).list();
+    }
+
+    @Override
+    public List<Problem> getAllProblems() {
+        return problemService.list();
+    }
+
+    @Override
+    public List<Language> getAllLanguage() {
+        return languageService.getLanguages(LanguageUtils.ORIGIN_LANGUAGE, false);
     }
 
 }

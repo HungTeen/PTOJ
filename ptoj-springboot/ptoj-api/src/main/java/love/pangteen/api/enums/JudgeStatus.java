@@ -69,4 +69,8 @@ public enum JudgeStatus {
         return STATUS_NULL;
     }
 
+    public boolean isValidStatus(){
+        return columnName != null;
+    }
+
 }

@@ -17,8 +17,8 @@ import java.util.List;
  * @create: 2024/6/19 20:59
  **/
 @RestController
-@RequestMapping("/test")
-public class TestController {
+@RequestMapping("/test/user")
+public class TestUserController {
 
     @Resource
     private HomeService homeService;

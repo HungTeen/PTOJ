@@ -2,7 +2,7 @@ package love.pangteen.user.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import love.pangteen.user.pojo.dto.*;
-import love.pangteen.user.pojo.entity.UserInfo;
+import love.pangteen.api.pojo.entity.UserInfo;
 import love.pangteen.user.pojo.vo.*;
 
 import javax.servlet.http.HttpServletResponse;

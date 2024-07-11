@@ -35,15 +35,15 @@ spring:
         - id: user
           uri: lb://user-service
           predicates:
-            - Path=/admin/account/**,/admin/user/**,/admin/dashboard/**,/user/**,/account/**,/home/**,/test/**
+            - Path=/admin/account/**,/admin/user/**,/admin/dashboard/**,/user/**,/account/**,/home/**,/test/user/**
         - id: problem
           uri: lb://problem-service
           predicates:
-            - Path=/admin/problem/**,/admin/tag/**,/problem/**,/submit/**,/tag/**,/language/**
+            - Path=/admin/problem/**,/admin/tag/**,/problem/**,/submit/**,/tag/**,/language/**,/test/problem/**
         - id: judge
           uri: lb://judge-service
           predicates:
-            - Path=/judge/**
+            - Path=/judge/**,/test/judge/**
         - id: training
           uri: lb://training-service
           predicates:

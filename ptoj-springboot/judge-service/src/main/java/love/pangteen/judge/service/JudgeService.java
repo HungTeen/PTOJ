@@ -14,6 +14,10 @@ import love.pangteen.api.pojo.entity.TestJudgeResult;
  **/
 public interface JudgeService extends IService<Judge> {
 
+    void randomInsertJudge();
+
+    void validateAllJudges();
+
     JudgeStatus judge(Judge judge);
 
     void remoteJudge(ToJudgeDTO toJudgeDTO);
@@ -21,4 +25,5 @@ public interface JudgeService extends IService<Judge> {
     TestJudgeResult testJudge(TestJudgeDTO testJudgeDTO);
 
     int getUserAcceptCount(String uid);
+
 }

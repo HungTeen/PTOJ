@@ -2,7 +2,7 @@ package love.pangteen.problem.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import love.pangteen.problem.mapper.LanguageMapper;
-import love.pangteen.problem.pojo.entity.Language;
+import love.pangteen.api.pojo.entity.Language;
 import love.pangteen.problem.service.LanguageService;
 import org.springframework.stereotype.Service;
 

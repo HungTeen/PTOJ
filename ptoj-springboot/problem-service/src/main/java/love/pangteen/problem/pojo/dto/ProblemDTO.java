@@ -1,7 +1,11 @@
 package love.pangteen.problem.pojo.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 import lombok.experimental.Accessors;
+import love.pangteen.api.pojo.entity.Language;
 import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.api.pojo.entity.ProblemCase;
 import love.pangteen.api.pojo.entity.Tag;
@@ -18,6 +22,9 @@ import java.util.List;
  **/
 @Data
 @Accessors(chain = true)
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class ProblemDTO {
 
     @NotNull(message = "题目的配置项不能为空！")

@@ -1,7 +1,7 @@
 package love.pangteen.user.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import love.pangteen.user.pojo.entity.UserInfo;
+import love.pangteen.api.pojo.entity.UserInfo;
 
 /**
  * @program: PTOJ

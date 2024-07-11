@@ -20,7 +20,7 @@ import love.pangteen.exception.StatusNotFoundException;
 import love.pangteen.pojo.AccountProfile;
 import love.pangteen.problem.mapper.ProblemMapper;
 import love.pangteen.problem.pojo.dto.ProblemDTO;
-import love.pangteen.problem.pojo.entity.Language;
+import love.pangteen.api.pojo.entity.Language;
 import love.pangteen.problem.pojo.vo.LastAcceptedCodeVO;
 import love.pangteen.problem.pojo.vo.ProblemFullScreenListVO;
 import love.pangteen.problem.pojo.vo.ProblemInfoVO;

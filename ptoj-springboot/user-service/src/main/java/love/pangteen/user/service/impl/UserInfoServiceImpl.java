@@ -20,7 +20,7 @@ import love.pangteen.user.manager.UserInfoManager;
 import love.pangteen.user.mapper.UserInfoMapper;
 import love.pangteen.user.pojo.dto.*;
 import love.pangteen.user.pojo.entity.Role;
-import love.pangteen.user.pojo.entity.UserInfo;
+import love.pangteen.api.pojo.entity.UserInfo;
 import love.pangteen.user.pojo.vo.*;
 import love.pangteen.user.service.UserInfoService;
 import love.pangteen.user.service.UserRoleService;

@@ -1,7 +1,7 @@
 package love.pangteen.problem.controller;
 
 import love.pangteen.api.annotations.IgnoreLogin;
-import love.pangteen.problem.pojo.entity.Language;
+import love.pangteen.api.pojo.entity.Language;
 import love.pangteen.problem.service.LanguageService;
 import love.pangteen.problem.service.ProblemLanguageService;
 import love.pangteen.problem.service.ProblemService;
