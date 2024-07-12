@@ -1,5 +1,6 @@
 package love.pangteen.judge.consumer;
 
+import lombok.extern.slf4j.Slf4j;
 import love.pangteen.api.constant.MQConstants;
 import love.pangteen.api.enums.JudgeStatus;
 import love.pangteen.api.message.JudgeMessage;
@@ -18,13 +19,13 @@ import org.apache.rocketmq.spring.core.RocketMQListener;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
-import java.util.Objects;
 
 /**
  * @program: PTOJ
  * @author: PangTeen
  * @create: 2024/3/15 17:23
  **/
+@Slf4j
 @RocketMQMessageListener(
         topic = MQConstants.JUDGE_TOPIC,
         consumerGroup = MQConstants.JUDGE_CONSUMER_GROUP
@@ -70,8 +71,15 @@ public class JudgeMessageConsumer implements RocketMQListener<JudgeMessage> {
         } else {
             Judge judge = judgeService.getById(msg.getJudgeId());
             if (judge != null) {
-                // 调度评测时发现该评测任务被取消，则结束评测。
-                if (Objects.equals(judge.getStatus(), JudgeStatus.STATUS_CANCELLED.getStatus())) {
+                if(JudgeStatus.STATUS_PENDING.getStatus().equals(judge.getStatus())){
+                    judgeService.updateJudgeStatus(JudgeStatus.STATUS_SUBMITTING);
+                    // 调用判题服务。
+                    judgeManager.submitProblemJudge(new ToJudgeDTO()
+                            .setJudge(judge)
+                            .setRemoteJudgeProblem(null)
+                    );
+                } else if(JudgeStatus.STATUS_CANCELLED.getStatus().equals(judge.getStatus())){
+                    // 调度评测时发现该评测任务被取消，则结束评测。
 //                if (JudgeUtils.isContestSubmission(judge.getCid())) {
 //                    UpdateWrapper<ContestRecord> updateWrapper = new UpdateWrapper<>();
 //                    // 取消评测，不罚时也不算得分
@@ -79,12 +87,10 @@ public class JudgeMessageConsumer implements RocketMQListener<JudgeMessage> {
 //                    updateWrapper.eq("submit_id", judge.getSubmitId()); // submit_id一定只有一个
 //                    contestRecordEntityService.update(updateWrapper);
 //                }
+                } else if(JudgeStatus.STATUS_SUBMITTING.getStatus().equals(judge.getStatus())){
+                    log.warn("评测机重复提交评测任务！评测ID：{}", judge.getSubmitId());
                 } else {
-                    // 调用判题服务。
-                    judgeManager.submitProblemJudge(new ToJudgeDTO()
-                            .setJudge(judge)
-                            .setRemoteJudgeProblem(null)
-                    );
+                    log.warn("已跳过未知状态的评测任务！评测ID：{}", judge.getSubmitId());
                 }
             }
         }

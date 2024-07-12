@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
 import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.problem.pojo.dto.ProblemDTO;
-import love.pangteen.problem.pojo.vo.LastAcceptedCodeVO;
-import love.pangteen.problem.pojo.vo.ProblemFullScreenListVO;
-import love.pangteen.problem.pojo.vo.ProblemInfoVO;
-import love.pangteen.problem.pojo.vo.RandomProblemVO;
+import love.pangteen.problem.pojo.vo.*;
 
 import java.util.List;
 import java.util.Map;
@@ -18,6 +15,8 @@ import java.util.Map;
  * @create: 2024/1/22 8:48
  **/
 public interface ProblemService extends IService<Problem> {
+
+    RecentUpdatedProblemVO getRecentProblemInfo(Long pid);
 
     IPage<Problem> getProblemList(Integer limit, Integer currentPage, String keyword, Integer auth, String oj);
 

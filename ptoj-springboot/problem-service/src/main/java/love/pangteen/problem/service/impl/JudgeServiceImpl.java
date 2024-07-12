@@ -270,4 +270,11 @@ public class JudgeServiceImpl extends ServiceImpl<JudgeMapper, Judge> implements
     public List<ProblemCountVO> getProblemListCount(List<Long> pidList) {
         return getBaseMapper().getProblemListCount(pidList);
     }
+
+    @Override
+    public void updateStatus(JudgeStatus judgeStatus) {
+        lambdaUpdate()
+                .set(Judge::getStatus, judgeStatus.getStatus())
+                .update();
+    }
 }

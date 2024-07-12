@@ -18,6 +18,8 @@ public interface JudgeService extends IService<Judge> {
 
     void validateAllJudges();
 
+    void updateJudgeStatus(JudgeStatus judgeStatus);
+
     JudgeStatus judge(Judge judge);
 
     void remoteJudge(ToJudgeDTO toJudgeDTO);

@@ -10,6 +10,7 @@ import love.pangteen.api.enums.JudgeMode;
 import love.pangteen.api.enums.ProblemAuth;
 import love.pangteen.api.enums.ProblemType;
 import love.pangteen.api.enums.RemoteOJ;
+import love.pangteen.api.pojo.entity.Language;
 import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.api.pojo.entity.ProblemCase;
 import love.pangteen.api.pojo.entity.Tag;
@@ -18,17 +19,15 @@ import love.pangteen.exception.StatusFailException;
 import love.pangteen.exception.StatusForbiddenException;
 import love.pangteen.exception.StatusNotFoundException;
 import love.pangteen.pojo.AccountProfile;
+import love.pangteen.problem.manager.ProblemInfoManager;
 import love.pangteen.problem.mapper.ProblemMapper;
 import love.pangteen.problem.pojo.dto.ProblemDTO;
-import love.pangteen.api.pojo.entity.Language;
-import love.pangteen.problem.pojo.vo.LastAcceptedCodeVO;
-import love.pangteen.problem.pojo.vo.ProblemFullScreenListVO;
-import love.pangteen.problem.pojo.vo.ProblemInfoVO;
-import love.pangteen.problem.pojo.vo.RandomProblemVO;
+import love.pangteen.problem.pojo.vo.*;
 import love.pangteen.problem.service.*;
 import love.pangteen.problem.utils.ProblemUtils;
 import love.pangteen.utils.AccountUtils;
 import love.pangteen.utils.ValidateUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -57,6 +56,24 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
 
     @Resource
     private ProblemTagService problemTagService;
+
+    @Resource
+    private ProblemInfoManager problemInfoManager;
+
+    @Override
+    public RecentUpdatedProblemVO getRecentProblemInfo(Long pid) {
+        RecentUpdatedProblemVO info = problemInfoManager.getProblemInfoFromCache(pid);
+        if(info == null){
+            Problem problem = getById(pid);
+            if(problem == null){
+                return null;
+            }
+            info = new RecentUpdatedProblemVO();
+            BeanUtils.copyProperties(problem, info);
+            problemInfoManager.update(pid, info);
+        }
+        return info;
+    }
 
     @Override
     public IPage<Problem> getProblemList(Integer limit, Integer currentPage, String keyword, Integer auth, String oj) {

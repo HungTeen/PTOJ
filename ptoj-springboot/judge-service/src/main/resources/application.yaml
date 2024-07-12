@@ -49,7 +49,7 @@ rocketmq:
     group: ${ptoj.rocketmq.group} #自定义的组名称
 logging:
   level:
-    love.pangteen: debug
+    love.pangteen: error
   pattern:
     dateformat: HH:mm:ss:SSS
   file:

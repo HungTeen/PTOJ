@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import love.pangteen.problem.pojo.vo.RecentUpdatedProblemVO;
 import love.pangteen.problem.service.ProblemService;
 import love.pangteen.utils.RedisUtils;
-import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -38,9 +37,7 @@ public class RecentProblemManager {
             try{
                 if(! initialized()){
                     List<Long> userList = problemService.getProblemsByCreateDate();
-                    userList.forEach(pid -> {
-                        this.createProblem(pid, false);
-                    });
+                    insertList(userList);
                 }
             } catch (Exception ignored){
                 log.error(ignored.getMessage());
@@ -59,6 +56,12 @@ public class RecentProblemManager {
         }
     }
 
+    public void insertList(List<Long> list){
+        for(int i = list.size() - 1; i >= 0; -- i){
+            createProblem(list.get(i), false);
+        }
+    }
+
     public void removeProblem(Long pid){
         assertInit();
         if(! redisUtils.lContains(KEY, pid)){
@@ -73,11 +76,7 @@ public class RecentProblemManager {
     public List<RecentUpdatedProblemVO> getRecentUpdatedProblemList() {
         assertInit();
         return redisUtils.lRange(KEY, 0, PROBLEM_COUNT).stream()
-                .map(pid -> {
-                    RecentUpdatedProblemVO vo = new RecentUpdatedProblemVO();
-                    BeanUtils.copyProperties(problemService.getProblem(Long.valueOf(pid.toString())), vo);
-                    return vo;
-                })
+                .map(pid -> problemService.getRecentProblemInfo((Long) pid))
                 .collect(Collectors.toList());
     }
 

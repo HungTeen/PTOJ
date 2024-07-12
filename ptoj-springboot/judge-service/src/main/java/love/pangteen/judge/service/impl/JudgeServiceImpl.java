@@ -120,6 +120,13 @@ public class JudgeServiceImpl extends ServiceImpl<JudgeMapper, Judge> implements
                 .update();
     }
 
+    @Override
+    public void updateJudgeStatus(JudgeStatus judgeStatus) {
+        lambdaUpdate()
+                .set(Judge::getStatus, judgeStatus.getStatus())
+                .update();
+    }
+
     /**
      * 标志该判题过程进入编译阶段。
      */

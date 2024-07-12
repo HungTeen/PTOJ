@@ -3,6 +3,7 @@ package love.pangteen.problem.service;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import love.pangteen.api.enums.JudgeStatus;
 import love.pangteen.api.pojo.entity.Judge;
 import love.pangteen.api.pojo.vo.ProblemCountVO;
 import love.pangteen.api.pojo.vo.ProblemVO;
@@ -39,4 +40,6 @@ public interface JudgeService extends IService<Judge> {
     List<Judge> getSubmitJudges(List<Long> pidList, String uid, Long cid, Long gid);
 
     List<ProblemCountVO> getProblemListCount(List<Long> pidList);
+
+    void updateStatus(JudgeStatus judgeStatus);
 }
