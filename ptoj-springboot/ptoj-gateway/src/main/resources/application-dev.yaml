@@ -16,3 +16,6 @@ ptoj:
   sentinel:
     host: localhost
     port: 8858
+logging:
+  level:
+    root: error

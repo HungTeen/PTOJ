@@ -31,3 +31,6 @@ ptoj:
   swagger:
     title: "题目管理接口文档"
     package: love.pangteen.problem.controller
+logging:
+  level:
+    root: error

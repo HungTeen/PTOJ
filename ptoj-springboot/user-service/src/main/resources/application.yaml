@@ -34,6 +34,7 @@ dubbo:
     address: nacos://${ptoj.nacos.host}:${ptoj.nacos.port}?username=${ptoj.nacos.username}&password=${ptoj.nacos.password}
   consumer:
     check: false
+    timeout: 3000
   metadata-report:
     retry-times: 3
 rocketmq:

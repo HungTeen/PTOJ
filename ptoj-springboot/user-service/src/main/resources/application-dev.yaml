@@ -25,3 +25,6 @@ ptoj:
   swagger:
     title: "用户管理接口文档"
     package: love.pangteen.user.controller
+logging:
+  level:
+    root: error

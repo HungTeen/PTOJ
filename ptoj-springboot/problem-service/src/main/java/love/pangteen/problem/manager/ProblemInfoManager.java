@@ -2,6 +2,7 @@ package love.pangteen.problem.manager;
 
 import love.pangteen.problem.pojo.vo.RecentUpdatedProblemVO;
 import love.pangteen.utils.RedisUtils;
+import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -11,6 +12,7 @@ import java.util.List;
  * @author: PangTeen
  * @create: 2024/7/11 16:57
  **/
+@Component
 public class ProblemInfoManager {
 
     private static final String KEY = "problem:info_map";
