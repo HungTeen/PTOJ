@@ -1,6 +1,6 @@
 package love.pangteen.problem.manager;
 
-import love.pangteen.problem.pojo.vo.RecentUpdatedProblemVO;
+import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.utils.RedisUtils;
 import org.springframework.stereotype.Component;
 
@@ -20,12 +20,12 @@ public class ProblemInfoManager {
     @Resource
     private RedisUtils redisUtils;
 
-    public RecentUpdatedProblemVO getProblemInfoFromCache(Object uid){
+    public Problem getProblemInfoFromCache(Object uid){
         updateExpire();
-        return (RecentUpdatedProblemVO) redisUtils.hmGet(KEY, uid);
+        return (Problem) redisUtils.hmGet(KEY, uid);
     }
 
-    public void update(Long uid, RecentUpdatedProblemVO info){
+    public void update(Long uid, Problem info){
         updateExpire();
         redisUtils.hmPut(KEY, uid, info);
     }

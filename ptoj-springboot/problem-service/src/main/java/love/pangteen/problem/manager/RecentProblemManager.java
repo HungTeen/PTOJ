@@ -1,9 +1,11 @@
 package love.pangteen.problem.manager;
 
 import lombok.extern.slf4j.Slf4j;
+import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.problem.pojo.vo.RecentUpdatedProblemVO;
 import love.pangteen.problem.service.ProblemService;
 import love.pangteen.utils.RedisUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
@@ -76,8 +78,15 @@ public class RecentProblemManager {
     public List<RecentUpdatedProblemVO> getRecentUpdatedProblemList() {
         assertInit();
         return redisUtils.lRange(KEY, 0, PROBLEM_COUNT).stream()
-                .map(pid -> problemService.getRecentProblemInfo(Long.valueOf((Integer) pid)))
+                .map(pid -> getRecentProblemInfo(Long.valueOf((Integer) pid)))
                 .collect(Collectors.toList());
+    }
+
+    public RecentUpdatedProblemVO getRecentProblemInfo(Long pid) {
+        RecentUpdatedProblemVO recentUpdatedProblemVO = new RecentUpdatedProblemVO();
+        Problem info = problemService.getProblem(pid);
+        BeanUtils.copyProperties(info, recentUpdatedProblemVO);
+        return recentUpdatedProblemVO;
     }
 
 }

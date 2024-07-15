@@ -2,16 +2,15 @@ package love.pangteen.problem.controller;
 
 import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.api.pojo.entity.ProblemCase;
+import love.pangteen.problem.manager.RecentProblemManager;
 import love.pangteen.problem.pojo.dto.ProblemDTO;
 import love.pangteen.api.pojo.entity.Language;
+import love.pangteen.problem.pojo.vo.RecentUpdatedProblemVO;
 import love.pangteen.problem.service.LanguageService;
 import love.pangteen.problem.service.ProblemService;
 import love.pangteen.problem.utils.LanguageUtils;
 import love.pangteen.result.CommonResult;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -30,6 +29,9 @@ public class ProblemTestController {
 
     @Resource
     private LanguageService languageService;
+
+    @Resource
+    private RecentProblemManager recentProblemManager;
 
     /**
      * 随机伪造题目数据。
@@ -82,6 +84,11 @@ public class ProblemTestController {
             problemService.addProblem(problemDTO);
         }
         return CommonResult.success();
+    }
+
+    @GetMapping("/recent-problems")
+    public CommonResult<List<RecentUpdatedProblemVO>> getRecentUpdatedProblemList() {
+        return CommonResult.success(recentProblemManager.getRecentUpdatedProblemList());
     }
 
 }

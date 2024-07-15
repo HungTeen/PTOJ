@@ -16,8 +16,6 @@ import java.util.Map;
  **/
 public interface ProblemService extends IService<Problem> {
 
-    RecentUpdatedProblemVO getRecentProblemInfo(Long pid);
-
     IPage<Problem> getProblemList(Integer limit, Integer currentPage, String keyword, Integer auth, String oj);
 
     Problem getProblem(Long pid);

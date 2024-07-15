@@ -17,14 +17,16 @@
 
 ## 介绍
 
-- **基于Vue和Spring Boot、Spring Cloud Alibaba构建的前后端分离，微服务架构的在线代码评测系统。**
-- **使用RocketMQ实现消息队列，使代码评测异步进行并解耦。**
-- **使用Nacos实现服务注册与发现，Dubbo实现微服务之间的RPC调用。**
-- **使用Redis实现分布式缓存、分布式锁以及过题排行榜等功能。**
-- **使用Sa-Token实现用户登录和鉴权。**
-- **使用Docker进行服务镜像构建与部署。**
-- **使用go-judge沙箱进行代码评测。**
-- **使用Sentinel进行服务限流、熔断和降级。**
+* 基于 Vue 和 SpringBoot 、Spring Cloud Alibaba 构建的前后端分离，微服务架构的在线代码评测系统。
+* 使用 Nacos 实现服务注册与发现，Dubbo 实现微服务之间的 RPC 调用。
+* 使用 go-judge 沙箱进行代码评测，判题使用 cgroup 隔离用户程序，保证安全性。
+* 通过 Sa-Token 集成 Redis 实现了分布式 Session 会话、网关统一鉴权和 RPC 调用鉴权。
+* 使用 Nacos 作为注册中心和配置中心，实现微服务的自动注册与配置管理，提高系统的可扩展性和可靠性。
+* 使用 Sentinel 对查询全站评测列表等接口进行限流，保障系统的稳定性。
+* 引入 RocketMQ 进行代码提交操作的消息队列处理，使代码评测异步进行，实现了流量的削峰。
+* 使用 Caffeine + Redis 构建二级缓存，将查询最近题目的**响应时间从 40ms 优化至 20ms**。
+* 使用 Redis 的 ZSet 数据结构实现用户过题排行榜功能，排行榜接口 **QPS 从 90 提升至 2000 以上**。
+* 编写 Dockerfile 将各个微服务制作成 Docker 镜像，通过docker-compose容器编排将项目部署在服务器。
 
 ## 部署
 
@@ -57,4 +59,4 @@
 * MySQL缓存查询将innodb_buffer_pool_size配置注释，走默认值。
 
 ## 架构
-![architecture](docs/images/architecture.png)
+<img src="docs/images/architecture.png" width="600">

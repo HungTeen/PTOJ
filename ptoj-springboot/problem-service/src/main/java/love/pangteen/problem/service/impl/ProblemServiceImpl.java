@@ -15,6 +15,7 @@ import love.pangteen.api.pojo.entity.Problem;
 import love.pangteen.api.pojo.entity.ProblemCase;
 import love.pangteen.api.pojo.entity.Tag;
 import love.pangteen.api.utils.RandomUtils;
+import love.pangteen.constant.CacheConstant;
 import love.pangteen.exception.StatusFailException;
 import love.pangteen.exception.StatusForbiddenException;
 import love.pangteen.exception.StatusNotFoundException;
@@ -22,12 +23,15 @@ import love.pangteen.pojo.AccountProfile;
 import love.pangteen.problem.manager.ProblemInfoManager;
 import love.pangteen.problem.mapper.ProblemMapper;
 import love.pangteen.problem.pojo.dto.ProblemDTO;
-import love.pangteen.problem.pojo.vo.*;
+import love.pangteen.problem.pojo.vo.LastAcceptedCodeVO;
+import love.pangteen.problem.pojo.vo.ProblemFullScreenListVO;
+import love.pangteen.problem.pojo.vo.ProblemInfoVO;
+import love.pangteen.problem.pojo.vo.RandomProblemVO;
 import love.pangteen.problem.service.*;
 import love.pangteen.problem.utils.ProblemUtils;
 import love.pangteen.utils.AccountUtils;
 import love.pangteen.utils.ValidateUtils;
-import org.springframework.beans.BeanUtils;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,19 +64,18 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
     @Resource
     private ProblemInfoManager problemInfoManager;
 
+//    @Cacheable(cacheNames = CacheConstant.GET_PROBLEM_INFO, key = "#pid", sync = true)
     @Override
-    public RecentUpdatedProblemVO getRecentProblemInfo(Long pid) {
-        RecentUpdatedProblemVO info = problemInfoManager.getProblemInfoFromCache(pid);
-        if(info == null){
-            Problem problem = getById(pid);
+    public Problem getProblem(Long pid) {
+        Problem problem = problemInfoManager.getProblemInfoFromCache(pid);
+        if(problem == null){
+            problem = getById(pid);
             if(problem == null){
-                return null;
+                throw new StatusFailException("题目不存在");
             }
-            info = new RecentUpdatedProblemVO();
-            BeanUtils.copyProperties(problem, info);
-            problemInfoManager.update(pid, info);
+            problemInfoManager.update(pid, problem);
         }
-        return info;
+        return problem;
     }
 
     @Override
@@ -97,11 +100,7 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
                 .page(new Page<>(currentPage, limit));
     }
 
-    @Override
-    public Problem getProblem(Long pid) {
-        return lambdaQuery().eq(Problem::getId, pid).oneOpt().orElseThrow(() -> new StatusFailException("查询失败！"));
-    }
-
+    @CacheEvict(cacheNames = CacheConstant.GET_PROBLEM_INFO, key = "#pid")
     @Transactional
     @Override
     public boolean deleteProblem(Long pid) {
@@ -143,6 +142,7 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
         return true;
     }
 
+    @CacheEvict(cacheNames = CacheConstant.GET_PROBLEM_INFO, key = "#pid")
     @Transactional
     @Override
     public void updateProblem(ProblemDTO problemDto) {
@@ -177,6 +177,7 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
         //TODO judge update.
     }
 
+    @CacheEvict(cacheNames = CacheConstant.GET_PROBLEM_INFO, key = "#pid")
     @Override
     public void changeProblemAuth(Problem problem) {
         ValidateUtils.validateProblemAuth(problem);
@@ -235,7 +236,7 @@ public class ProblemServiceImpl extends ServiceImpl<ProblemMapper, Problem> impl
     public String getProblemOJ(Long pid) {
         String oj = OJConstant.DEFAULT_OJ;
         if (pid != null) {
-            Problem problem = getById(pid);
+            Problem problem = getProblem(pid);
             if (problem.getIsRemote()) {
                 oj = problem.getProblemId().split("-")[0];
             }
