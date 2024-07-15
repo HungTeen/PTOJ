@@ -21,21 +21,17 @@ public interface UserInfoService extends IService<UserInfo> {
 
     UserInfo getUserInfoByName(String username);
 
-    void editUser(AdminEditUserDTO adminEditUserDto);
+    void onUserInfoChanged(String uid);
+
+    boolean editUser(AdminEditUserDTO adminEditUserDto);
 
     GenerateKeyVO generateUser(GenerateUserDTO generateUserDTO);
 
     void generateUserExcel(String key, HttpServletResponse response) throws IOException;
 
-    void deleteUser(DeleteUserDTO deleteUserDTO);
+    boolean deleteUser(DeleteUserDTO deleteUserDTO);
 
     CheckUsernameOrEmailVO checkUsernameOrEmail(CheckUsernameOrEmailDTO checkUsernameOrEmailDto);
-
-    UserInfoVO changeUserInfo(EditUserInfoDTO editUserInfoDTO);
-
-    UserHomeVO getUserHomeInfo(String uid, String username);
-
-    UserCalendarHeatmapVO getUserCalendarHeatmap(String uid, String username);
 
     int getTotalUserCount();
 

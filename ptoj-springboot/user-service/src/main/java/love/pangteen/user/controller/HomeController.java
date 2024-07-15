@@ -34,7 +34,7 @@ public class HomeController {
 
     @GetMapping("/get-recent-seven-ac-rank")
     public CommonResult<List<ACMRankVO>> getRecentSevenACRank() {
-        return CommonResult.success(homeService.getRecentSevenACRank(Boolean.TRUE));
+        return CommonResult.success(homeService.getRecentSevenACRank());
     }
 
     @GetMapping("/get-last-week-submission-statistics")

@@ -42,8 +42,6 @@ rocketmq:
   producer:
     group: ${ptoj.rocketmq.group} #自定义的组名称
 logging:
-  level:
-    love.pangteen: debug
   pattern:
     dateformat: HH:mm:ss:SSS
   file:

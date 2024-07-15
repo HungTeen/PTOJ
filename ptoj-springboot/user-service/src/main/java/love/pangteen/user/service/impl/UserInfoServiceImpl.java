@@ -2,45 +2,45 @@ package love.pangteen.user.service.impl;
 
 import cn.dev33.satoken.secure.SaSecureUtil;
 import cn.dev33.satoken.stp.StpUtil;
-import cn.hutool.core.date.DateUtil;
 import cn.hutool.core.lang.Validator;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import lombok.extern.slf4j.Slf4j;
 import love.pangteen.api.enums.OJRole;
-import love.pangteen.api.pojo.entity.Judge;
-import love.pangteen.api.pojo.entity.Problem;
-import love.pangteen.api.service.IDubboJudgeService;
-import love.pangteen.api.service.IDubboProblemService;
+import love.pangteen.api.pojo.entity.UserInfo;
+import love.pangteen.constant.CacheConstant;
 import love.pangteen.exception.StatusFailException;
-import love.pangteen.pojo.AccountProfile;
 import love.pangteen.user.manager.UserGenerateExcelManager;
 import love.pangteen.user.manager.UserInfoManager;
 import love.pangteen.user.mapper.UserInfoMapper;
-import love.pangteen.user.pojo.dto.*;
-import love.pangteen.user.pojo.entity.Role;
-import love.pangteen.api.pojo.entity.UserInfo;
-import love.pangteen.user.pojo.vo.*;
+import love.pangteen.user.pojo.dto.AdminEditUserDTO;
+import love.pangteen.user.pojo.dto.CheckUsernameOrEmailDTO;
+import love.pangteen.user.pojo.dto.DeleteUserDTO;
+import love.pangteen.user.pojo.dto.GenerateUserDTO;
+import love.pangteen.user.pojo.vo.CheckUsernameOrEmailVO;
+import love.pangteen.user.pojo.vo.GenerateKeyVO;
 import love.pangteen.user.service.UserInfoService;
-import love.pangteen.user.service.UserRoleService;
-import love.pangteen.utils.AccountUtils;
-import org.apache.dubbo.config.annotation.DubboReference;
-import org.springframework.beans.BeanUtils;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @program: PTOJ
  * @author: PangTeen
  * @create: 2024/1/18 22:30
  **/
+@Slf4j
 @Service
 public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> implements UserInfoService {
 
@@ -48,19 +48,12 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
     private UserGenerateExcelManager userGenerateExcelManager;
 
     @Resource
-    private UserRoleService userRoleService;
-
-    @DubboReference
-    private IDubboJudgeService judgeService;
-
-    @DubboReference
-    private IDubboProblemService problemService;
-
-    @Resource
     private UserInfoManager userInfoManager;
 
+    @Cacheable(cacheNames = CacheConstant.GET_USER_INFO, key = "#uid", sync = true)
     @Override
     public UserInfo getUserInfo(String uid) {
+//        log.info("查询Redis");
         return getUserInfo(uid, true);
     }
 
@@ -68,7 +61,11 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
     public UserInfo getUserInfo(String uid, boolean cached) {
         UserInfo userInfo = cached ? userInfoManager.getUserInfoFromCache(uid) : null;
         if(userInfo == null){
+//            log.info("查询数据库");
             userInfo = getById(uid);
+            if(userInfo == null){
+                throw new StatusFailException("用户不存在！");
+            }
             if(cached) userInfoManager.update(uid, userInfo);
         }
         return userInfo;
@@ -79,9 +76,15 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         return lambdaQuery().eq(UserInfo::getUsername, username).one();
     }
 
+    @CacheEvict(cacheNames = CacheConstant.GET_USER_INFO, key = "#uid")
+    @Override
+    public void onUserInfoChanged(String uid) {
+        userInfoManager.onModified(uid);
+    }
+
     @Transactional
     @Override
-    public void editUser(AdminEditUserDTO userDTO) {
+    public boolean editUser(AdminEditUserDTO userDTO) {
         // 更新UserInfo表。
         userDTO.setPassword(SaSecureUtil.md5(userDTO.getPassword()));
         boolean updateUserInfo = lambdaUpdate().eq(UserInfo::getUuid, userDTO.getUid())
@@ -100,9 +103,7 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
             StpUtil.logout(userDTO.getUid());
         }
 
-        if(updateUserInfo){
-            userInfoManager.onModified(userDTO.getUid());
-        }
+        return updateUserInfo;
     }
 
     @Transactional
@@ -138,14 +139,14 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         userGenerateExcelManager.generateUserExcel(key, response);
     }
 
+    @Transactional
     @Override
-    public void deleteUser(DeleteUserDTO deleteUserDTO) {
+    public boolean deleteUser(DeleteUserDTO deleteUserDTO) {
         boolean isOk = removeByIds(deleteUserDTO.getIds());
         if (!isOk) {
             throw new StatusFailException("删除失败！");
-        } else {
-            userInfoManager.onModified(deleteUserDTO.getIds());
         }
+        return true;
     }
 
     @Transactional
@@ -161,95 +162,9 @@ public class UserInfoServiceImpl extends ServiceImpl<UserInfoMapper, UserInfo> i
         return vo;
     }
 
-    @Transactional
-    @Override
-    public UserInfoVO changeUserInfo(EditUserInfoDTO editDTO) {
-        UserInfo userInfo = new UserInfo();
-        BeanUtils.copyProperties(editDTO, userInfo);
-        AccountProfile profile = AccountUtils.getProfile();
-        userInfo.setUuid(profile.getUuid());
-        if(updateById(userInfo)){
-            UserRolesVO userRolesVO = userRoleService.getUserRoles(profile.getUuid(), null);
-            UserInfoVO userInfoVO = new UserInfoVO();
-            BeanUtils.copyProperties(userRolesVO, userInfoVO);
-            userInfoVO.setRoleList(userRolesVO.getRoles().stream().map(Role::getRole).collect(Collectors.toList()));
-            userInfoManager.onModified(profile.getUuid());
-            return userInfoVO;
-        } else {
-            throw new StatusFailException("个人信息修改失败！");
-        }
-    }
-
-    @Override
-    public UserHomeVO getUserHomeInfo(String uid, String username) {
-        UserInfo userInfo = getUserInfo(uid, username);
-
-        UserHomeVO userHomeVO = new UserHomeVO();
-        BeanUtils.copyProperties(userInfo, userHomeVO);
-//        List<UserAcProblem> acProblemList = userAcProblemService.getAcProblemList(userInfo.getUuid());
-//        List<Long> acPidList = acProblemList.stream().map(UserAcProblem::getPid).distinct().collect(Collectors.toList());
-        List<Long> acPidList = judgeService.getUserAcceptList(uid);
-        List<Problem> problems = problemService.getProblems(acPidList);
-        Map<Integer, List<UserHomeProblemVO>> acMap = problems.stream().map(problem -> {
-            UserHomeProblemVO problemVO = new UserHomeProblemVO();
-            BeanUtils.copyProperties(problem, problemVO);
-            return problemVO;
-        }).collect(Collectors.groupingBy(UserHomeProblemVO::getDifficulty));
-        userHomeVO.setSolvedList(problems.stream().map(Problem::getProblemId).collect(Collectors.toList()));
-        userHomeVO.setSolvedGroupByDifficulty(acMap);
-
-        userHomeVO.setTotal(judgeService.getUserTotalSubmitCount(userInfo.getUuid()));
-        return userHomeVO;
-    }
-
-    @Override
-    public UserCalendarHeatmapVO getUserCalendarHeatmap(String uid, String username) {
-        UserInfo userInfo = getUserInfo(uid, username);
-
-        UserCalendarHeatmapVO userCalendarHeatmapVo = new UserCalendarHeatmapVO();
-        userCalendarHeatmapVo.setEndDate(DateUtil.format(new Date(), "yyyy-MM-dd"));
-
-        List<Judge> lastYearUserJudgeList = judgeService.getLastYearUserJudgeList(userInfo.getUuid());
-        HashMap<String, Integer> tmpRecordMap = new HashMap<>();
-        for (Judge judge : lastYearUserJudgeList) {
-            Date submitTime = judge.getSubmitTime();
-            String dateStr = DateUtil.format(submitTime, "yyyy-MM-dd");
-            tmpRecordMap.merge(dateStr, 1, Integer::sum);
-        }
-        List<HashMap<String, Object>> dataList = new ArrayList<>();
-        for (Map.Entry<String, Integer> record : tmpRecordMap.entrySet()) {
-            HashMap<String, Object> tmp = new HashMap<>(2);
-            tmp.put("date", record.getKey());
-            tmp.put("count", record.getValue());
-            dataList.add(tmp);
-        }
-        userCalendarHeatmapVo.setDataList(dataList);
-        return userCalendarHeatmapVo;
-    }
-
     @Override
     public int getTotalUserCount() {
         return Math.toIntExact(lambdaQuery().count());
-    }
-
-    private UserInfo getUserInfo(String uid, String username) {
-        // 如果没有uid和username，默认查询当前登录用户的。
-        if (StrUtil.isEmpty(uid) && StrUtil.isEmpty(username)) {
-            if (StpUtil.isLogin()) {
-                uid = StpUtil.getLoginIdAsString();
-            } else {
-                throw new StatusFailException("请求参数错误：uid和username不能都为空！");
-            }
-        }
-
-        UserInfo userInfo = lambdaQuery()
-                .eq(StrUtil.isNotEmpty(uid), UserInfo::getUuid, uid)
-                .eq(StrUtil.isNotEmpty(username), UserInfo::getUsername, username)
-                .one();
-        if (userInfo == null) {
-            throw new StatusFailException("用户不存在！");
-        }
-        return userInfo;
     }
 
 }

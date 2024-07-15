@@ -20,7 +20,7 @@ public class ProblemInfoManager {
     @Resource
     private RedisUtils redisUtils;
 
-    public RecentUpdatedProblemVO getProblemInfoFromCache(Long uid){
+    public RecentUpdatedProblemVO getProblemInfoFromCache(Object uid){
         updateExpire();
         return (RecentUpdatedProblemVO) redisUtils.hmGet(KEY, uid);
     }

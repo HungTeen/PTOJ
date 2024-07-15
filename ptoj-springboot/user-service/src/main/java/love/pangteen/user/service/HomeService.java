@@ -13,6 +13,9 @@ import java.util.List;
  * @create: 2024/3/26 22:46
  **/
 public interface HomeService {
+
+    List<ACMRankVO> getRecentSevenACRank();
+
     List<ACMRankVO> getRecentSevenACRank(Boolean cached);
 
     SubmissionStatisticsVO getLastWeekSubmissionStatistics(Boolean forceRefresh);

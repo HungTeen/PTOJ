@@ -59,6 +59,10 @@ public class UserAcceptManager {
         redisUtils.zAdd(KEY, uid, - count);
     }
 
+    public List<Pair<String, Long>> getTopUsers(){
+        return getTopUsers(true);
+    }
+
     public List<Pair<String, Long>> getTopUsers(Boolean cached){
         if(cached){
             assertInit();

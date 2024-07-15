@@ -42,13 +42,17 @@ public class AdminUserController {
 
     @PutMapping("/edit-user")
     public CommonResult<Void> editUser(@RequestBody @Validated AdminEditUserDTO adminEditUserDto) {
-        userInfoService.editUser(adminEditUserDto);
+        if(userInfoService.editUser(adminEditUserDto)){
+            userInfoService.onUserInfoChanged(adminEditUserDto.getUid());
+        }
         return CommonResult.success();
     }
 
     @DeleteMapping("/delete-user")
     public CommonResult<Void> deleteUser(@RequestBody @Validated DeleteUserDTO deleteUserDTO) {
-        userInfoService.deleteUser(deleteUserDTO);
+        if(userInfoService.deleteUser(deleteUserDTO)){
+            deleteUserDTO.getIds().forEach(userInfoService::onUserInfoChanged);
+        }
         return CommonResult.success();
     }
 

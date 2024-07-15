@@ -93,5 +93,15 @@
 <!--            <artifactId>sentinel-apache-dubbo-adapter</artifactId>-->
 <!--            <version>${sentinel.version}</version>-->
 <!--        </dependency>-->
+        <!--本地缓存-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+        <!--Caffeine-->
+        <dependency>
+            <groupId>com.github.ben-manes.caffeine</groupId>
+            <artifactId>caffeine</artifactId>
+        </dependency>
     </dependencies>
 </project>

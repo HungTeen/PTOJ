@@ -35,18 +35,28 @@ public class HomeServiceImpl implements HomeService {
     @Resource
     private UserInfoService userInfoService;
 
+    @Override
+    public List<ACMRankVO> getRecentSevenACRank() {
+        List<Pair<String, Long>> topUsers = userAcceptManager.getTopUsers();
+        return topUsers.stream().map(tuple -> {
+            ACMRankVO acmRankVO = new ACMRankVO();
+            BeanUtils.copyProperties(userInfoService.getUserInfo(tuple.getKey()), acmRankVO);
+            acmRankVO.setUid(tuple.getKey());
+            acmRankVO.setAc(tuple.getValue().intValue());
+            return acmRankVO;
+        }).collect(Collectors.toList());
+    }
 
     @Override
     public List<ACMRankVO> getRecentSevenACRank(Boolean cached) {
         List<Pair<String, Long>> topUsers = userAcceptManager.getTopUsers(cached);
-        List<ACMRankVO> acmRankVOS = topUsers.stream().map(tuple -> {
+        return topUsers.stream().map(tuple -> {
             ACMRankVO acmRankVO = new ACMRankVO();
             BeanUtils.copyProperties(userInfoService.getUserInfo(tuple.getKey(), cached), acmRankVO);
             acmRankVO.setUid(tuple.getKey());
             acmRankVO.setAc(tuple.getValue().intValue());
             return acmRankVO;
         }).collect(Collectors.toList());
-        return acmRankVOS;
     }
 
     @Override

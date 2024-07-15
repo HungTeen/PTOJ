@@ -76,7 +76,7 @@ public class RecentProblemManager {
     public List<RecentUpdatedProblemVO> getRecentUpdatedProblemList() {
         assertInit();
         return redisUtils.lRange(KEY, 0, PROBLEM_COUNT).stream()
-                .map(pid -> problemService.getRecentProblemInfo((Long) pid))
+                .map(pid -> problemService.getRecentProblemInfo(Long.valueOf((Integer) pid)))
                 .collect(Collectors.toList());
     }
 

@@ -42,6 +42,7 @@
         <jjwt.version>0.9.1</jjwt.version>
         <sa-token.version>1.37.0</sa-token.version>
         <oshi.version>6.4.11</oshi.version>
+        <caffeine.version>3.1.8</caffeine.version>
         <docker-plugin.version>1.2.2</docker-plugin.version>
     </properties>
 
@@ -127,6 +128,11 @@
                 <groupId>com.github.oshi</groupId>
                 <artifactId>oshi-core</artifactId>
                 <version>${oshi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.ben-manes.caffeine</groupId>
+                <artifactId>caffeine</artifactId>
+                <version>${caffeine.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

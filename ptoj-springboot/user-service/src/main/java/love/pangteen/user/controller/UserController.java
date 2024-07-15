@@ -7,6 +7,7 @@ import love.pangteen.user.pojo.dto.CheckUsernameOrEmailDTO;
 import love.pangteen.user.pojo.dto.EditUserInfoDTO;
 import love.pangteen.user.pojo.vo.*;
 import love.pangteen.user.service.AccountService;
+import love.pangteen.user.service.UserHomeService;
 import love.pangteen.user.service.UserInfoService;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +27,9 @@ public class UserController {
     private UserInfoService userInfoService;
 
     @Resource
+    private UserHomeService userHomeService;
+
+    @Resource
     private AccountService accountService;
 
     @RequestMapping(value = "/check-username-or-email", method = RequestMethod.POST)
@@ -37,13 +41,13 @@ public class UserController {
     @GetMapping("/get-user-home-info")
     public CommonResult<UserHomeVO> getUserHomeInfo(@RequestParam(value = "uid", required = false) String uid,
                                                     @RequestParam(value = "username", required = false) String username) {
-        return CommonResult.success(userInfoService.getUserHomeInfo(uid, username));
+        return CommonResult.success(userHomeService.getUserHomeInfo(uid, username));
     }
 
     @GetMapping("/get-user-calendar-heatmap")
     public CommonResult<UserCalendarHeatmapVO> getUserCalendarHeatmap(@RequestParam(value = "uid", required = false) String uid,
                                                                       @RequestParam(value = "username", required = false) String username) {
-        return CommonResult.success(userInfoService.getUserCalendarHeatmap(uid, username));
+        return CommonResult.success(userHomeService.getUserCalendarHeatmap(uid, username));
     }
 
     @PostMapping("/change-password")
@@ -67,7 +71,9 @@ public class UserController {
      */
     @PostMapping("/change-userinfo")
     public CommonResult<UserInfoVO> changeUserInfo(@Validated @RequestBody EditUserInfoDTO editUserInfoDTO) {
-        return CommonResult.success(userInfoService.changeUserInfo(editUserInfoDTO));
+        UserInfoVO info = userHomeService.changeUserInfo(editUserInfoDTO);
+        userInfoService.onUserInfoChanged(info.getUid());
+        return CommonResult.success(info);
     }
 
 }

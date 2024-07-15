@@ -1,10 +1,10 @@
 package love.pangteen.problem.pojo.vo;
 
 import io.swagger.annotations.ApiModelProperty;
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.util.Date;
 
 /**
@@ -14,7 +14,7 @@ import java.util.Date;
  **/
 @Data
 @NoArgsConstructor
-public class RecentUpdatedProblemVO {
+public class RecentUpdatedProblemVO implements Serializable {
 
     @ApiModelProperty(value = "主键id")
     private Long id;

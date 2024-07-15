@@ -27,4 +27,4 @@ ptoj:
     package: love.pangteen.user.controller
 logging:
   level:
-    root: error
+    root: info
